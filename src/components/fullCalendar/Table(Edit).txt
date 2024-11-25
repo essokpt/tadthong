@@ -1,0 +1,91 @@
+import React from "react";
+
+export default function Table() {
+  const data = [
+    {
+      name: "WIP1 / Work In process 1",
+      items: [
+        { label: "ยอดยกมา", values: [100, 110, 90, 10, "10", "", "", ""] },
+        { label: "ผลิตเพิ่ม", values: [80, 70, "", "", "", "", "", ""] },
+        { label: "กำจัดออก", values: [80, "", 80, "", "", "", "", ""] },
+        { label: "ยอดคงไว้", values: [110, "", 90, "", "", "", "", ""] },
+      ],
+    },
+    {
+      name: "WIP2 / Work In process 2",
+      items: [
+        { label: "ยอดยกมา", values: ["", "", "", "", "", "", "", ""] },
+        { label: "ผลิตเพิ่ม", values: ["", "", "", "", "", "", "", ""] },
+        { label: "กำจัดออก", values: ["", "", "", "", "", "", "", ""] },
+        { label: "ยอดคงไว้", values: ["", "", "", "", "", "", "", ""] },
+      ],
+    },
+  ];
+
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+      <div className="overflow-x-auto">
+        <table className="table-auto border-collapse border border-gray-500">
+          <thead>
+            <tr>
+              <th className="border border-gray-400 px-4 py-2" rowSpan={2}>
+                สินค้า WIP ที่มาจาก Item master <br /> type = WIP
+              </th>
+              <th className="border border-gray-400 px-4 py-2" rowSpan={2}>
+                รายการ
+              </th>
+              <th className="border border-gray-400 px-4 py-2" colSpan={8}>
+                June 2024
+              </th>
+            </tr>
+            <tr>
+              {[...Array(8)].map((_, i) => (
+                <th key={i} className="border border-gray-400 px-4 py-2">
+                  {i + 1}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((wip, index) => (
+              <React.Fragment key={index}>
+                {wip.items.map((item, itemIndex) => (
+                  <tr key={itemIndex}>
+                    {/* แสดงชื่อของ WIP1 หรือ WIP2 เฉพาะในแถวแรก */}
+                    {itemIndex === 0 && (
+                      <td
+                        className="border border-gray-400 px-4 py-2"
+                        rowSpan={wip.items.length}
+                      >
+                        {wip.name}
+                      </td>
+                    )}
+                    <td className="border border-gray-400 px-4 py-2">
+                      {item.label}
+                    </td>
+                    {item.values.map((value, valueIndex) => (
+                      <td
+                        key={valueIndex}
+                        className={`border border-gray-400 px-4 py-2 ${
+                          value === 80
+                            ? "text-red-500"
+                            : value === 70 || value === 110
+                            ? "text-green-500"
+                            : value === 90
+                            ? "text-blue-500"
+                            : ""
+                        }`}
+                      >
+                        {value}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </React.Fragment>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </main>
+  );
+}
