@@ -215,6 +215,20 @@ export const sidelinks: SideLink[] = [
         icon: <IconHomeDollar size={22} />,
         role: 'avl',
       },
+      {
+        title: 'Weight Scale Price Master',
+        label: '',
+        href: '/master/weightScalePrice',
+        icon: <IconHomeDollar size={22} />,
+        role: 'weightScalePrice',
+      },
+      {
+        title: 'Approve Weight Scale Price Master',
+        label: '',
+        href: '/master/approveWeightScalePrice',
+        icon: <IconHomeDollar size={22} />,
+        role: 'approveWeightScalePrice',
+      },
     ],
   },
   {
@@ -342,7 +356,7 @@ export const sidelinks: SideLink[] = [
         label: '',
         href: '/invoice',
         icon: <IconReceipt2 size={22} />,
-        role: 'saleOrder',
+        role: 'invoice',
       },
       
     ],

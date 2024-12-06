@@ -23,7 +23,33 @@ export const customerSchema = z.object({
     venderId: z.string(),
     vender: z.object({
         code: z.string(),
-        companyName : z.string()
+        companyName: z.string(),
+        address: z.string(),
+        subDistrict: z.string(),
+        district: z.string(),
+        province: z.string(),
+        zipcode: z.string(),
+        country : z.string(),
+        paymentType : z.string(),
+        phone: z.string(),
+        phoneExt: z.string(),
+        fax: z.string(),
+        faxExt: z.string(),
+        tax: z.string(), 
+        email: z.string(), 
+        contactName : z.string(),       
+        venderBillings : z.object({
+            id: z.number(),
+            code: z.string(),
+            name: z.string(),
+            address: z.string(),
+            district: z.string(),
+            subDistrict: z.string(),
+            province: z.string(),
+            zipcode: z.string(),
+            country: z.string(),
+            phone: z.string(),
+        })
     }),
     user: z.object({        
         firstName : z.string()

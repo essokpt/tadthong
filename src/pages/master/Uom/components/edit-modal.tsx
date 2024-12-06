@@ -22,14 +22,16 @@ import { ApiType } from 'types/api'
 
 interface EditModalProps {
   isOpen: boolean
-  onClose: () => void 
+  onClose: () => void
   data: UomType
+  editble: boolean
 }
 
 export const EditModal: React.FC<EditModalProps> = ({
   isOpen,
-  onClose, 
+  onClose,
   data,
+  editble,
 }) => {
   const [isMounted, setIsMounted] = useState(false)
   const { handleSubmit, register } = useForm()
@@ -39,13 +41,12 @@ export const EditModal: React.FC<EditModalProps> = ({
   async function updateData(data: any) {
     setOnloading(true)
     const res: any = await updateUom(data)
-    
+
     if (res.status == 200) {
-      console.log(res.data);
-      
+      console.log(res.data)
     }
     setTimeout(() => {
-      setOnloading(false)      
+      setOnloading(false)
       onClose()
       setRefresh(true)
     }, 1000)
@@ -71,6 +72,7 @@ export const EditModal: React.FC<EditModalProps> = ({
             <form onSubmit={handleSubmit(updateData)}>
               <div className='grid grid-cols-1 gap-2 '>
                 <Input
+                  readOnly={editble}
                   className='hidden'
                   {...register('id')}
                   defaultValue={data.id}
@@ -84,6 +86,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                     Code
                   </Label>
                   <Input
+                    readOnly={editble}
                     className='text-[0.8rem]'
                     {...register('code')}
                     defaultValue={data.code}
@@ -94,52 +97,58 @@ export const EditModal: React.FC<EditModalProps> = ({
                     className='py-1 text-[0.8rem] text-muted-foreground'
                     htmlFor='description'
                   >
-                   Description
+                    Description
                   </Label>
                   <Input
+                    readOnly={editble}
                     className='text-[0.8rem]'
                     {...register('description')}
                     defaultValue={data.description}
                   />
                 </div>
                 <div className='grid'>
-                          <Label
-                            className='py-1 text-[0.8rem] text-muted-foreground'
-                            htmlFor='status'
-                          >
-                            Status
-                          </Label>
-                          <select
-                            {...register('status')}
-                            defaultValue={data.status}
-                            // id={item.id}
-                            // onChange={handleChangeBranch}
-                            className='flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1'
-                          >
-                            {/* <option
+                  <Label
+                    className='py-1 text-[0.8rem] text-muted-foreground'
+                    htmlFor='status'
+                  >
+                    Status
+                  </Label>
+                  <select
+                    {...register('status')}
+                    defaultValue={data.status}
+                    // id={item.id}
+                    // onChange={handleChangeBranch}
+                    className='flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1'
+                  >
+                    {/* <option
                               className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
                               value={data.status}
                             >
                               {data.status}
                             </option> */}
 
-                            <option
-                              className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
-                              value='Active'
-                            >
-                              Active
-                            </option>
-                            <option
-                              className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
-                              value='Inactive'
-                            >
-                              Inactive
-                            </option>
-                          </select>
-                        </div>
-                
+                    <option
+                      className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
+                      value='Active'
+                    >
+                      Active
+                    </option>
+                    <option
+                      className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
+                      value='Inactive'
+                    >
+                      Inactive
+                    </option>
+                  </select>
+                </div>
+
                 <DialogFooter>
-                  <Button loading={onloading} type='submit' variant='button'>
+                  <Button
+                    disabled={editble}
+                    loading={onloading}
+                    type='submit'
+                    variant='button'
+                  >
                     Save changes
                   </Button>
                 </DialogFooter>

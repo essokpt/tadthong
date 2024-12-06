@@ -3,6 +3,7 @@ export interface CompanyType{
     code: string
     companyName: string
     address: string
+    subDistrict: string
     district: string
     province: string
     zipcode: string

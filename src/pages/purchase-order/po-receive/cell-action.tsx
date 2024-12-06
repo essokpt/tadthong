@@ -6,6 +6,7 @@ import { ReceiveModal } from './receive-modal'
 import { IconEdit } from '@tabler/icons-react'
 import { ApiContext } from '@/components/layouts/api-context'
 import { ApiType } from 'types/api'
+import usePermission from '@/hooks/use-permission'
 
 interface DataTableRowActionsProps {
   row: PurchaseOrder
@@ -30,6 +31,32 @@ const initialValue = {
   vender: {
     code: '',
     companyName: '',
+    address: '',
+    subDistrict: '',
+    district: '',
+    province: '',
+    zipcode: '',
+    country: '',
+    paymentType: '',
+    phone: '',
+    phoneExt: '',
+    fax: '',
+    faxExt: '',
+    tax: '',
+    email: '',
+    contactName: '',
+    venderBillings: {
+      id: 0,
+      code: '',
+      name: '',
+      address: '',
+      district: '',
+      subDistrict: '',
+      province: '',
+      zipcode: '',
+      country: '',
+      phone: '',
+    },
   },
   user: {
     firstName: '',
@@ -46,6 +73,7 @@ const initialValue = {
   amount: 0,
   discount :0,  
   vat :0,
+  approveBy: '',
   purchaseOrderFileAttach: [{
     id: 0,
     fileName: '',
@@ -55,15 +83,11 @@ const initialValue = {
 
 
 export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
-  //const [loading, setLoading] = useState(false)
-  //const [open, setOpen] = useState(false)
-  //const [deleteId, setDeleteId] = useState(null)
-  //const [deleteTitle, setdeleteTitle] = useState(null)
-
   const [isEdit, setIsEdit] = useState(false)
   const [editValue, setEditValue] = useState<PurchaseOrder>(initialValue)
   const { setRefresh } = useContext(ApiContext) as ApiType
-
+  const rule: any = usePermission('poReceive')
+  
   function updateAction(row: any) {
     setIsEdit(true)
     setEditValue(row)
@@ -92,6 +116,7 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
         title={deleteTitle}
       /> */}
       <Button 
+      disabled={!rule[0]?.canView}
       size='icon' 
       variant='outline' 
       className='rounded-full bg-primary text-white'

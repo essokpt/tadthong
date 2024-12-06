@@ -4,7 +4,7 @@ import { Button } from '@/components/custom/button'
 import { useForm } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
 import { Label } from '@radix-ui/react-label'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+//import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { format } from 'date-fns'
 import { CalendarIcon } from 'lucide-react'
 import {
@@ -46,7 +46,6 @@ import {
   IconFile,
   IconInfoCircle,
   IconTrash,
-  IconUpload,
 } from '@tabler/icons-react'
 import { getLocation } from '@/services/locationApi'
 import { LocationType } from '@/pages/location/components/type'
@@ -104,7 +103,7 @@ export const EditModal: React.FC<EditModalProps> = ({
   const [onloading, setOnloading] = useState(false)
   const [venders, setVender] = useState<VenderType[]>([])
   const [locations, setLocation] = useState<LocationType[]>([])
-  const [files, setFiles] = useState('')
+  //const [files, setFiles] = useState('')
   const [open, setOpen] = useState(false)
   const [openDeleteItem, setOpenDeleteItem] = useState(false)
 
@@ -139,11 +138,11 @@ export const EditModal: React.FC<EditModalProps> = ({
           data.purchaseOrderFileAttach?.push(response[index])
         }
         console.log('uploadFiles -success', response.status)
-        setFiles('')
+       
       }
       setTimeout(() => {
         setOnloading(false)
-        setFiles('')
+       
       }, 3000)
     }
   }

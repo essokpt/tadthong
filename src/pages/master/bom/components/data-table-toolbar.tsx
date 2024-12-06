@@ -2,27 +2,30 @@ import { Cross2Icon, PlusCircledIcon } from '@radix-ui/react-icons'
 import { Table } from '@tanstack/react-table'
 import { Button } from '@/components/custom/button'
 import { Input } from '@/components/ui/input'
-import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
-import { SearchIcon } from 'lucide-react';
-import { DataTableViewOptions } from './data-table-view-options';
+import { useNavigate } from 'react-router-dom'
+import { useState } from 'react'
+import { SearchIcon } from 'lucide-react'
+import { DataTableViewOptions } from './data-table-view-options'
+import usePermission from '@/hooks/use-permission'
 //import { DataTableViewOptions } from './data-table-view-options'
 
 // import { priorities, statuses } from '../mockdata/data'
 // import { DataTableFacetedFilter } from './data-table-faceted-filter'
 
-
 interface DataTableToolbarProps<TData> {
   table: Table<TData>
   searchData: (str: any) => void
-  link: string  
+  link: string
 }
 
 export function DataTableToolbar<TData>({
-  table,searchData, link
+  table,
+  searchData,
+  link,
 }: DataTableToolbarProps<TData>) {
   const [query, setQuery] = useState('')
   const navigate = useNavigate()
+  const rule: any = usePermission('bom')
 
   const reset = () => {
     searchData('')
@@ -40,7 +43,7 @@ export function DataTableToolbar<TData>({
         />
         <Button
           variant='outline'
-          size='sm'        
+          size='sm'
           className='h-8 px-2 lg:px-3'
           onClick={() => searchData(query)}
         >
@@ -57,15 +60,16 @@ export function DataTableToolbar<TData>({
         )}
       </div>
       {link && (
-      <Button
-        variant='outline'
-        size='sm'
-        className='h-8 border bg-button text-white'
-        onClick={() => navigate(link)}
-      >
-        <PlusCircledIcon className='mr-2 h-4 w-4' />
-        New
-      </Button>
+        <Button
+          disabled={!rule[0]?.canCreate}
+          variant='outline'
+          size='sm'
+          className='h-8 border bg-button text-white'
+          onClick={() => navigate(link)}
+        >
+          <PlusCircledIcon className='mr-2 h-4 w-4' />
+          New
+        </Button>
       )}
     </div>
   )

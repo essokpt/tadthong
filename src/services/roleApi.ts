@@ -54,11 +54,36 @@ export async function createRole(data:any) {
     }
   }
 
+  export async function createAccessPermissionsRole(roleId:number, data:any) {
+    console.log('createAccessPermissionsRole',data);
+     try {
+       const response = await api.post(`${endpoint}/CreateAccessPermission/${roleId}`, data);
+       console.log('createAccessPermissionsRole',response.status);
+      // const res = await response.data
+       return response
+     } catch (error) {
+       console.error(error);
+     }
+   }
+   
+
   export async function updateRole(data:any) {
     // console.error('login',data);
      try {
        const response = await api.put(endpoint, data);
        console.log('updateRoleWithPermissions',response.status);
+      // const res = await response.data
+       return response
+     } catch (error) {
+       console.error(error);
+     }
+   }
+
+   export async function updateAccessPermission(data:any) {
+    // console.error('login',data);
+     try {
+       const response = await api.put(`${endpoint}/UpdateAccessPermission`, data);
+       console.log('UpdateAccessPermission',response);
       // const res = await response.data
        return response
      } catch (error) {

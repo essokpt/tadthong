@@ -34,6 +34,7 @@ import { PurchaseRequestItem } from './schema'
 import { createPurchaseOrder } from '@/services/purchaseOrderApi'
 import { format } from 'date-fns'
 import { useNavigate } from 'react-router-dom'
+import usePermission from '@/hooks/use-permission'
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
@@ -69,6 +70,8 @@ export function DataTable<TData, TValue>({
 
   const [validate, setValidate] = React.useState<AlertData>(intial)
   const [dataConvertSelected, setDataConvertSelected] = React.useState<PurchaseRequestItem[]>([])
+
+  const rule: any = usePermission('purchaseRequest')
 
   let today = new Date()
   let branchid: any = localStorage.getItem('branchId')
@@ -214,6 +217,7 @@ export function DataTable<TData, TValue>({
         </div>
 
         <Button
+         disabled={!rule[0]?.canCreate}
           variant='outline'
           size='sm'
           className='h-8 border bg-primary text-white'

@@ -40,6 +40,7 @@ import {
   IconFile,
   IconInfoCircle,
 } from '@tabler/icons-react'
+import usePermission from '@/hooks/use-permission'
 
 interface EditModalProps {
   isOpen: boolean
@@ -61,11 +62,12 @@ export const EditModal: React.FC<EditModalProps> = ({
   const [venders, setVender] = useState<VenderType[]>([])
   const [locations, setLocation] = useState<LocationType[]>([])
   const [action, setAction] = useState('')
+  const rule: any = usePermission('purchaseOrder')
 
   const openFile = (file: any) => {
     window.open(
-      //`http://tadthongback.c-space.store/files/PurchaseOrder/${file}`,
-      `https://localhost:7244/files/PurchaseOrder/${file}`,
+      `http://tadthongback.c-space.store/files/PurchaseOrder/${file}`,
+      //`https://localhost:7244/files/PurchaseOrder/${file}`,
       '_blank',
       'noreferrer'
     )
@@ -499,7 +501,12 @@ export const EditModal: React.FC<EditModalProps> = ({
 
                   <br />
                   <DialogFooter>
-                    <Button loading={onloading} type='submit' variant='button'>
+                    <Button
+                      disabled={!rule[0]?.canView}
+                      loading={onloading}
+                      type='submit'
+                      variant='button'
+                    >
                       Save changes
                     </Button>
                   </DialogFooter>

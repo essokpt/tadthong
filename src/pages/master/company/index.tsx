@@ -66,6 +66,7 @@ import { MagnifyingGlassIcon } from '@radix-ui/react-icons'
 import useThaiAddress from '@/hooks/use-thaiAddress'
 import useDebounce from '@/hooks/use-debounce'
 import { PageHeader } from '@/components/layouts/header'
+import usePermission from '@/hooks/use-permission'
 
 const initalData = {
   id: '',
@@ -161,16 +162,17 @@ export default function Company() {
   const [addressThai, setAddressThai] = useState<ThaiAddress[]>()
   const [billAddressThai, setBillAddressThai] = useState<ThaiAddress[]>()
 
+  const rule: any = usePermission('company')
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     values: data,
   })
 
   function handleChangeRemark(e: ChangeEvent<HTMLInputElement>) {
-    console.log("handleChangeRemark", e.target.value);
+    console.log('handleChangeRemark', e.target.value)
     setUploadRemark(e.target.value)
   }
-
 
   async function handleUploadFile() {
     if (files && expireDate) {
@@ -819,6 +821,7 @@ export default function Company() {
                     <br />
 
                     <Button
+                      disabled={!rule[0]?.canUpdate}
                       className='mt-2 w-full'
                       loading={isLoading}
                       variant='button'
@@ -836,7 +839,7 @@ export default function Company() {
                       <Label htmlFor='terms' className='ml-3 text-lg'>
                         Attach Files.
                       </Label>
-                    </div>                  
+                    </div>
 
                     <div className='grid w-full  items-center'>
                       <Label className='py-1 text-[0.8rem]' htmlFor='picture'>
@@ -891,8 +894,8 @@ export default function Company() {
                         onChange={handleChangeRemark}
                       />
                     </div>
-                   
-                      <div className='grid col-start-3 align-items-end'> 
+
+                    <div className='align-items-end col-start-3 grid'>
                       <Button
                         className='w-[110px]'
                         variant='button'
@@ -902,7 +905,7 @@ export default function Company() {
                         <IconUpload className='mr-2' />
                         Upload
                       </Button>
-                      </div>
+                    </div>
                   </div>
                   <hr />
                   <div className='grid items-center'>

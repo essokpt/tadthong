@@ -1,5 +1,6 @@
 import { AlertModal } from "@/components/custom/alert-modal";
 import { Button } from "@/components/custom/button";
+import 'jspdf-autotable'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,7 +16,14 @@ import { ApproveModal } from "@/components/custom/approve-modal";
 import { approvePurchaseRequest, deletePurchaseRequest } from "@/services/purchaseRequestApi";
 import { ApiContext } from "@/components/layouts/api-context";
 import { ApiType } from "types/api";
-import { IconSettingsDown } from "@tabler/icons-react";
+import { IconPrinter, IconSettingsDown } from "@tabler/icons-react";
+//import { useNavigate } from "react-router-dom";
+import { jsPDF } from "jspdf";
+import  logo  from '@/assets/logo.jpg'
+import  '@/assets/fonts/Sarabun-Light-italic';
+import  '@/assets/fonts/Sarabun-Regular-normal';
+import usePermission from "@/hooks/use-permission";
+
 
 interface DataTableRowActionsProps{
     row: PurchaseRequest
@@ -74,6 +82,8 @@ const initialApprove = {
 export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [editble, setEditble] = useState(false);
+
   const [openApprove, setOpenApprove] = useState(false);
   const [deleteId, setDeleteId] = useState(null)
   const [approveId, setApproveId] = useState(initialApprove)
@@ -81,8 +91,127 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
   const [approveTitle, setApproveTitle] = useState(null)
 
   const [isEdit, setIsEdit] = useState(false);
+  const [printX, setPrintX] = useState(0);
+  const [printY, setPrintY] = useState(0);
   const [editValue, setEditValue] = useState<PurchaseRequest>(initialValue)
   const { setRefresh } = useContext(ApiContext) as ApiType
+
+  const rule: any = usePermission('purchaseRequest')
+
+
+  function printHeader(doc:any){
+    let bodyItems = [];  
+    for (let index = 0; index < editValue.purchaseRequestItems.length; index++) {
+      let item = [
+        index+1, 
+        editValue.purchaseRequestItems[index].quantity,
+        editValue.purchaseRequestItems[index].itemMaster.code,
+        editValue.purchaseRequestItems[index].specification,
+        editValue.purchaseRequestItems[index].price,
+        editValue.purchaseRequestItems[index].total,
+        editValue.purchaseRequestItems[index].includeVat,
+        editValue.purchaseRequestItems[index].amount
+      ]
+      bodyItems.push(item);
+      
+    }
+
+    for (let index = 0; index < 5; index++) {
+        bodyItems.push(['','','','','','','','']);
+    }
+ 
+    //summary
+    bodyItems.push(['','','','','Total', editValue.total,editValue.sumVat, editValue.amount]);
+
+
+    doc.addImage(logo, 'JPG', 15, 5, 30, 30)
+  
+    doc.setFontSize(15) 
+    doc.setFont('Sarabun-Regular', 'normal');
+    doc.text('ใบขอซื้อ', printX + 90, printY + 10);
+    doc.setFontSize(15)
+    doc.text('Purchase Request', printX + 78, printY + 20);
+   
+   // setPrintY(printY+20)
+    doc.setFontSize(10)
+    doc.text('ชื่อผู้ขาย',printX + 15, printY + 40)
+    doc.text(`: ${editValue.user.firstName}`,printX + 45, printY + 40)
+
+    doc.setFontSize(10)
+    doc.text('วันที่',printX + 145, printY + 40)
+    doc.text(`: ${editValue.createAt}`,printX + 165, printY + 40)
+
+    doc.setFontSize(10)
+    doc.text('เหตุผลในการขอซื้อ',printX + 15, printY + 50)
+    doc.text(`: ${editValue.cause}`,printX + 45, printY + 50)
+
+    doc.setFontSize(10)
+    doc.text('ผู้จัดหา/จัดซื้อ',printX + 145, printY + 50)
+    doc.text(`: ${editValue.user.firstName}`,printX + 165, printY + 50)
+
+    doc.setFontSize(10)
+    doc.text('ผู้รับผิดชอบ/จัดเก็บ',printX + 15, printY + 60)
+    doc.text(`: ${editValue.user.firstName}`,printX + 45, printY + 60)
+
+    doc.setFontSize(10)
+    doc.text('ผู้ใช้งาน',printX + 145, printY + 60)
+    doc.text(`: ${editValue.user.firstName}`,printX + 165, printY + 60)
+
+    doc.autoTable({
+      startY: printY + 70,
+      theme: 'grid',
+       headStyles: {                  
+         // lineColor: [0, 0, 0],
+          halign: 'center',
+          valign: 'middle',
+         // cellPadding: 1.5
+      },
+      columnStyles: {
+          0: { halign: 'center', valign: 'middle', cellWidth: 15 },
+          1: { halign: 'center', valign: 'middle', cellWidth: 20 },
+          2: { halign: 'center', valign: 'middle', cellWidth: 30 },
+          3: { halign: 'left', valign: 'middle', cellWidth: 50 },
+          4: { halign: 'right', valign: 'middle', cellWidth: 20 },
+          5: { halign: 'right', valign: 'middle', cellWidth: 20 },
+          6: { halign: 'right', valign: 'middle', cellWidth: 15 },
+          7: { halign: 'right', valign: 'middle', cellWidth: 20 },                            
+      },
+      head: [['Item', 'Quantity', 'Item Code', 'Description', 'Unit Price', 'Amount', 'Vat', 'Total']],
+      body: bodyItems,
+  })
+
+  let finalY = doc.lastAutoTable.finalY || 5
+  doc.text('Remark : ',printX + 15, finalY + 10)
+  doc.text(`${editValue.remark}`,printX + 32, finalY + 10)
+
+  //footer
+  doc.text('ผู้ขอซื้อ ',printX + 55, printY + 200)
+  doc.text('ผู้ขออนุมัติ',printX + 137, printY + 200)
+
+  doc.setDrawColor(0, 0, 0);
+  doc.line(printX + 35, printY + 215, printX + 90, printY + 215) 
+  doc.line(printX + 120, printY + 215, printX + 170, printY + 215) 
+
+  
+  doc.setFontSize(10)
+  doc.text('Date : ',printX + 45, printY + 225)
+  doc.text(`${editValue.createAt}`,printX + 55, printY + 225) 
+
+  doc.text('Date : ',printX + 120, printY + 225)
+  doc.line(printX + 130, printY + 225, printX + 170, printY + 225) 
+
+}
+
+  async function print(data:PurchaseRequest) {
+    console.log('Print value:', data);
+    
+    setEditValue(data)
+    const doc = new jsPDF();
+    setPrintX(0);
+    setPrintY(10);
+    printHeader(doc); 
+    doc.output('dataurlnewwindow');
+  }
 
 
   function updateAction(row:any) {   
@@ -156,6 +285,7 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
           isOpen={isEdit}
           onClose={closeEditModal}         
           data={editValue}
+          editble={editble}
       />
       <AlertModal
         isOpen={open}
@@ -173,22 +303,31 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-        
+          <DropdownMenuItem 
+            disabled={row.status == 'Wait Approve' ||  !rule[0]?.canUpdate}
+            //onClick={() => navigate(`/purchase-request/print/${row.id}`)}
+            onClick={() => print(row)}
+            >
+            <IconPrinter className="mr-2 h-4 w-4" />  Print
+          </DropdownMenuItem>
          
           <DropdownMenuItem 
-            disabled={row.status == 'Wait Approve' || row.status == 'Approved'} 
+            disabled={row.status == 'Wait Approve' || row.status == 'Approved' ||  !rule[0]?.canUpdate} 
             onClick={() => approveAction(row)}> 
             <Edit className="mr-2 h-4 w-4" />  Send Approve
           </DropdownMenuItem>
 
           <DropdownMenuItem
-            disabled={row.status == 'Wait Approve' || row.status == 'Approved'} 
-            onClick={() => updateAction(row)}
+            disabled={row.status == 'Wait Approve' || row.status == 'Approved' ||  !rule[0]?.canUpdate} 
+            onClick={() => { 
+              setEditble(true)
+              updateAction(row)
+            }}
           >
             <Edit className="mr-2 h-4 w-4" /> Update
           </DropdownMenuItem>
           <DropdownMenuItem 
-            disabled={row.status == 'Wait Approve' || row.status == 'Approved'} 
+            disabled={row.status == 'Wait Approve' || row.status == 'Approved' ||  !rule[0]?.canDelete} 
             onClick={() => deleteAction(row)}>
             <Trash className="mr-2 h-4 w-4" /> Delete
           </DropdownMenuItem>

@@ -11,6 +11,7 @@ import { deletePurchaseRequest } from "@/services/purchaseRequestApi";
 import { IconEyeCheck } from "@tabler/icons-react";
 import { ApiContext } from "@/components/layouts/api-context";
 import { ApiType } from "types/api";
+import usePermission from "@/hooks/use-permission";
 
 interface DataTableRowActionsProps{
     row: PurchaseRequest
@@ -76,6 +77,9 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
   const [editValue, setEditValue] = useState<PurchaseRequest>(initialValue)
 
   const { setRefresh } = useContext(ApiContext) as ApiType
+
+  const rule: any = usePermission('prApprove')
+
 
   function updateAction(row:any) {   
     setIsEdit(true) 
@@ -164,6 +168,7 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
         title={deleteTitle}
       />
        <Button
+         disabled={!rule[0]?.canView}
         size='icon'
         variant='outline'
         className='rounded-full bg-primary text-white'

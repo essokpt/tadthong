@@ -34,12 +34,14 @@ interface EditModalProps {
   isOpen: boolean
   onClose: () => void
   data: ImportMaterial
+  isEdit: boolean
 }
 
 export const EditModal: React.FC<EditModalProps> = ({
   isOpen,
   onClose,
   data,
+  isEdit,
 }) => {
   const [isMounted, setIsMounted] = useState(false)
   const { handleSubmit, register } = useForm()
@@ -77,14 +79,14 @@ export const EditModal: React.FC<EditModalProps> = ({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className='h-screen max-w-full'>
+        <DialogContent className='h-screen max-w-full overflow-scroll'>
           <DialogHeader>
             <DialogTitle>Import Weight Scale Data.</DialogTitle>
           </DialogHeader>
           <Separator className='bg-primary' />
 
-          <div className='grid gap-4 overflow-scroll '>
-            <form onSubmit={handleSubmit(updateData)} className='h-[45rem] mr-3 '>
+          <div className='grid h-auto gap-4'>
+            <form onSubmit={handleSubmit(updateData)} className='mr-3 '>
               {/* <div className='grid grid-cols-3 gap-2 '> */}
               <div className='mb-3 mt-2 grid grid-cols-3 items-start gap-2 space-x-3 space-y-0 rounded-md border p-3 shadow'>
                 <div className='col-span-3 flex items-center'>
@@ -163,6 +165,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                     Location
                   </Label>
                   <select
+                   disabled={!isEdit}
                     {...register('locationId')}
                     defaultValue={data.locationId}
                     className='flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1'
@@ -192,6 +195,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                     Approved/Reject By
                   </Label>
                   <Input
+                    readOnly={!isEdit}
                     className='text-[0.8rem]'
                     {...register('approvedBy')}
                     defaultValue={data.approvedBy}
@@ -206,13 +210,13 @@ export const EditModal: React.FC<EditModalProps> = ({
                     Comment
                   </Label>
                   <Input
+                    readOnly={!isEdit}
                     className='text-[0.8rem]'
                     {...register('remark')}
                     defaultValue={data.remark}
                   />
                 </div>
               </div>
-              
 
               {/* <div className='grid'> */}
               <div className='mb-3 mt-2 grid grid-cols-1 items-start gap-2 space-x-3 space-y-0 rounded-md border p-4 shadow'>
@@ -227,15 +231,25 @@ export const EditModal: React.FC<EditModalProps> = ({
                   <TableHeader>
                     <TableRow>
                       <TableHead>Import ID (Ident)</TableHead>
-                      <TableHead className='w-[6rem]'>เลขที่ชั่งเข้า (ticket1)</TableHead>
-                      <TableHead className='w-[6rem]'>เลขที่ชั่งออก (ticket2)</TableHead>
-                      <TableHead className='w-[6rem]'>ทะเบียนรถ (truck)</TableHead>
+                      <TableHead className='w-[6rem]'>
+                        เลขที่ชั่งเข้า (ticket1)
+                      </TableHead>
+                      <TableHead className='w-[6rem]'>
+                        เลขที่ชั่งออก (ticket2)
+                      </TableHead>
+                      <TableHead className='w-[6rem]'>
+                        ทะเบียนรถ (truck)
+                      </TableHead>
                       <TableHead>วันชั่งเข้า (datein)</TableHead>
                       <TableHead>เวลาชั่งเข้า (timein)</TableHead>
-                      <TableHead className='w-[6rem]'>น้ำหนักชั่งเข้า (w1)</TableHead>
+                      <TableHead className='w-[6rem]'>
+                        น้ำหนักชั่งเข้า (w1)
+                      </TableHead>
                       <TableHead>วันชั่งออก (dateout)</TableHead>
                       <TableHead>เวลาชั่งออก (timeout)</TableHead>
-                      <TableHead className='w-[6rem]'>น้ำหนักชั่งออก (w2)</TableHead>
+                      <TableHead className='w-[6rem]'>
+                        น้ำหนักชั่งออก (w2)
+                      </TableHead>
                       <TableHead>ประเภท (code1)</TableHead>
                       <TableHead>บริษัท (code2)</TableHead>
                       <TableHead>สินค้า (code3)</TableHead>
@@ -244,12 +258,20 @@ export const EditModal: React.FC<EditModalProps> = ({
                       <TableHead>สิ่งเจือปน% (remark2)</TableHead>
                       <TableHead>หมายเหตุ (remark3)</TableHead>
                       <TableHead>ราคา (price)</TableHead>
-                      <TableHead className='w-[6rem]'>หักความชื้น (adj_w1)</TableHead>
-                      <TableHead className='w-[6rem]'>หักสิ่งเจือปน (adj_w2)</TableHead>
+                      <TableHead className='w-[6rem]'>
+                        หักความชื้น (adj_w1)
+                      </TableHead>
+                      <TableHead className='w-[6rem]'>
+                        หักสิ่งเจือปน (adj_w2)
+                      </TableHead>
                       <TableHead>หักอื่นๆ (adj_w3)</TableHead>
-                      <TableHead className='w-[6rem]'>หักเงินค่าชั่ง (adj_m1)</TableHead>
-                      <TableHead>หักค่าลง  (adj_m2)</TableHead>
-                      <TableHead className='w-[6rem]'>หักเงินอื่นๆ  (adj_m3)</TableHead>
+                      <TableHead className='w-[6rem]'>
+                        หักเงินค่าชั่ง (adj_m1)
+                      </TableHead>
+                      <TableHead>หักค่าลง (adj_m2)</TableHead>
+                      <TableHead className='w-[6rem]'>
+                        หักเงินอื่นๆ (adj_m3)
+                      </TableHead>
                       <TableHead>Print 1 (print1)</TableHead>
                       <TableHead>Print 2 (print2)</TableHead>
                       <TableHead>CheckSum (chksum)</TableHead>
@@ -294,15 +316,10 @@ export const EditModal: React.FC<EditModalProps> = ({
                       </TableRow>
                     ))}
                   </TableBody>
-                  {/* <TableFooter>
-            <Button className='mt-2 w-full float-end' loading={isLoading} onClick={handleSubmit}>
-              Create
-            </Button>
-          </TableFooter> */}
                 </Table>
               </div>
               <br />
-              <DialogFooter>
+              <DialogFooter className={`${isEdit ? 'text-left' : 'hidden'}`}>
                 <Button loading={onloading} type='submit' variant='button'>
                   Save changes
                 </Button>

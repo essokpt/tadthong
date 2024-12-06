@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/custom/button'
 import { Layout, LayoutBody } from '@/components/custom/layout'
@@ -37,9 +36,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-// import { getVenders } from '@/services/vendersApi'
-// import { Venders } from '@/pages/master/vender/components/schema'
-import { PlusCircledIcon } from '@radix-ui/react-icons'
 import { CreateModal } from './create-modal'
 import {
   IconChecklist,

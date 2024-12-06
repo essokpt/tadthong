@@ -1,12 +1,12 @@
 //import { AlertModal } from '@/components/custom/alert-modal'
 import { Button } from '@/components/custom/button'
-
 import { Branches } from './schema'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 //import { deleteBranch } from '@/services/branchApi'
 import { EditModal } from './edit-modal'
 import { BranchType } from './type'
 import { IconEdit } from '@tabler/icons-react'
+import usePermission from '@/hooks/use-permission'
 
 interface DataTableRowActionsProps {
   row: Branches
@@ -41,10 +41,13 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
   const [isEdit, setIsEdit] = useState(false)
   const [editValue, setEditValue] = useState<BranchType>(initBranch)
 
+  const rule:any = usePermission('branch') 
+
   function updateAction(row: any) {
     setIsEdit(true)
     setEditValue(row)
     console.log('update row', row)
+   
   }
 
   // const onConfirm = async () => {
@@ -63,6 +66,10 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
   //   setDeleteId(row.id)
   //   setdeleteTitle(row.branchName)
   // }
+  useEffect(() => {
+    //isPermission('branch')
+  }, [])
+  
 
   return (
     <>
@@ -80,10 +87,12 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
       /> */}
 
       <Button
+        disabled={!rule[0]?.canUpdate}
         size='icon'
         variant='outline'
         className='rounded-full bg-primary text-white'
         onClick={() => updateAction(row)}
+       //onClick={() => console.log(rule)}
       >
         <IconEdit size={20} />
       </Button>

@@ -15,6 +15,7 @@ import { deleteSaleOrder } from '@/services/saleOrderApi'
 import { ApiContext } from '@/components/layouts/api-context'
 import { ApiType } from 'types/api'
 import { IconSettingsDown } from '@tabler/icons-react'
+import usePermission from '@/hooks/use-permission'
 
 interface DataTableRowActionsProps {
   row: SaleOrder
@@ -69,6 +70,12 @@ const initialValue = {
       sourceHumidity: 0,
       destinationHumidity: 0,
       destinationWeighingScale: "",
+      humidity: 0,
+      adulteration : 0,
+      other: 0,
+      weighingMoney: 0,
+      shipDown : 0,
+      cashOther :  0, 
       remark: "",
   }] ,
   saleOrderAttachFiles: [{
@@ -81,12 +88,14 @@ const initialValue = {
 export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
   const [loading, setLoading] = useState(false)
   const [open, setOpen] = useState(false)
+  const [editble, setEditble] = useState(false)
   const [approveId, setApproveId] = useState(null)
   const [deleteTitle, setdeleteTitle] = useState(null)
 
   const [isEdit, setIsEdit] = useState(false)
   const [editValue, setEditValue] = useState<SaleOrder>(initialValue)
   const { setRefresh } = useContext(ApiContext) as ApiType
+  const rule: any = usePermission('saleOrder')
 
   function updateAction(row: any) {
     row.createBy = row.user.firstName 
@@ -128,6 +137,7 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
         isOpen={isEdit}
         onClose={closeEditModal}
         data={editValue}
+        isEdit={editble}
       />
       <AlertModal
         isOpen={open}
@@ -145,14 +155,26 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end'>
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-
+          <DropdownMenuItem
+            disabled={!rule[0]?.canView}
+            onClick={() => { 
+              setEditble(false)
+              updateAction(row)
+            }}
+          >
+            <Edit className='mr-2 h-4 w-4' /> View
+          </DropdownMenuItem>
           <DropdownMenuItem
             disabled={
               row.status == 'Wait Approve' ||
               row.status == 'Approved' ||
-              row.status == 'Completed'
+              row.status == 'Completed' || 
+              !rule[0]?.canUpdate
             }
-            onClick={() => updateAction(row)}
+            onClick={() => { 
+              setEditble(true)
+              updateAction(row)
+            }}
           >
             <Edit className='mr-2 h-4 w-4' /> Update
           </DropdownMenuItem>
@@ -160,7 +182,7 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
              disabled={
               row.status == 'Wait Approve' ||
               row.status == 'Approved' ||
-              row.status == 'Completed'
+              row.status == 'Completed' ||  !rule[0]?.canDelete
             }
             onClick={() => deleteAction(row)}
           >

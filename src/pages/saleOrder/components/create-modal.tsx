@@ -37,6 +37,13 @@ import {
 } from '@/components/ui/form'
 import { cn } from '@/lib/utils'
 import { Check, ChevronsUpDown } from 'lucide-react'
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from '@/components/ui/select'
 
 // interface ChangeEvent<T = Element> extends SyntheticEvent<T> {
 //   target: EventTarget & T
@@ -72,7 +79,7 @@ const formSchema = z.object({
   destinationHumidity: z.number(),
   destinationWeighingScale: z.string(),
   remark: z.string(),
-
+  uomType: z.string(),
   humidity: z.number(),
   adulteration: z.number(),
   other: z.number(),
@@ -90,6 +97,8 @@ export const CreateModal: React.FC<EditModalProps> = ({
 }) => {
   const [isMounted, setIsMounted] = useState(false)
   const [itemMaster, setItemMaster] = useState<ItemType[]>([])
+ // const [uomList, setUomList] = useState<ItemType[]>([])
+
   const form = useForm<z.infer<typeof formSchema>>({
     //resolver: zodResolver(formSchema),
     values: editData,
@@ -105,6 +114,7 @@ export const CreateModal: React.FC<EditModalProps> = ({
     }
     console.log('find new item', exitIndex)
     createData(data)
+    form.reset()
     onClose()
   }
 
@@ -148,9 +158,8 @@ export const CreateModal: React.FC<EditModalProps> = ({
     //sumAfterAmount(sumAfterprice, 'price')
   }
 
-  
   function handleChangeCustomerQty() {
-   // console.log('handleChangeCustomerQty', value.target.value) adulteration
+    // console.log('handleChangeCustomerQty', value.target.value) adulteration
     let qty = form.getValues('quantity')
     let humidity = form.getValues('humidity')
     let adulteration = form.getValues('adulteration')
@@ -159,22 +168,19 @@ export const CreateModal: React.FC<EditModalProps> = ({
     let sumAmount = qty - humidity - adulteration - other
     form.setValue('cuttingWeight', sumAmount)
     sumAfterAmount()
-
   }
   function handleChangeCustomerPrice() {
     // console.log('handleChangeCustomerQty', value.target.value) adulteration
-     let unitPrice = form.getValues('unitPrice')
-     let weighingMoney = form.getValues('weighingMoney')
-     let shipDown = form.getValues('shipDown')
-     let cashOther = form.getValues('cashOther')
- 
-     let sumAmount = unitPrice - weighingMoney - shipDown - cashOther
-     form.setValue('underCutPrice', sumAmount)
- 
-     sumAfterAmount()
-   }
-  
+    let unitPrice = form.getValues('unitPrice')
+    let weighingMoney = form.getValues('weighingMoney')
+    let shipDown = form.getValues('shipDown')
+    let cashOther = form.getValues('cashOther')
 
+    let sumAmount = unitPrice - weighingMoney - shipDown - cashOther
+    form.setValue('underCutPrice', sumAmount)
+
+    sumAfterAmount()
+  }
 
   function handleChangeCutPrice(item: any) {
     console.log('handleChangeCutPrice', item.target.value)
@@ -305,6 +311,36 @@ export const CreateModal: React.FC<EditModalProps> = ({
                     )}
                   />
 
+                  {/* <FormField
+                    control={form.control}
+                    name='uomType'
+                    render={({ field }) => (
+                      <FormItem className='space-y-1 '>
+                        <FormLabel>UOM Type</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder='Select a uom type'>
+                                {field.value}
+                              </SelectValue>
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            /<SelectItem value='New'>New</SelectItem>
+                            <SelectItem value='Active'>Active</SelectItem>
+                            <SelectItem value='Inactive'>Inactive</SelectItem>
+                            <SelectItem value='None'>None</SelectItem>
+                          </SelectContent>
+                        </Select>
+
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  /> */}
+
                   <FormField
                     control={form.control}
                     name='quantity'
@@ -332,14 +368,15 @@ export const CreateModal: React.FC<EditModalProps> = ({
                       <FormItem className='space-y-1'>
                         <FormLabel>Humidity</FormLabel>
                         <FormControl>
-                        <Input {...field} type='number' 
-                          //onChange={handleChangeCustomerQty}
+                          <Input
+                            {...field}
+                            type='number'
+                            //onChange={handleChangeCustomerQty}
                             onChange={(e) => {
                               field.onChange(e.target.value)
                               handleChangeCustomerQty()
-                              
                             }}
-                            />
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -353,13 +390,14 @@ export const CreateModal: React.FC<EditModalProps> = ({
                       <FormItem className='space-y-1'>
                         <FormLabel>Adulteration</FormLabel>
                         <FormControl>
-                          <Input {...field} type='number' 
-                           onChange={(e) => {
-                            field.onChange(e.target.value)
-                            handleChangeCustomerQty()
-                            
-                          }}
-                        />
+                          <Input
+                            {...field}
+                            type='number'
+                            onChange={(e) => {
+                              field.onChange(e.target.value)
+                              handleChangeCustomerQty()
+                            }}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -372,11 +410,13 @@ export const CreateModal: React.FC<EditModalProps> = ({
                       <FormItem className='space-y-1'>
                         <FormLabel>Other</FormLabel>
                         <FormControl>
-                          <Input {...field} type='number' 
-                           onChange={(e) => {
-                            field.onChange(e.target.value)
-                            handleChangeCustomerQty()                            
-                          }}
+                          <Input
+                            {...field}
+                            type='number'
+                            onChange={(e) => {
+                              field.onChange(e.target.value)
+                              handleChangeCustomerQty()
+                            }}
                           />
                         </FormControl>
                         <FormMessage />
@@ -411,12 +451,14 @@ export const CreateModal: React.FC<EditModalProps> = ({
                       <FormItem className='space-y-1'>
                         <FormLabel>Weighing Money</FormLabel>
                         <FormControl>
-                          <Input {...field} type='number' 
-                          onChange={(e) => {
-                            field.onChange(e.target.value)
-                            handleChangeCustomerPrice()                            
-                          }}
-                           />
+                          <Input
+                            {...field}
+                            type='number'
+                            onChange={(e) => {
+                              field.onChange(e.target.value)
+                              handleChangeCustomerPrice()
+                            }}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -430,12 +472,14 @@ export const CreateModal: React.FC<EditModalProps> = ({
                       <FormItem className='space-y-1'>
                         <FormLabel>ShipDown</FormLabel>
                         <FormControl>
-                          <Input {...field} type='number'   
-                          onChange={(e) => {
-                            field.onChange(e.target.value)
-                            handleChangeCustomerPrice()                            
-                          }}
-                           />
+                          <Input
+                            {...field}
+                            type='number'
+                            onChange={(e) => {
+                              field.onChange(e.target.value)
+                              handleChangeCustomerPrice()
+                            }}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -449,12 +493,14 @@ export const CreateModal: React.FC<EditModalProps> = ({
                       <FormItem className='space-y-1'>
                         <FormLabel>Cash Other</FormLabel>
                         <FormControl>
-                          <Input {...field} type='number' 
+                          <Input
+                            {...field}
+                            type='number'
                             onChange={(e) => {
                               field.onChange(e.target.value)
-                              handleChangeCustomerPrice()                            
+                              handleChangeCustomerPrice()
                             }}
-                             />
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

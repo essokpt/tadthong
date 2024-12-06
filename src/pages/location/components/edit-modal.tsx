@@ -48,6 +48,7 @@ interface EditModalProps {
   isOpen: boolean
   onClose: () => void
   data: LocationType
+  editble: boolean
 }
 interface IWarehouse {
   id: string
@@ -65,13 +66,14 @@ const formSchema = z.object({
     name: z.string(),
   }),
   status: z.string(),
-  remark: z.string()
+  remark: z.string(),
 })
 
 export const EditModal: React.FC<EditModalProps> = ({
   isOpen,
   onClose,
   data,
+  editble,
 }) => {
   const [isMounted, setIsMounted] = useState(false)
   //const { handleSubmit, register } = useForm()
@@ -81,7 +83,7 @@ export const EditModal: React.FC<EditModalProps> = ({
   const { setRefresh } = useContext(ApiContext) as ApiType
 
   const form = useForm<z.infer<typeof formSchema>>({
-   // resolver: zodResolver(formSchema),
+    // resolver: zodResolver(formSchema),
     values: data,
     // defaultValues:{
     //   id: data.id,
@@ -90,7 +92,7 @@ export const EditModal: React.FC<EditModalProps> = ({
   })
   async function updateData(payload: any) {
     setOnloading(true)
-   // payload.warehouseId = parseInt(payload.warehouseId)
+    // payload.warehouseId = parseInt(payload.warehouseId)
     console.log('updateData', payload)
 
     const res: any = await updateLocation(payload)
@@ -127,17 +129,17 @@ export const EditModal: React.FC<EditModalProps> = ({
             <Form {...form}>
               <form onSubmit={form.handleSubmit(updateData)}>
                 <div className='mb-3 grid grid-cols-1 items-start gap-2 space-x-3 space-y-0 rounded-md border p-4 shadow'>
-                <Input
-                  className='hidden'
-                  {...form.register('id')}
-                  defaultValue={data.id}
-                />
                   <Input
-                  className='hidden'
-                  {...form.register('warehouseId')}
-                  defaultValue={data.warehouseId}
-                />
-                 
+                    className='hidden'
+                    {...form.register('id')}
+                    defaultValue={data.id}
+                  />
+                  <Input
+                    className='hidden'
+                    {...form.register('warehouseId')}
+                    defaultValue={data.warehouseId}
+                  />
+
                   <FormField
                     control={form.control}
                     name='name'
@@ -145,7 +147,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                       <FormItem>
                         <FormLabel>Name</FormLabel>
                         <FormControl>
-                          <Input {...field} />
+                          <Input {...field} readOnly={editble} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -162,6 +164,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                           <PopoverTrigger asChild>
                             <FormControl>
                               <Button
+                                disabled={editble}
                                 variant='outline'
                                 role='combobox'
                                 className={cn(
@@ -226,7 +229,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                       <FormItem className='space-y-1'>
                         <FormLabel>Description</FormLabel>
                         <FormControl>
-                          <Input {...field} />
+                          <Input {...field} readOnly={editble} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -239,20 +242,24 @@ export const EditModal: React.FC<EditModalProps> = ({
                       <FormItem className='space-y-1'>
                         <FormLabel>Status</FormLabel>
                         <FormControl>
-                          <Input {...field} readOnly />
+                          <Input {...field} readOnly={editble} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-               
-                
-                <br />
-                <DialogFooter>
-                  <Button loading={onloading} type='submit' variant='button'>
-                    Save changes
-                  </Button>
-                </DialogFooter>
+
+                  <br />
+                  <DialogFooter>
+                    <Button
+                      disabled={editble}
+                      loading={onloading}
+                      type='submit'
+                      variant='button'
+                    >
+                      Save changes
+                    </Button>
+                  </DialogFooter>
                 </div>
               </form>
             </Form>

@@ -7,7 +7,7 @@ import { useState } from 'react'
 // import { ApiType } from 'types/api'
 import { IconEdit } from '@tabler/icons-react'
 import { EditModal } from '../edit-modal'
-import { findPurchaseRequest, updatePurchaseRequestItem } from '@/services/purchaseRequestApi'
+import { findPurchaseRequest } from '@/services/purchaseRequestApi'
 import { PurchaseRequest } from '../schema'
 
 interface DataTableRowActionsProps {
@@ -108,17 +108,16 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
     setIsEdit(false)
   }
 
-  async function updateData(row: any) {
-    console.log('updateData', row)    
-      //setOnloading(true)  
-      const res: any = await updatePurchaseRequestItem(row)
+  // async function updateData(row: any) {
+  //   console.log('updateData', row)    
+  //     const res: any = await updatePurchaseRequestItem(row)
   
-      if (res.status == 200) {
-        console.log('updatePurchaseItem:', res)
-        setIsEdit(false)
-      }
+  //     if (res.status == 200) {
+  //       console.log('updatePurchaseItem:', res)
+  //       setIsEdit(false)
+  //     }
      
-  }
+  // }
 
   return (
     <>
@@ -126,6 +125,7 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
           isOpen={isEdit}
           onClose={closeEditModal}         
           data={editValue}
+          editble={true}
       />
      
       {/* <EditModal

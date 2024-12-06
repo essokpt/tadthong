@@ -5,7 +5,6 @@ import { Button } from '@/components/custom/button'
 import { Layout, LayoutBody } from '@/components/custom/layout'
 import { useNavigate } from 'react-router-dom'
 import { Separator } from '@/components/ui/separator'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Command,
   CommandEmpty,
@@ -68,6 +67,7 @@ import { Badge } from '@/components/ui/badge'
 type ItemList = {
   id: number
   itemMasterId: string
+  uomType: string
   selectedItemMaster: string
   itemMaster: {
     id: string
@@ -123,6 +123,7 @@ const initalValue = {
   weighingMoney: 0,
   shipDown: 0,
   cashOther: 0,
+  uomType: ''
 }
 
 const formSchema = z.object({

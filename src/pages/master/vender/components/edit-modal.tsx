@@ -54,6 +54,7 @@ interface EditModalProps {
   isOpen: boolean
   onClose: () => void
   data: Venders
+  editble: boolean
 }
 const intial = {
   id: 0,
@@ -80,6 +81,7 @@ export const EditModal: React.FC<EditModalProps> = ({
   isOpen,
   onClose,
   data,
+  editble,
 }) => {
   const [venderTypes, setVenderType] = useState<IVenderType[]>([])
   const [isMounted, setIsMounted] = useState(false)
@@ -98,7 +100,7 @@ export const EditModal: React.FC<EditModalProps> = ({
   const { userInputCallback, dataValue } = useThaiAddress()
   const debounceValue = useDebounce(userInputCallback, 600)
 
- async function addFile(payload: any) {
+  async function addFile(payload: any) {
     //setFiles(payload)
     const formData = new FormData()
     for (let i = 0; i < payload?.length; i++) {
@@ -107,7 +109,6 @@ export const EditModal: React.FC<EditModalProps> = ({
     }
 
     console.log('upload file data:', formData)
-
 
     const res: any = await venderUploadFiles(formData)
     if (res.status == 200) {
@@ -256,7 +257,6 @@ export const EditModal: React.FC<EditModalProps> = ({
   useEffect(() => {
     setIsMounted(true)
     getVenderType().then((data) => setVenderType(data))
-
   }, [])
 
   if (!isMounted) {
@@ -300,6 +300,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                         Company Name
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('companyName')}
                         defaultValue={data.companyName}
@@ -313,6 +314,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                         Code
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('code')}
                         defaultValue={data.code}
@@ -326,6 +328,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                         Tax ID
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('tax')}
                         defaultValue={data.tax}
@@ -339,6 +342,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                         Bank Account
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('bankAccount')}
                         defaultValue={data.bankAccount}
@@ -352,6 +356,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                         Special Intruction
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('specialIntruction')}
                         defaultValue={data.specialIntruction}
@@ -366,6 +371,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                         Payment Term
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('paymentTerm')}
                         defaultValue={data.paymentTerm}
@@ -379,6 +385,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                         Currency
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('currency')}
                         defaultValue={data.currency}
@@ -406,13 +413,13 @@ export const EditModal: React.FC<EditModalProps> = ({
                         </option> */}
 
                         {venderTypes?.map((item) => (
-                              <option
-                                className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
-                                value={item.id}
-                              >
-                                {item.typeName}
-                              </option>
-                            ))}
+                          <option
+                            className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
+                            value={item.id}
+                          >
+                            {item.typeName}
+                          </option>
+                        ))}
                       </select>
                     </div>
                     <div className='grid'>
@@ -502,6 +509,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                         Address
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('address')}
                         defaultValue={data.address}
@@ -518,6 +526,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                         <MagnifyingGlassIcon className='mr-2 h-4 w-4 shrink-0 border-separate opacity-50' />
 
                         <Input
+                          readOnly={editble}
                           className='mt-1 text-[0.8rem]'
                           onClick={() => setOpen(false)}
                           {...register('subDistrict')}
@@ -536,6 +545,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                       </Label>
 
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('district')}
                         defaultValue={data.district}
@@ -549,6 +559,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                         Province
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('province')}
                         defaultValue={data.province}
@@ -562,6 +573,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                         Zipcode
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('zipcode')}
                         defaultValue={data.zipcode}
@@ -575,6 +587,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                         Country
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('country')}
                         defaultValue={data.country}
@@ -589,6 +602,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                         Latitude
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('latitude')}
                         defaultValue={data.latitude}
@@ -603,6 +617,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                         Longtitude
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('longtitude')}
                         defaultValue={data.longtitude}
@@ -625,6 +640,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                         Phone
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('phone')}
                         defaultValue={data.phone}
@@ -639,6 +655,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                         Phone-Ext
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('phoneExt')}
                         defaultValue={data.phoneExt}
@@ -652,6 +669,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                         Fax
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('fax')}
                         defaultValue={data.fax}
@@ -665,6 +683,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                         Fax-Ext
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('faxExt')}
                         defaultValue={data.faxExt}
@@ -679,6 +698,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                         Contact Name
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('contactName')}
                         defaultValue={data.contactName}
@@ -692,6 +712,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                         Email
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('email')}
                         defaultValue={data.email}
@@ -706,6 +727,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                         Alternate Phone
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('alternatePhone')}
                         defaultValue={data.alternatePhone}
@@ -720,6 +742,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                         Remark
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('remark')}
                         defaultValue={data.remark}
@@ -728,7 +751,12 @@ export const EditModal: React.FC<EditModalProps> = ({
                   </div>
 
                   <DialogFooter>
-                    <Button loading={onloading} type='submit' variant='button'>
+                    <Button
+                      disabled={editble}
+                      loading={onloading}
+                      type='submit'
+                      variant='button'
+                    >
                       Save changes
                     </Button>
                   </DialogFooter>
@@ -812,6 +840,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                   <TableRow>
                     <TableCell>
                       <Button
+                        disabled={editble}
                         variant='button'
                         size='sm'
                         className='w-13 h-8'
@@ -826,75 +855,72 @@ export const EditModal: React.FC<EditModalProps> = ({
               </Table>
             </TabsContent>
             <TabsContent value='file' className='h-[35rem]'>
-                {/* <Card className='min-h-full overflow-scroll '>
+              {/* <Card className='min-h-full overflow-scroll '>
                   <CardContent className='h-[35rem] space-y-2'> */}
-                    <div className='grid gap-4'>
-                    <FileDrag uploadData={(e) => addFile(e)} />  
-                     
+              <div className='grid gap-4'>
+                <FileDrag uploadData={(e) => addFile(e)} />
 
-                      <Table className='overflow-scroll'>
-                        <TableCaption>A list of file attached.</TableCaption>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>File Name</TableHead>
+                <Table className='overflow-scroll'>
+                  <TableCaption>A list of file attached.</TableCaption>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>File Name</TableHead>
 
-                            <TableHead className='items-center'>
-                              Action
-                            </TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {data.venderFileAttach?.map((item) => (
-                            <TableRow key={item.id}>
-                              <TableCell className='font-medium'>
-                                {item.fileName}
-                              </TableCell>
+                      <TableHead className='items-center'>Action</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {data.venderFileAttach?.map((item) => (
+                      <TableRow key={item.id}>
+                        <TableCell className='font-medium'>
+                          {item.fileName}
+                        </TableCell>
 
-                              <TableCell className='w-[8rem]'>
-                                <Button
-                                  size='icon'
-                                  variant='ghost'
-                                  className='rounded-full'
-                                  //onClick={() => downloadFile(item.path)}
-                                >
-                                  <IconDownload size={20} />
-                                </Button>
-                                <Button
-                                  size='icon'
-                                  variant='ghost'
-                                  className='rounded-full'
-                                 // onClick={() => openFile(item.path)}
-                                >
-                                  <IconEye size={20} />
-                                </Button>
+                        <TableCell className='w-[8rem]'>
+                          <Button
+                            size='icon'
+                            variant='ghost'
+                            className='rounded-full'
+                            //onClick={() => downloadFile(item.path)}
+                          >
+                            <IconDownload size={20} />
+                          </Button>
+                          <Button
+                            size='icon'
+                            variant='ghost'
+                            className='rounded-full'
+                            // onClick={() => openFile(item.path)}
+                          >
+                            <IconEye size={20} />
+                          </Button>
 
-                                <Button
-                                  size='icon'
-                                  variant='ghost'
-                                  className='rounded-full'
-                                  //onClick={() => deleteAction(item)}
-                                >
-                                  <IconTrash size={20} />
-                                </Button>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                        <TableFooter>
-                          <TableRow>
-                            <TableCell colSpan={10} className='text-right'>
-                              {/* <Button loading={false} >
+                          <Button
+                            size='icon'
+                            variant='ghost'
+                            className='rounded-full'
+                            //onClick={() => deleteAction(item)}
+                          >
+                            <IconTrash size={20} />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                  <TableFooter>
+                    <TableRow>
+                      <TableCell colSpan={10} className='text-right'>
+                        {/* <Button loading={false} >
                             <IconRefresh size={20} />
                             Add
                           </Button> */}
-                            </TableCell>
-                          </TableRow>
-                        </TableFooter>
-                      </Table>
-                    </div>
-                  {/* </CardContent>
+                      </TableCell>
+                    </TableRow>
+                  </TableFooter>
+                </Table>
+              </div>
+              {/* </CardContent>
                 </Card> */}
-              </TabsContent>
+            </TabsContent>
           </Tabs>
         </DialogContent>
         <BillingModal

@@ -16,7 +16,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Table,
   TableBody,
@@ -50,6 +49,7 @@ import { SaleOrder } from './schema'
 import { CustomerType } from '@/pages/master/customer/components/type'
 import { getCustomer } from '@/services/customerApi'
 import {
+  createSaleOrderItem,
   deleteFileAttach,
   deleteSaleOrderItem,
   downloadFileAttach,
@@ -64,8 +64,8 @@ import {
   IconEye,
   IconFile,
   IconInfoCircle,
+  IconPlus,
   IconTrash,
-  IconUpload,
 } from '@tabler/icons-react'
 import { AlertModal } from '@/components/custom/alert-modal'
 import { cn, downloadFileData } from '@/lib/utils'
@@ -78,19 +78,21 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { Label } from '@/components/ui/label'
+import { Badge } from '@/components/ui/badge'
 //import { PlusCircledIcon } from '@radix-ui/react-icons'
 
 interface EditModalProps {
   isOpen: boolean
   onClose: () => void
   data: SaleOrder
+  isEdit: boolean
 }
 // interface ChangeEvent<T = Element> extends SyntheticEvent<T> {
 //   target: EventTarget & T
 // }
 
 const initalValue = {
-  id: 0,
+  id: -1,
   itemMasterId: '0',
   selectedItemMaster: '',
   itemMaster: {
@@ -98,6 +100,7 @@ const initalValue = {
     code: '',
     name: '',
   },
+  uomType: '',
   saleOrderId: 0,
   quantity: 0,
   unitPrice: 0,
@@ -118,30 +121,6 @@ const initalValue = {
   shipDown: 0,
   cashOther: 0,
 }
-
-// const initalValue = {
-//   id: 0,
-//   itemMasterId: '0',
-//   selectedItemMaster: '',
-//   itemMaster: {
-//     id: '',
-//     code: '',
-//     name: '',
-//   },
-//   saleOrderId: 0,
-//   quantity: 0,
-//   unitPrice: 0,
-//   amount: 0,
-//   underCutPrice: 0,
-//   cuttingWeight: 0,
-//   afterCutPrice: 0,
-//   afterCutQuantity: 0,
-//   afterAmount: 0,
-//   sourceHumidity: 0,
-//   destinationHumidity: 0,
-//   destinationWeighingScale: '',
-//   remark: '',
-// }
 
 const formSchema = z.object({
   id: z.number(),
@@ -167,6 +146,7 @@ export const EditModal: React.FC<EditModalProps> = ({
   isOpen,
   onClose,
   data,
+  isEdit,
 }) => {
   const [isMounted, setIsMounted] = useState(false)
   // const { handleSubmit, register, setValue } = useForm()
@@ -176,7 +156,7 @@ export const EditModal: React.FC<EditModalProps> = ({
   const [editValue, setEditValue] = useState<ItemList>(initalValue)
 
   //new
-  const [files, setFiles] = useState('')
+  //const [files, setFiles] = useState('')
   const [open, setOpen] = useState(false)
   const [openEdit, setOpenEdit] = useState(false)
 
@@ -194,29 +174,12 @@ export const EditModal: React.FC<EditModalProps> = ({
   async function addNewData(payload: any) {
     console.log('addNewData', payload)
     setOnloading(true)
-    // if(payload.id == -1){
-    //   console.log('create new sale oreder item')
-
-    //   payload.id = 0
-    //   payload.saleOrderId = data.id
-    //   const res: any = await createSaleOrderItem(payload)
-    //   if (res) {
-    //     console.log('createSaleOrderItem -success')
-    //     data.saleOrderItems.length = 0
-
-    //     for (let index = 0; index < res.length; index++) {
-    //       data.saleOrderItems.push(res[index])
-
-    //     }
-    //     setEditValue(initalValue)
-    //   }
-
-    // }
+   
     if (payload.id != -1) {
       console.log('update sale oreder item', payload.id)
       const res: any = await updateSaleOrderItem(payload)
       if (res) {
-        console.log('uploadFiles -success', res.status)
+        console.log('update sale oreder item -success', res)
         const itemIndex = data.saleOrderItems.findIndex(
           (a) => a.id == payload.id
         )
@@ -224,27 +187,27 @@ export const EditModal: React.FC<EditModalProps> = ({
           data.saleOrderItems[itemIndex] = res
         }
       }
+    }else{
+      payload.id = 0
+      payload.saleOrderId = data.id
+      console.log('add new sale oreder item', payload)
+      const res: any = await createSaleOrderItem(payload)
+      if (res.length > 0) {
+        console.log('update sale oreder item -success', res)
+          data.saleOrderItems.length = 0
+        
+          for (let index = 0; index < res.length; index++) {
+            data.saleOrderItems.push(res[index]);            
+          }
+      }
+
     }
     setTimeout(() => {
       setOnloading(false)
     }, 1000)
   }
 
-  // function handleChangeCustomer(e: ChangeEvent<HTMLSelectElement>) {
-  //   console.log('handleChangeCustomer', e.target.value)
-  //   setValue('customerId', parseInt(e.target.value))
-  // }
-
-  // function handleChangeLocation(e: ChangeEvent<HTMLSelectElement>) {
-  //   console.log('handleChangeLocation', e.target.value)
-  //   setValue('locationId', parseInt(e.target.value))
-  // }
-
-  function addFile(payload: any) {
-    setFiles(payload)
-    console.log('File data:', payload)
-  }
-
+  
   async function uploadFile(payload: any) {
     if (payload) {
       setOnloading(true)
@@ -262,7 +225,6 @@ export const EditModal: React.FC<EditModalProps> = ({
       }
       setTimeout(() => {
         setOnloading(false)
-        setFiles('')
       }, 1000)
     }
   }
@@ -343,10 +305,16 @@ export const EditModal: React.FC<EditModalProps> = ({
     }
   }
 
+  function addNewItem(){
+    setEditValue(initalValue)
+    setOpenEdit(true)
+  }
+
   function updateItem(data: any) {
+    data.selectedItemMaster = data.itemMaster.name
     setEditValue(data)
     setOpenEdit(true)
-    console.log('updateData:', editValue)
+    console.log('updateData:', data)
   }
 
   function deleteItem(data: any) {
@@ -681,7 +649,9 @@ export const EditModal: React.FC<EditModalProps> = ({
                         </TableCaption>
                         <TableHeader>
                           <TableRow>
-                            <TableHead className='w-[7rem]'>Item Code</TableHead>
+                            <TableHead className='w-[7rem]'>
+                              Item Code
+                            </TableHead>
                             <TableHead className='w-[10rem]'>
                               Item Name
                             </TableHead>
@@ -738,7 +708,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                               <TableCell>
                                 {item.destinationWeighingScale}
                               </TableCell>
-                              <TableCell>
+                              <TableCell hidden={!isEdit}>
                                 <div className='flex items-center gap-2'>
                                   {/* <Button
                                   loading={onloading}
@@ -764,17 +734,19 @@ export const EditModal: React.FC<EditModalProps> = ({
                           ))}
                         </TableBody>
                         <TableFooter>
-                          {/* <TableRow>
-                        <TableCell colSpan={15} className='text-left'>
-                          <Button 
-                              loading={false} 
-                              onClick={openCreate}
-                          >
-                             <PlusCircledIcon className='mr-2 h-4 w-4' />
-                            Add
-                          </Button>
-                        </TableCell>
-                      </TableRow> */}
+                          <TableRow>
+                         
+                          <TableCell colSpan={15} className={`${isEdit ? 'text-left' : 'hidden'}`}>
+                            <Badge
+                              className='h-7 w-[7rem] text-white hover:bg-primary'
+                              variant={'default'}
+                              onClick={() => addNewItem()}
+                            >
+                              <IconPlus size={20} className='mr-2 h-4 w-4' />
+                              Add Item
+                            </Badge>
+                          </TableCell>
+                          </TableRow>
                         </TableFooter>
                       </Table>
                     </div>
@@ -786,20 +758,9 @@ export const EditModal: React.FC<EditModalProps> = ({
                           File Attach.
                         </Label>
                       </div>
-
-                      <FileDrag uploadData={(e) => uploadFile(e)} />
-                      {/* <div className='float-end'>
-                            <Button
-                              loading={onloading}
-                              variant='button'
-                              size='sm'
-                              className='float-end h-8 w-24'
-                              onClick={uploadFile}
-                            >
-                              <IconUpload className='mr-2 h-4 w-4' />
-                              Upload
-                            </Button>
-                          </div> */}
+                      <div className={`${isEdit ? 'none' : 'hidden'}`}>
+                        <FileDrag uploadData={(e) => uploadFile(e)} />
+                      </div>
 
                       <Table className='overflow-scroll'>
                         <TableCaption>A list of file attached.</TableCaption>
@@ -819,8 +780,8 @@ export const EditModal: React.FC<EditModalProps> = ({
                                 {item.fileName}
                               </TableCell>
 
-                              <TableCell className='w-[8rem]'>
-                                <div className='flex items-center gap-2'>
+                              <TableCell hidden={!isEdit}>
+                                <div className='flex items-center gap-3'>
                                   <IconDownload
                                     size={20}
                                     onClick={() => downloadFile(item.path)}
@@ -838,28 +799,20 @@ export const EditModal: React.FC<EditModalProps> = ({
                             </TableRow>
                           ))}
                         </TableBody>
-                        <TableFooter>
-                          <TableRow>
-                            <TableCell colSpan={10} className='text-right'>
-                              {/* <Button loading={false} >
-                            <IconRefresh size={20} />
-                            Add
-                          </Button> */}
-                            </TableCell>
-                          </TableRow>
-                        </TableFooter>
+                        
                       </Table>
                     </div>
-
-                    <Button
-                      loading={onloading}
-                      type='submit'
-                      variant='button'
-                      size='sm'
-                      className='float-end mt-8 h-8 space-y-1'
-                    >
-                      Save Change
-                    </Button>
+                    <div className={`${isEdit ? 'none' : 'hidden'}`}>
+                      <Button
+                        loading={onloading}
+                        type='submit'
+                        variant='button'
+                        size='sm'
+                        className='float-end mt-8 h-8 space-y-1'
+                      >
+                        Save Change
+                      </Button>
+                    </div>
                   </form>
                 </div>
               </Form>

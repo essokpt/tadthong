@@ -5,9 +5,12 @@ import { findInvoiceById } from '@/services/saleOrderApi'
 import logo from '../../../../../src/assets/logo.jpg'
 import '@/components/print/style.css'
 import { useReactToPrint } from "react-to-print";
+import { CompanySchema } from '@/pages/master/company/components/schema'
 
 export const PrintInvoice = () => {
-  const [invoiceDetail, SetInvoiceDetail] = useState<Invoice>()
+  const [invoiceDetail, setInvoiceDetail] = useState<Invoice>()
+  const [companyInfo, setCompanyInfo] = useState<CompanySchema>()
+
   const { id } = useParams()
  // const componentRef = useRef();
   const componentRef = useRef<HTMLDivElement>(null)
@@ -30,7 +33,10 @@ export const PrintInvoice = () => {
   });
 
   useEffect(() => {
-    findInvoiceById(id).then((data) => SetInvoiceDetail(data))
+    findInvoiceById(id).then((data) => {
+        setInvoiceDetail(data.invoice)
+        setCompanyInfo(data.company)
+    })
   }, [])
   return (
       <div className = "invoice-wrapper" id = "print-area" >
@@ -38,11 +44,12 @@ export const PrintInvoice = () => {
                 <div className = "invoice-container" >
                     <div className = "invoice-head">
                         <div className = "invoice-head-top">
-                            <div className = "invoice-head-top-left text-start">
+                            <div className = "invoice-head-top-left text-start items-center">
                                 <img src = {logo} />
+                                <p>{companyInfo?.companyName}</p>
                             </div>
-                            <div className = "invoice-head-top-right text-end">
-                                <h3>Invoice</h3>
+                            <div className = "invoice-head-top-right text-center float-end">
+                                <h4 className='border border-sky-500 w-40'>สำหรับลูกค้า</h4>
                             </div>
                         </div>
                         <div className = "hr"></div>

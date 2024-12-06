@@ -1,164 +1,190 @@
-import { AlertModal } from "@/components/custom/alert-modal";
-import { Button } from "@/components/custom/button";
+import { AlertModal } from '@/components/custom/alert-modal'
+import { Button } from '@/components/custom/button'
 
-import { useContext, useState } from "react";
-import { EditModal } from "./edit-modal";
-import { PurchaseOrder } from "../../components/schema";
-import { ApproveModal } from "@/components/custom/approve-modal";
-import { createApproveMaterial } from "@/services/approveMaterialApi";
-import { format } from "date-fns";
-import { deletePurchaseRequest } from "@/services/purchaseRequestApi";
-import { IconEyeCheck } from "@tabler/icons-react";
-import { ApiContext } from "@/components/layouts/api-context";
-import { ApiType } from "types/api";
+import { useContext, useState } from 'react'
+import { EditModal } from './edit-modal'
+import { PurchaseOrder } from '../../components/schema'
+import { ApproveModal } from '@/components/custom/approve-modal'
+import { createApproveMaterial } from '@/services/approveMaterialApi'
+import { format } from 'date-fns'
+import { deletePurchaseRequest } from '@/services/purchaseRequestApi'
+import { IconEyeCheck } from '@tabler/icons-react'
+import { ApiContext } from '@/components/layouts/api-context'
+import { ApiType } from 'types/api'
+import usePermission from '@/hooks/use-permission'
 
-interface DataTableRowActionsProps{
-    row: PurchaseOrder
-  }
-
-  const initialValue = {
-    id: '',
-    code: '',
-    description: '',
-    branchId: 0,
-    refPr: '',
-    createAt: '',
-    userId: '',
-    venderId: '',
-    received: 0,
-    balance: 0,
-    cause: '',
-    currency: '',
-    paymenTerm: '',
-    paymentType: '',
-    deliveryDate: '',
-    vender: {
-      code: '',
-      companyName: '',
-    },
-    user: {
-      firstName: '',
-    },
-    locationId: 0,
-    location: {
-      id: 0,
-      name: '',
-    },
-    remark: '',
-    status: '',
-    purchaseOrderItems: [],
-    amount: 0,
-    discount : 0,   
-    vat : 0,
-    paymentTerm : '',
-    purchaseOrderFileAttach: [{
-      id: 0,
-      fileName: '',
-      path: ''
-  }]
-  }
-
-const initialApprove = {
-  id : 0,
-  code : '',
-  name: ''
+interface DataTableRowActionsProps {
+  row: PurchaseOrder
 }
 
+const initialValue = {
+  id: '',
+  code: '',
+  description: '',
+  branchId: 0,
+  refPr: '',
+  createAt: '',
+  userId: '',
+  venderId: '',
+  received: 0,
+  balance: 0,
+  cause: '',
+  currency: '',
+  paymenTerm: '',
+  paymentType: '',
+  deliveryDate: '',
+  vender: {
+    code: '',
+    companyName: '',
+    address: '',
+    subDistrict: '',
+    district: '',
+    province: '',
+    zipcode: '',
+    country: '',
+    paymentType: '',
+    phone: '',
+    phoneExt: '',
+    fax: '',
+    faxExt: '',
+    tax: '',
+    email: '',
+    contactName: '',
+    venderBillings: {
+      id: 0,
+      code: '',
+      name: '',
+      address: '',
+      district: '',
+      subDistrict: '',
+      province: '',
+      zipcode: '',
+      country: '',
+      phone: '',
+    },
+  },
+  user: {
+    firstName: '',
+  },
+  locationId: 0,
+  location: {
+    id: 0,
+    name: '',
+  },
+  remark: '',
+  status: '',
+  purchaseOrderItems: [],
+  amount: 0,
+  discount: 0,
+  vat: 0,
+  paymentTerm: '',
+  approveBy: '',
+  purchaseOrderFileAttach: [
+    {
+      id: 0,
+      fileName: '',
+      path: '',
+    },
+  ],
+}
+
+const initialApprove = {
+  id: 0,
+  code: '',
+  name: '',
+}
 
 export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
-  const [loading, setLoading] = useState(false);
-  const [open, setOpen] = useState(false);
-  const [openApprove, setOpenApprove] = useState(false);
+  const [loading, setLoading] = useState(false)
+  const [open, setOpen] = useState(false)
+  const [openApprove, setOpenApprove] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
   const [approveData, setApproveId] = useState(initialApprove)
   const [deleteTitle, setdeleteTitle] = useState(null)
   const [approveTitle, setApproveTitle] = useState(null)
 
-  const [isEdit, setIsEdit] = useState(false);
+  const [isEdit, setIsEdit] = useState(false)
   const [editValue, setEditValue] = useState<PurchaseOrder>(initialValue)
-const { setRefresh } = useContext(ApiContext) as ApiType
-  function updateAction(row:any) {   
-    setIsEdit(true) 
+  const { setRefresh } = useContext(ApiContext) as ApiType
+
+  const rule: any = usePermission('purchaseOrder')
+
+  function updateAction(row: any) {
+    setIsEdit(true)
     setEditValue(row)
-    console.log('update row',row);  
+    console.log('update row', row)
   }
 
-  // function approveAction(row:any) {   
-  //   setOpenApprove(true) 
+  // function approveAction(row:any) {
+  //   setOpenApprove(true)
   //   setApproveMatId(row)
-  //   setApproveTitle(row.name)   
-  //   console.log('Approve data',row);  
+  //   setApproveTitle(row.name)
+  //   console.log('Approve data',row);
   // }
 
   const onConfirm = async () => {
-    const res:any = await deletePurchaseRequest(deleteId)
-    if(res.status == 200) {
+    const res: any = await deletePurchaseRequest(deleteId)
+    if (res.status == 200) {
       setDeleteId(null)
-      console.log('deletePurchaseRequest -success', res.status)      
+      console.log('deletePurchaseRequest -success', res.status)
       setOpen(false)
       setdeleteTitle(null)
       setApproveTitle(null)
-    } 
+    }
     setTimeout(() => {
       setLoading(false)
     }, 1000)
-  };
+  }
 
   const sendApprove = async () => {
     setLoading(true)
-    let today = new Date();
-    const userId:any = localStorage.getItem('userId')
+    let today = new Date()
+    const userId: any = localStorage.getItem('userId')
     const newApprove = {
       code: `AP-${approveData.code}`,
-      description : `Request for approve -${approveData.name}`,
-      priority : 'medium',
+      description: `Request for approve -${approveData.name}`,
+      priority: 'medium',
       status: 'Pending',
-      materialId : approveData.id,
-      userId : parseInt(userId),
-      createAt: format(today, 'yyyy-MM-dd')
+      materialId: approveData.id,
+      userId: parseInt(userId),
+      createAt: format(today, 'yyyy-MM-dd'),
     }
 
-    console.log('sendApprove',newApprove)     
-    const res:any = await createApproveMaterial(newApprove)
-    if(res.status == 200) {
-      console.log('deleteMaterial -success', res.status)    
-      setLoading(false)  
+    console.log('sendApprove', newApprove)
+    const res: any = await createApproveMaterial(newApprove)
+    if (res.status == 200) {
+      console.log('deleteMaterial -success', res.status)
+      setLoading(false)
       setOpen(false)
       setApproveId(initialApprove)
-    } 
+    }
     setTimeout(() => {
-     
       setOpenApprove(false)
     }, 1000)
-  };
+  }
 
   function closeEditModal() {
     setIsEdit(false)
     setRefresh(true)
   }
 
-
-  // async function deleteAction(row:any) {   
-  //   setOpen(true) 
-  //   setDeleteId(row.id)  
+  // async function deleteAction(row:any) {
+  //   setOpen(true)
+  //   setDeleteId(row.id)
   //   setdeleteTitle(row.code)
   // }
 
   return (
     <>
-     <ApproveModal
+      <ApproveModal
         isOpen={openApprove}
         onClose={() => setOpenApprove(false)}
         onConfirm={sendApprove}
         loading={loading}
         title={approveTitle}
       />
-      
-      <EditModal
-          isOpen={isEdit}
-          onClose={closeEditModal}         
-          data={editValue}
-      />
+
+      <EditModal isOpen={isEdit} onClose={closeEditModal} data={editValue} />
       <AlertModal
         isOpen={open}
         onClose={() => setOpen(false)}
@@ -166,10 +192,11 @@ const { setRefresh } = useContext(ApiContext) as ApiType
         loading={loading}
         title={deleteTitle}
       />
-       <Button
+      <Button
         size='icon'
         variant='outline'
         className='rounded-full bg-primary text-white'
+        disabled={!rule[0]?.canView}
         onClick={() => updateAction(row)}
       >
         <IconEyeCheck size={20} />
@@ -208,5 +235,5 @@ const { setRefresh } = useContext(ApiContext) as ApiType
       
       </DropdownMenu> */}
     </>
-  );
-};
+  )
+}

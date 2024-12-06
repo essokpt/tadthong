@@ -24,6 +24,8 @@ export const schema = z.object({
         province: z.string(),
         zipcode: z.string(),
         country: z.string(),
+        tax: z.string(),
+        paymentTerm: z.string(),
         customerBillings: z.object({
             address: z.string(),
             district: z.string(),
@@ -43,6 +45,7 @@ export const schema = z.object({
                 id: z.number(),
                 code: z.string(),
                 name: z.string(),
+                stockingUom: z.string()
             }),
             quantity: z.number(),
             unitPrice: z.number(),
@@ -57,11 +60,11 @@ export const schema = z.object({
             destinationWeighingScale: z.string(),
             remark: z.string(),
             saleOrder: z.object({
+                id: z.number(),
                 code: z.string()
             }),
         })
-    }))
-          
+    }))      
        
 })
 

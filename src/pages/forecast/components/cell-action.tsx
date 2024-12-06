@@ -15,6 +15,7 @@ import { deleteForecast } from "@/services/forecastApi";
 import { ApiContext } from "@/components/layouts/api-context";
 import { ApiType } from "types/api";
 import { IconSettingsDown } from "@tabler/icons-react";
+import usePermission from "@/hooks/use-permission";
 
 interface DataTableRowActionsProps{
     row: Forecast
@@ -54,9 +55,11 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
   const [deleteId, setDeleteId] = useState(null)
   const [deleteTitle, setdeleteTitle] = useState(null)
   const [isEdit, setIsEdit] = useState(false);
+  const [editble, setEditble] = useState(false);
   const [editValue, setEditValue] = useState<Forecast>(initialValue)
  
   const { setRefresh } = useContext(ApiContext) as ApiType
+  const rule: any = usePermission('forecast')
 
   function updateAction(row:any) {   
   
@@ -91,9 +94,9 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
     <>
       <EditModal
           isOpen={isEdit}
-          onClose={() => setIsEdit(false)}
-        
+          onClose={() => setIsEdit(false)}        
           data={editValue}
+          editble={editble}
       />
       <AlertModal
         isOpen={open}
@@ -111,13 +114,27 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-
           <DropdownMenuItem
-            onClick={() => updateAction(row)}
+            disabled={!rule[0]?.canView}
+            onClick={() => {
+              setEditble(false)
+              updateAction(row)
+            }}
+          >
+            <Edit className="mr-2 h-4 w-4" /> View
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            disabled={!rule[0]?.canUpdate}
+            onClick={() => {
+              setEditble(true)
+              updateAction(row)
+            }}
           >
             <Edit className="mr-2 h-4 w-4" /> Update
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => deleteAction(row)}>
+          <DropdownMenuItem 
+            disabled={!rule[0]?.canDelete}
+          onClick={() => deleteAction(row)}>
             <Trash className="mr-2 h-4 w-4" /> Delete
           </DropdownMenuItem>
         </DropdownMenuContent>

@@ -5,6 +5,26 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+export function isPermission(module:any, action:string){ 
+  const acl:any = localStorage.getItem('accessPermissions')
+  const aclPermission = JSON.parse(acl)
+  const isPermission = aclPermission.find((a:any) => a.permission == module)
+ 
+  if(isPermission){
+    console.log('find acl:', aclPermission.find((a:any) => a.permission == module));
+     if(action == 'create') return isPermission.canCreate
+     if(action == 'update') return isPermission.canUpdate
+     if(action == 'view') return isPermission.canView
+     if(action == 'delete') return isPermission.canDelete
+
+  }
+ 
+ // console.log('user roles:', localStorage.getItem('roles'));
+   
+  return null
+ 
+}
+
 export function downloadFileData(filename:any, fileData: any) {
     // Create a Blob from the response data
     const pdfBlob = new Blob([fileData], { type: "text/plain;charset=utf-8" });

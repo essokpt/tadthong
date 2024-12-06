@@ -9,11 +9,18 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Invoice } from './schema'
 import { Trash } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { deleteInvoice } from '@/services/saleOrderApi'
 import { useNavigate } from 'react-router-dom'
 import { IconEye, IconPrinter, IconSettingsDown } from '@tabler/icons-react'
 import { EditModal } from './edit-modal'
+import { findCompany } from '@/services/companyApi'
+import { CompanyType } from '@/pages/master/company/components/type'
+import 'jspdf-autotable'
+import { jsPDF } from 'jspdf'
+import logo from '@/assets/logo.jpg'
+import '@/assets/fonts/Sarabun-Regular-normal'
+import usePermission from '@/hooks/use-permission'
 
 interface DataTableRowActionsProps {
   row: Invoice
@@ -21,65 +28,95 @@ interface DataTableRowActionsProps {
 
 const initialValue = {
   id: 0,
-  code: '',    
+  code: '',
   cause: '',
   currency: '',
   paymentTerm: '',
   total: 0,
   vat: 0,
-  amount : 0, 
+  amount: 0,
   createAt: '',
-  status: '',      
+  status: '',
   customerId: 0,
   customer: {
-      code: '',
-      companyName : '',
-      attn:'',
+    paymentTerm: '',
+    code: '',
+    companyName: '',
+    attn: '',
+    address: '',
+    district: '',
+    subDistrict: '',
+    province: '',
+    zipcode: '',
+    country: '',
+    tax: '',
+    customerBillings: {
       address: '',
       district: '',
       subDistrict: '',
       province: '',
       zipcode: '',
       country: '',
-      customerBillings: {
-          address: '',
-          district: '',
-          subDistrict: '',
-          province: '',
-          zipcode: '',
-          country: '',
-          contactName: '',
-      }
+      contactName: '',
+    },
   },
-  invoiceItems: [{
+  invoiceItems: [
+    {
       id: '',
       saleOrderItems: {
+        id: 0,
+        itemMasterId: 0,
+        itemMaster: {
           id: 0,
-          itemMasterId: 0,
-          itemMaster: {
-              id: 0,
-              code: '',
-              name: '',
-          },
-          quantity: 0,
-          unitPrice: 0,
-          amount: 0,
-          underCutPrice: 0,
-          cuttingWeight: 0,
-          afterCutPrice: 0,
-          afterCutQuantity: 0,
-          afterAmount: 0,
-          sourceHumidity: 0,
-          destinationHumidity: 0,
-          destinationWeighingScale: '',
-          remark: '',
-          saleOrder: {
-              code: ''
-          },
-      }
-  }]        
+          code: '',
+          name: '',
+          stockingUom: ''
+        },
+        quantity: 0,
+        unitPrice: 0,
+        amount: 0,
+        underCutPrice: 0,
+        cuttingWeight: 0,
+        afterCutPrice: 0,
+        afterCutQuantity: 0,
+        afterAmount: 0,
+        sourceHumidity: 0,
+        destinationHumidity: 0,
+        destinationWeighingScale: '',
+        remark: '',
+        saleOrder: {
+          id: 0,
+          code: '',
+        },
+      },
+    },
+  ],
 }
 
+const initCompany = {
+  id: "",
+  code: "",
+  companyName: "",
+  address: "",
+  subDistrict: "",
+  district: "",
+  province: "",
+  zipcode: "",
+  country: "",
+  phone: "",
+  fax: "",
+  tax: "", 
+  email: "", 
+  remark: "",
+  ext : "",
+  attn : "",
+  foundedDate: "",
+  billAddress: "",
+  billProvince: "",
+  billZipcode: "",
+  billCountry: "",  
+  billSubDistrict: "",  
+}
 
 export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
   const [loading, setLoading] = useState(false)
@@ -88,15 +125,12 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
   const [deleteId, setDeleteId] = useState(null)
   const [deleteTitle, setdeleteTitle] = useState(null)
   const [editValue, setEditValue] = useState<Invoice>(initialValue)
+  const [company, setCompany] = useState<CompanyType>(initCompany)
+  const [printX, setPrintX] = useState(0)
+  const [printY, setPrintY] = useState(0)
 
-  
   const navigate = useNavigate()
-
-  function viewAction(row: any) {
-    setIsEdit(true)
-    setEditValue(row)
-    console.log('update row', row)
-  }
+  const rule: any = usePermission('invoice')
 
   const onConfirm = async () => {
     const res: any = await deleteInvoice(deleteId)
@@ -110,15 +144,211 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
   }
 
   async function deleteAction(row: any) {
-    console.log('Invoice Detail: ',row);
+    console.log('Invoice Detail: ', row)
     setOpen(true)
     setDeleteId(row.id)
     setdeleteTitle(row.code)
   }
 
+  async function print(data: Invoice) {
+    console.log('Print value:', data)
+    const res: any = await findCompany(1)
+    if (res.status == 200) {
+      console.log('findCompany -success', res)
+      setCompany(res)
+    }
+   
+    setEditValue(data)
+    const doc = new jsPDF()
+    setPrintX(0)
+    setPrintY(10)
+    printHeader(doc)
+    doc.output('dataurlnewwindow')
+  }
+
+  function printHeader(doc: any) {
+    let bodyItems = []
+    for (let index = 0; index < editValue.invoiceItems.length; index++) {
+      let item = [
+        index + 1,
+        editValue.invoiceItems[index].saleOrderItems.itemMaster.code,
+        editValue.invoiceItems[index].saleOrderItems.itemMaster.name,
+        editValue.invoiceItems[index].saleOrderItems.quantity,
+        editValue.invoiceItems[index].saleOrderItems.itemMaster.stockingUom,
+        editValue.invoiceItems[index].saleOrderItems.unitPrice,
+        editValue.invoiceItems[index].saleOrderItems.amount,
+
+      ]
+      bodyItems.push(item)
+    }
+
+    for (let index = 0; index < 8; index++) {
+      bodyItems.push(['', '', '', '', '', '', '', ''])
+    }
+
+    //summary
+    // bodyItems.push(['','','','','Total', editValue.total,editValue.sumVat, editValue.amount]);
+
+    doc.addImage(logo, 'JPG', 15, 5, 30, 30)
+    doc.setFont('Sarabun-Regular', 'normal')
+
+    doc.setFontSize(15)
+    doc.text(company.companyName, printX + 50, printY + 10)
+    doc.setFontSize(10)
+    doc.text(
+      `${company?.address} ตำบล${company?.subDistrict} ${company?.district}  จังหวัด${company?.province}  ${company?.zipcode}`,
+      printX + 50,
+      printY + 15
+    )
+    doc.text(
+      `โทร.${company?.phone} เลขประจำตัวผู้เสียภาษีอากร ${company?.tax}`,
+      printX + 50,
+      printY + 20
+    )
+
+    doc.rect(printX + 45, printY + 30, 117, 15)
+    doc.setFontSize(15) 
+    doc.text('ต้นฉบับใบกำกับภาษี / ใบเสร็จรับเงิน / ใบส่งสินค้า', printX + 50, printY + 37) 
+    doc.setFontSize(12) 
+    doc.text('ORIGINAL TAX INVOICE / RECEIPT / DELIVERY ORDER', printX + 52, printY + 42) 
+
+    doc.setFontSize(10)
+    doc.text('ลูกค้า', printX + 15, printY + 50)
+    doc.text(`: ${editValue.customer?.companyName}`, printX + 50, printY + 50)
+    
+    doc.setFontSize(10)
+    doc.text('เลขที่ No.', printX + 120, printY + 50)
+    doc.text(`: ${editValue.code}`, printX + 160, printY + 50)
+
+    doc.setFontSize(10)
+    doc.text('ที่อยู่', printX + 15, printY + 60)
+    doc.text(`${editValue.customer.address} `, printX + 50, printY + 60)
+    doc.text(
+      `ตำบล${editValue.customer.subDistrict} ${editValue.customer.district} จังหวัด${editValue.customer.province}  ${editValue.customer?.zipcode}`,
+      printX + 20,
+      printY + 70
+    )
+
+    doc.setFontSize(10)
+    doc.text('วันที่', printX + 120, printY + 60)
+    doc.text(`: ${editValue.createAt}`, printX + 160, printY + 60)
+
+    doc.setFontSize(10)
+    doc.text('หน้า', printX + 120, printY + 70)
+
+    doc.setFontSize(10)
+    doc.text('เลขประจำตัวผู้เสียภาษี', printX + 15, printY + 80)
+    doc.text(`: ${editValue.customer?.tax}`, printX + 50, printY + 80)
+
+    doc.setFontSize(10)
+    doc.text('PO No.', printX + 120, printY + 80)
+
+    doc.setFontSize(10)
+    doc.text('สำนักงาน/สาขา', printX + 15, printY + 90)
+    doc.text(`: ${editValue.customer?.code}`, printX + 50, printY + 90)
+    doc.text('Payment Term', printX + 120, printY + 90)
+    doc.text(`: ${editValue.paymentTerm}`, printX + 160, printY + 70)
+
+
+    doc.autoTable({
+      startY: printY + 95,
+      theme: 'grid',
+      bodyStyles: {
+        font: 'Sarabun-Regular',
+        lineColor: [0, 0, 0],
+      },
+      headStyles: {
+        font: 'Sarabun-Regular',
+        lineColor: [0, 0, 0],
+        halign: 'center',
+        valign: 'middle',
+        // cellPadding: 1.5
+      },
+      columnStyles: {
+        0: { halign: 'center', valign: 'middle', cellWidth: 15, rowSpan: 2 },
+        1: { halign: 'center', valign: 'middle', cellWidth: 20 },
+        2: { halign: 'center', valign: 'middle', cellWidth: 60 },
+        3: { halign: 'left', valign: 'middle', cellWidth: 20 },
+        4: { halign: 'right', valign: 'middle', cellWidth: 20 },
+         5: { halign: 'right', valign: 'middle', cellWidth: 25,  },
+      },
+      head: [
+        ['ลำดับ', 'รหัสสินค้า', 'รายละเอียด', 'จำนวน', 'หน่วย', 'ราคาต่อหน่วย', 'จำนวนเงิน'],
+      ],
+      body: bodyItems,
+    })
+
+    let finalY = doc.lastAutoTable.finalY || 5
+   
+    doc.rect(14,finalY+3,87,16)
+    doc.text('ตัวอักษร', printX + 16, finalY + 8)
+    doc.line(printX + 14, finalY + 11, printX + 101, finalY + 11)
+    doc.text('ผิดตก ยกเว้น E. & O.E', printX + 16, finalY + 16)
+
+    doc.text('หมายเหตุ : ', printX + 16, finalY + 32)
+
+    doc.rect(109,finalY+3,87,48)
+    doc.line(printX + 32, printY + 260, printX + 68, printY + 260)
+
+    doc.text('รวมเงิน', printX + 111, finalY + 7)
+    doc.text('TOTAL', printX + 111, finalY + 11)
+    doc.text(editValue.total>0 ? editValue.total.toString() : '0', printX + 180, finalY + 9)
+    doc.line(109, finalY + 13, printX + 196, finalY + 13)
+
+    doc.text('ส่วนลด', printX + 111, finalY + 17)
+    doc.text('DISCOUNT', printX + 111, finalY + 21)
+    doc.text('0', printX + 180, finalY + 19)
+    doc.line(109, finalY + 23, printX + 196, finalY + 23)
+
+    doc.text('มูลค่าสินค้าหลังหักส่วนลด', printX + 111, finalY + 28)
+    doc.text('TOTAL AMOUNT AFTER DISCOUNT', printX + 111, finalY + 32)
+    doc.text(editValue.total>0 ? editValue.total.toString() : '0', printX + 180, finalY + 30)
+    doc.line(109, finalY + 33, printX + 196, finalY + 33)
+
+    doc.text('ภาษีมูลค่าเพิ่ม', printX + 111, finalY + 37)
+    doc.text('VAT 7%', printX + 111, finalY + 41)
+    doc.text((editValue.total>0 ? (editValue.total * 0.07).toString() : '0'), printX + 180, finalY + 39)
+    doc.line(109, finalY + 43, printX + 196, finalY + 43)
+    
+    doc.text('ยอดรวมสุทธิ', printX + 111, finalY + 46)
+    doc.text('GRAND TOTAL', printX + 111, finalY + 50)
+
+    doc.line(printX + 174, finalY + 3, printX + 174, finalY + 51)
+   
+  //   //footer
+    doc.setFontSize(9)
+    doc.text(`*กรณีชำระด้วยเช็คโปรดสั่งจ่ายเช็คขีดคร่อมในนามของ บริษท ตาดทอง 88 จำกัด เท่านั้น และขีดฆ่า "หรือผู้ถือ"`, printX + 34, printY + 238)
+    doc.text(`กรรมสิทธิ์ในสินค้ายังเป็นของบริษทฯ จนกว่าจะมีการชำระเงินเรียบร้อยแล้ว กรณีชำระเงินล่าช้าจะต้องชำระดอกเบี้ย 1.25% ต่อเดือน`, printX + 22, printY + 243)
+    doc.setFontSize(10)
+    doc.text(`ใบเสร็จรับเงินจะสมบูรณ์ต่อเมื่อบริษัท ตาดทอง 88 จำกัด ได้ร้บเงินตามเช็คหรือ เงินโอนเข้าบัญชีเรียบร้อยแล้วเท่านั้น`, printX + 22, printY + 248)
+
+
+    doc.rect(14, printY + 250, 182, 30)
+    doc.line(printX + 72, printY + 250, printX + 72, printY + 280)
+    doc.line(printX + 135, printY + 250, printX + 135, printY + 280)
+
+    doc.setFontSize(10)
+    doc.text('ผู้รับสินค้า ', printX + 17, printY + 260)
+    doc.line(printX + 32, printY + 260, printX + 68, printY + 260)
+     doc.text('ลงวันที่ ', printX + 17, printY + 270)
+     doc.line(printX + 32, printY + 270, printX + 68, printY + 270)
+
+     doc.text('ผู้ส่งสินค้า ', printX + 75, printY + 260)
+     doc.line(printX + 90, printY + 260, printX + 130, printY + 260)
+     doc.text('ลงวันที่ ', printX + 75, printY + 270)
+     doc.line(printX + 90, printY + 270, printX + 130, printY + 270)
+
+     doc.text(company?.companyName, printX + 137, printY + 257)
+     doc.line(printX + 140, printY + 270, printX + 190, printY + 270)
+     doc.text('ผู้มีอำนาจลงนาม', printX + 155, printY + 275)
+  }
+
+  useEffect(() => {
+   
+  }, [])
+
   return (
     <>
-      
       <AlertModal
         isOpen={open}
         onClose={() => setOpen(false)}
@@ -127,37 +357,41 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
         title={deleteTitle}
       />
 
-    <EditModal
-          isOpen={isEdit}
-          onClose={() => setIsEdit(false)}         
-          data={editValue}
+      <EditModal
+        isOpen={isEdit}
+        onClose={() => setIsEdit(false)}
+        data={editValue}
       />
 
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <Button variant='ghost' className='h-8 w-8 p-0'>
             <span className='sr-only'>Open menu</span>
-            <IconSettingsDown className="h-4 w-4 text-button" />
+            <IconSettingsDown className='h-4 w-4 text-button' />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end'>
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuItem            
-           
-            onClick={() => viewAction(row)}
-          >
-            <IconEye className='mr-2 h-4 w-4' /> View
-          </DropdownMenuItem>
-          <DropdownMenuItem            
-            //onClick={() => updateAction(row)}
-            onClick={() => navigate(`/invoice/view/${row.id}`)}
+          <DropdownMenuItem
+            disabled={row.status == 'Wait Approve' || !rule[0]?.canView}
+            onClick={() => print(row)}
           >
             <IconPrinter className='mr-2 h-4 w-4' /> Print
           </DropdownMenuItem>
+         
           <DropdownMenuItem
-          
-            onClick={() => deleteAction(row)}
+            onClick={() => navigate(`/invoice/detail/${row.id}`)}
           >
+            <IconEye className='mr-2 h-4 w-4' /> View
+          </DropdownMenuItem>
+          {/* <DropdownMenuItem
+            onClick={() => navigate(`/invoice/view/${row.id}`)}
+          >
+            <IconPrinter className='mr-2 h-4 w-4' /> Print
+          </DropdownMenuItem> */}
+          <DropdownMenuItem 
+             disabled={!rule[0]?.canDelete}
+          onClick={() => deleteAction(row)}>
             <Trash className='mr-2 h-4 w-4' /> Delete
           </DropdownMenuItem>
         </DropdownMenuContent>

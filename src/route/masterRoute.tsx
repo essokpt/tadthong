@@ -61,7 +61,10 @@ import WIP from '@/pages/workOrder/wip';
 import  UserProfile  from '@/pages/master/user/components/user-profile';
 import MasterReports from '@/pages/report';
 import DailyReports from '@/pages/report/daily';
-
+import { ViewInvoice } from '@/pages/saleOrder/invoice/components/view-invoice';
+import WeightScale from '@/pages/master/weightScale';
+import { WeightScalePriceForm } from '@/pages/master/weightScale/components/weightScale-form';
+import WeightScaleApprove from '@/pages/master/weightScale/approve';
 
 export default [
   {
@@ -250,6 +253,7 @@ export default [
     element: PRForm,
     requireRoles: 'purchaseRequest',
   },
+  
   {
     path: 'approve-pr',
     element: ApprovePurchaseRequest,
@@ -316,6 +320,11 @@ export default [
     requireRoles: 'saleOrder',
   },
   {
+    path: '/invoice/detail/:id',
+    element: ViewInvoice,
+    requireRoles: 'saleOrder',
+  },
+  {
     path: '/invoice/view/:id',
     element: PrintInvoice,
     requireRoles: 'saleOrder',
@@ -375,6 +384,21 @@ export default [
     path: '/daily-report',
     element: DailyReports,
     requireRoles: 'report',
+  },
+  {
+    path: '/master/weightScalePrice',
+    element: WeightScale,
+    requireRoles: 'weightScalePrice',
+  },
+  {
+    path: '/master/weightScalePrice/new',
+    element: WeightScalePriceForm,
+    requireRoles: 'weightScalePrice',
+  },
+  {
+    path: '/master/approveWeightScalePrice',
+    element: WeightScaleApprove,
+    requireRoles: 'approveWeightScalePrice',
   },
   
 ];

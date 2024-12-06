@@ -37,6 +37,7 @@ import {
   createInventory,
   createInventoryHistory,
 } from '@/services/inventoryApi'
+import usePermission from '@/hooks/use-permission'
 
 interface ReceiveModalProps {
   isOpen: boolean
@@ -59,6 +60,8 @@ export const ReceiveModal: React.FC<ReceiveModalProps> = ({
 
   const userid: any = localStorage.getItem('userId')
   const today = new Date()
+
+  const rule: any = usePermission('poReceive')
 
   function handleChangePrice(e: ChangeEvent<HTMLInputElement>) {
     console.log('handleChangePrice value', e.target.id)
@@ -96,38 +99,38 @@ export const ReceiveModal: React.FC<ReceiveModalProps> = ({
     // )
     // data.purchaseOrderItems = receiptItem
     for (let index = 0; index < data.purchaseOrderItems.length; index++) {
-      if(data.purchaseOrderItems[index].receiveQuantity > 0){
+      if (data.purchaseOrderItems[index].receiveQuantity > 0) {
         data.purchaseOrderItems[index].received =
-        data.purchaseOrderItems[index].received +
-        data.purchaseOrderItems[index].receiveQuantity
-      data.purchaseOrderItems[index].balance =
-        data.purchaseOrderItems[index].quantity -
-        data.purchaseOrderItems[index].received
-      data.purchaseOrderItems[index].status =
-        data.purchaseOrderItems[index].balance == 0 ? 'Completed' : 'Pending'
-      //add onhand stock
-      //data.purchaseOrderItems[index].locationId = data.locationId
-      data.purchaseOrderItems[index].warehouseId = 1
-      data.purchaseOrderItems[index].branchesId = data.branchId
-      //add hisory
-      data.purchaseOrderItems[index].stockType = 'PO-Receipt'
-      data.purchaseOrderItems[index].ref = data.code
-      data.purchaseOrderItems[index].stockBy = data.user.firstName
-     // data.purchaseOrderItems[index].status = 'Stock In'
+          data.purchaseOrderItems[index].received +
+          data.purchaseOrderItems[index].receiveQuantity
+        data.purchaseOrderItems[index].balance =
+          data.purchaseOrderItems[index].quantity -
+          data.purchaseOrderItems[index].received
+        data.purchaseOrderItems[index].status =
+          data.purchaseOrderItems[index].balance == 0 ? 'Completed' : 'Pending'
+        //add onhand stock
+        //data.purchaseOrderItems[index].locationId = data.locationId
+        data.purchaseOrderItems[index].warehouseId = 1
+        data.purchaseOrderItems[index].branchesId = data.branchId
+        //add hisory
+        data.purchaseOrderItems[index].stockType = 'PO-Receipt'
+        data.purchaseOrderItems[index].ref = data.code
+        data.purchaseOrderItems[index].stockBy = data.user.firstName
+        // data.purchaseOrderItems[index].status = 'Stock In'
       }
-     
     }
 
     console.log('updateReceive', data.purchaseOrderItems)
 
     const res: any = await createReceiveOrderItem(data.purchaseOrderItems)
     if (res.status == 200) {
-      let checkReceiptCompleted = data.purchaseOrderItems.find(a => a.balance > 0)
-      console.log("Check Receipt Completed", checkReceiptCompleted);
-      if(!checkReceiptCompleted){
-        data.status = "Completed"
-        console.log("Check Receipt Completed", data);
-        
+      let checkReceiptCompleted = data.purchaseOrderItems.find(
+        (a) => a.balance > 0
+      )
+      console.log('Check Receipt Completed', checkReceiptCompleted)
+      if (!checkReceiptCompleted) {
+        data.status = 'Completed'
+        console.log('Check Receipt Completed', data)
       }
       const response: any = await updatePurchaseOrderItem(data)
 
@@ -143,7 +146,6 @@ export const ReceiveModal: React.FC<ReceiveModalProps> = ({
       onClose()
     }, 2000)
   }
-
 
   useEffect(() => {
     setIsMounted(true)
@@ -180,7 +182,6 @@ export const ReceiveModal: React.FC<ReceiveModalProps> = ({
                       <TableHead>Value</TableHead>
                       <TableHead>Amount</TableHead>
                       <TableHead>Status</TableHead>
-                     
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -207,7 +208,7 @@ export const ReceiveModal: React.FC<ReceiveModalProps> = ({
                               value={item.locationId}
                             >
                               - Please Select Location
-                             </option>
+                            </option>
                             {locations?.map((item) => (
                               <option
                                 className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
@@ -234,7 +235,6 @@ export const ReceiveModal: React.FC<ReceiveModalProps> = ({
                         </TableCell>
                         <TableCell>{item.amount}</TableCell>
                         <TableCell>{item.status}</TableCell>
-                        
                       </TableRow>
                     ))}
                   </TableBody>
@@ -242,6 +242,7 @@ export const ReceiveModal: React.FC<ReceiveModalProps> = ({
                     <TableRow>
                       <TableCell colSpan={10}>
                         <Button
+                          disabled={!rule[0]?.canUpdate}
                           loading={onloading}
                           variant='button'
                           size='sm'

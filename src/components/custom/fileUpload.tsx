@@ -20,7 +20,7 @@ import {
   DropzoneOptions,
 } from "react-dropzone";
 import { toast } from "sonner";
-import { Trash2 as RemoveIcon } from "lucide-react";
+//import { Trash2 as RemoveIcon } from "lucide-react";
 import { buttonVariants } from "./button";
 import { IconTrash } from "@tabler/icons-react";
 
@@ -283,7 +283,9 @@ export const FileUploaderItem = forwardRef<
   HTMLDivElement,
   { index: number } & React.HTMLAttributes<HTMLDivElement>
 >(({ className, index, children, ...props }, ref) => {
-  const { removeFileFromSet, activeIndex, direction } = useFileUpload();
+  const { removeFileFromSet, activeIndex } = useFileUpload();
+  //const { removeFileFromSet, activeIndex, direction } = useFileUpload();
+
   const isSelected = index === activeIndex;
   return (
     <div

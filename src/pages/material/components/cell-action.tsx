@@ -14,7 +14,8 @@ import { EditModal } from './edit-modal'
 import { deleteMaterial } from '@/services/materialApi'
 import { ApiContext } from '@/components/layouts/api-context'
 import { ApiType } from 'types/api'
-import { IconSettingsDown } from '@tabler/icons-react'
+import { IconEye, IconSettingsDown } from '@tabler/icons-react'
+import usePermission from '@/hooks/use-permission'
 //import { ApproveModal } from '@/components/custom/approve-modal'
 //import { createApproveMaterial } from '@/services/approveMaterialApi'
 //import { format } from 'date-fns'
@@ -35,7 +36,7 @@ const initialValue = {
     firstName: '',
     lastName: '',
   },
-  locationId : 0,
+  locationId: 0,
   location: {
     id: 0,
     name: '',
@@ -52,25 +53,29 @@ const initialValue = {
 export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
   const [loading, setLoading] = useState(false)
   const [open, setOpen] = useState(false)
+  // const [canEdit, setCanEdit] = useState(false)
+  const [editble, setEditble] = useState(false)
+
   const [deleteId, setDeleteId] = useState(null)
   const [deleteTitle, setdeleteTitle] = useState(null)
 
   const [isEdit, setIsEdit] = useState(false)
   const [editValue, setEditValue] = useState<ImportMaterial>(initialValue)
-  
+
   const { setRefresh } = useContext(ApiContext) as ApiType
+  const rule: any = usePermission('material')
+
   function updateAction(row: any) {
     setIsEdit(true)
     setEditValue(row)
     console.log('update row', row)
   }
 
-   const onConfirm = async () => {
+  const onConfirm = async () => {
     setLoading(true)
     const res: any = await deleteMaterial(deleteId)
     if (res.status == 200) {
       console.log('deleteMaterial -success', res.status)
-      
     }
     setTimeout(() => {
       setOpen(false)
@@ -105,16 +110,15 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
   //   }, 1000)
   // }
 
-   function deleteAction(row: any) {
+  function deleteAction(row: any) {
     setOpen(true)
     setDeleteId(row.id)
     setdeleteTitle(row.code)
   }
 
-   function closeEditModal() {
+  function closeEditModal() {
     setIsEdit(false)
     setRefresh(true)
-   
   }
 
   return (
@@ -131,6 +135,7 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
         isOpen={isEdit}
         onClose={closeEditModal}
         data={editValue}
+        isEdit={editble}
       />
       <AlertModal
         isOpen={open}
@@ -143,18 +148,33 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
         <DropdownMenuTrigger asChild>
           <Button variant='ghost' className='h-8 w-8 p-0'>
             <span className='sr-only'>Open menu</span>
-            <IconSettingsDown className="h-4 w-4 text-button" />
+            <IconSettingsDown className='h-4 w-4 text-button' />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end'>
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-
-          <DropdownMenuItem  onClick={() => updateAction(row)}>
+          <DropdownMenuItem
+            disabled={!rule[0]?.canView}
+            onClick={() => {
+              setEditble(false)
+              updateAction(row)
+            }}
+          >
+            <IconEye className='mr-2 h-4 w-4' /> View
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            disabled={row.status == 'approved' || !rule[0]?.canUpdate}
+            onClick={() => {
+              setEditble(true)
+              updateAction(row)
+            }}
+          >
             <Edit className='mr-2 h-4 w-4' /> Update
           </DropdownMenuItem>
-          <DropdownMenuItem disabled={row.status != 'New'} onClick={() => deleteAction(row)}>
-
-        
+          <DropdownMenuItem
+            disabled={row.status != 'New' || !rule[0]?.canDelete}
+            onClick={() => deleteAction(row)}
+          >
             <Trash className='mr-2 h-4 w-4' /> Delete
           </DropdownMenuItem>
         </DropdownMenuContent>

@@ -4,6 +4,7 @@ import { RouterProvider } from 'react-router-dom'
 import { Toaster } from '@/components/ui/toaster'
 import { ThemeProvider } from '@/components/layouts/theme-provider'
 import '@/index.css'
+
 import { router } from './routing'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

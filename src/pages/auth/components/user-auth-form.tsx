@@ -29,6 +29,9 @@ import { toast } from '@/components/ui/use-toast'
 
 interface UserAuthFormProps extends HTMLAttributes<HTMLDivElement> {}
 
+const permisstionRole = [
+  { module: 'saleOrder', canCreate: false, canView: true, canUpdate: true, canDelete: false}
+]
 const formSchema = z.object({
   email: z
     .string()
@@ -67,7 +70,8 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         'permisstions',
         JSON.stringify(isAuthenticate.branch.roleBranches.permission)
       )
-
+      localStorage.setItem('permisstionRole', JSON.stringify(permisstionRole))
+      localStorage.setItem('accessPermissions', JSON.stringify(isAuthenticate.branch.roleBranches.accessPermissions))
       console.log('Login success', isAuthenticate.token)
       setIsLoading(false)
       navigate('/', { replace: true })

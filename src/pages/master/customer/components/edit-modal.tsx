@@ -53,8 +53,8 @@ import { MagnifyingGlassIcon } from '@radix-ui/react-icons'
 interface AlertModalProps {
   isOpen: boolean
   onClose: () => void
-  // loading: boolean
   data: Customer
+  editble: boolean
 }
 interface ChangeEvent<T = Element> extends SyntheticEvent<T> {
   target: EventTarget & T
@@ -84,6 +84,7 @@ export const EditModal: React.FC<AlertModalProps> = ({
   isOpen,
   onClose,
   data,
+  editble,
 }) => {
   const [open, setOpen] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
@@ -264,7 +265,9 @@ export const EditModal: React.FC<AlertModalProps> = ({
           <div className='grid gap-4'>
             <Tabs defaultValue='information' className='w-full'>
               <TabsList className='grid w-full grid-cols-2'>
-                <TabsTrigger value='information'>General Information</TabsTrigger>
+                <TabsTrigger value='information'>
+                  General Information
+                </TabsTrigger>
                 <TabsTrigger value='account'>Billing</TabsTrigger>
               </TabsList>
               <TabsContent value='information' className='h-full'>
@@ -278,6 +281,7 @@ export const EditModal: React.FC<AlertModalProps> = ({
                       </Label>
                     </div>
                     <Input
+                      readOnly={editble}
                       className='hidden'
                       {...register('id')}
                       defaultValue={data.id}
@@ -290,6 +294,7 @@ export const EditModal: React.FC<AlertModalProps> = ({
                         Code
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('code')}
                         defaultValue={data.code}
@@ -304,6 +309,7 @@ export const EditModal: React.FC<AlertModalProps> = ({
                         Company Name
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('companyName')}
                         defaultValue={data.companyName}
@@ -317,6 +323,7 @@ export const EditModal: React.FC<AlertModalProps> = ({
                         Tax ID
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('tax')}
                         defaultValue={data.tax}
@@ -330,6 +337,7 @@ export const EditModal: React.FC<AlertModalProps> = ({
                         Special Intruction
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('specialIntruction')}
                         defaultValue={data.specialIntruction}
@@ -343,6 +351,7 @@ export const EditModal: React.FC<AlertModalProps> = ({
                         Mang.Free%
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('meng')}
                         defaultValue={data.meng}
@@ -357,6 +366,7 @@ export const EditModal: React.FC<AlertModalProps> = ({
                         Profit Cost markup
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('costmarkup')}
                         defaultValue={data.costmarkup}
@@ -370,6 +380,7 @@ export const EditModal: React.FC<AlertModalProps> = ({
                         Credit Limit Amount/Order
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('creditLimitOrder')}
                         defaultValue={data.creditLimitOrder}
@@ -383,6 +394,7 @@ export const EditModal: React.FC<AlertModalProps> = ({
                         Credit Limit Amount/Item
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('creditLimitItem')}
                         defaultValue={data.creditLimitItem}
@@ -396,6 +408,7 @@ export const EditModal: React.FC<AlertModalProps> = ({
                         Currency
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('currency')}
                         defaultValue={data.currency}
@@ -410,6 +423,7 @@ export const EditModal: React.FC<AlertModalProps> = ({
                         Payment Term
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('paymentTerm')}
                         defaultValue={data.paymentTerm}
@@ -487,7 +501,6 @@ export const EditModal: React.FC<AlertModalProps> = ({
                       </select>
                     </div>
                     <div className='grid py-[25px]'>
-                    
                       <div className='rounded-md border border-input py-1.5'>
                         <input
                           className='ml-3'
@@ -521,6 +534,7 @@ export const EditModal: React.FC<AlertModalProps> = ({
                         Address
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('address')}
                         defaultValue={data.address}
@@ -538,6 +552,7 @@ export const EditModal: React.FC<AlertModalProps> = ({
                         <MagnifyingGlassIcon className='mr-2 h-4 w-4 shrink-0 border-separate opacity-50' />
 
                         <Input
+                          readOnly={editble}
                           className='mt-1 text-[0.8rem]'
                           onClick={() => setOpen(false)}
                           {...register('subDistrict')}
@@ -556,6 +571,7 @@ export const EditModal: React.FC<AlertModalProps> = ({
                         District
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('district')}
                         defaultValue={data.district}
@@ -569,6 +585,7 @@ export const EditModal: React.FC<AlertModalProps> = ({
                         Province
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('province')}
                         defaultValue={data.province}
@@ -582,6 +599,7 @@ export const EditModal: React.FC<AlertModalProps> = ({
                         Zipcode
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('zipcode')}
                         defaultValue={data.zipcode}
@@ -595,15 +613,15 @@ export const EditModal: React.FC<AlertModalProps> = ({
                         Country
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('country')}
                         defaultValue={data.country}
                       />
                     </div>
-                   </div>
+                  </div>
 
                   <div className='mb-3 grid grid-cols-3 items-start gap-2 space-x-3 space-y-0 rounded-md border p-4 shadow'>
-
                     <div className='col-span-3 mb-2  flex items-center'>
                       {/* <IconMap /> */}
                       <Label htmlFor='terms' className='ml-3 text-lg'>
@@ -618,6 +636,7 @@ export const EditModal: React.FC<AlertModalProps> = ({
                         Phone
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('phone')}
                         defaultValue={data.phone}
@@ -631,6 +650,7 @@ export const EditModal: React.FC<AlertModalProps> = ({
                         Fax
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('fax')}
                         defaultValue={data.fax}
@@ -644,6 +664,7 @@ export const EditModal: React.FC<AlertModalProps> = ({
                         Fax-Ext
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('ext')}
                         defaultValue={data.ext}
@@ -657,6 +678,7 @@ export const EditModal: React.FC<AlertModalProps> = ({
                         Attn
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('attn')}
                         defaultValue={data.attn}
@@ -670,6 +692,7 @@ export const EditModal: React.FC<AlertModalProps> = ({
                         Email
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('email')}
                         defaultValue={data.email}
@@ -684,6 +707,7 @@ export const EditModal: React.FC<AlertModalProps> = ({
                         Alternate Phone
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('alternatePhone')}
                         defaultValue={data.alternatePhone}
@@ -698,6 +722,7 @@ export const EditModal: React.FC<AlertModalProps> = ({
                         Phone-Ext
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('phoneExt')}
                         defaultValue={data.phoneExt}
@@ -712,6 +737,7 @@ export const EditModal: React.FC<AlertModalProps> = ({
                         Alternate Fax
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('alternateFax')}
                         defaultValue={data.alternateFax}
@@ -726,6 +752,7 @@ export const EditModal: React.FC<AlertModalProps> = ({
                         Note
                       </Label>
                       <Input
+                        readOnly={editble}
                         className='text-[0.8rem]'
                         {...register('remark')}
                         defaultValue={data.remark}
@@ -734,7 +761,12 @@ export const EditModal: React.FC<AlertModalProps> = ({
                   </div>
 
                   <DialogFooter>
-                    <Button loading={onloading} type='submit' variant='button'>
+                    <Button
+                      disabled={editble}
+                      loading={onloading}
+                      type='submit'
+                      variant='button'
+                    >
                       Save changes
                     </Button>
                   </DialogFooter>
@@ -838,6 +870,7 @@ export const EditModal: React.FC<AlertModalProps> = ({
                           <TableRow>
                             <TableCell>
                               <Button
+                              disabled={editble}
                                 variant='button'
                                 size='sm'
                                 className='w-13 h-8'

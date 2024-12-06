@@ -29,22 +29,40 @@ import { ImportMaterial } from '../../components/schema'
 import { updateMaterial } from '@/services/materialApi'
 import { ApiContext } from '@/components/layouts/api-context'
 import { ApiType } from 'types/api'
-import { IconCheck, IconChecklist } from '@tabler/icons-react'
+import { IconCheck, IconChecklist, IconSum } from '@tabler/icons-react'
+import { Summary } from './schema'
+import usePermission from '@/hooks/use-permission'
 
 interface EditModalProps {
   isOpen: boolean
   onClose: () => void
   data: ImportMaterial
+  summary: Summary
 }
 
 interface ChangeEvent<T = Element> extends SyntheticEvent<T> {
   target: EventTarget & T
 }
 
+// const initSum = {
+//   sumWeightIn: 0,
+//   sumWeightOut: 0,
+//   sumWeightNet:0,
+//   sumHumiduty: 0,
+//   sumadulteration: 0,
+//   sumOther: 0,
+//   sumAmount: 0,
+//   sumCol7: 0,
+//   sumShiping: 0,
+//   sumMoney: 0,
+//   sumBalance: 0,
+// }
+
 export const EditModal: React.FC<EditModalProps> = ({
   isOpen,
   onClose,
   data,
+  summary,
 }) => {
   const [isMounted, setIsMounted] = useState(false)
   const [onloading, setOnloading] = useState(false)
@@ -52,6 +70,7 @@ export const EditModal: React.FC<EditModalProps> = ({
 
   const { handleSubmit, register } = useForm()
   const { setRefresh } = useContext(ApiContext) as ApiType
+  const rule: any = usePermission('approve')
 
   async function updateData(payload: any) {
     setOnloading(true)
@@ -87,6 +106,7 @@ export const EditModal: React.FC<EditModalProps> = ({
 
   useEffect(() => {
     setIsMounted(true)
+    // summary()
   }, [])
 
   if (!isMounted) {
@@ -102,9 +122,9 @@ export const EditModal: React.FC<EditModalProps> = ({
           </DialogHeader>
           <Separator className='bg-primary' />
 
-          <div className='grid h-screen w-full gap-4 overflow-scroll'>
+          <div className='grid h-auto w-full gap-4 overflow-scroll'>
             <Card>
-              <CardContent className='h-[45rem] space-y-2 overflow-scroll'>
+              <CardContent className='h-auto space-y-2'>
                 <div className='grid gap-4'>
                   <form onSubmit={handleSubmit(updateData)}>
                     <div className='mb-3 mt-2 grid grid-cols-1 items-start gap-2 space-x-3 space-y-0 rounded-md border p-4 shadow'>
@@ -121,7 +141,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                         <select
                           //defaultValue={data.status}
                           onChange={handleChangeRole}
-                          className='flex mt-1 h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1'
+                          className='mt-1 flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1'
                         >
                           <option
                             className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
@@ -152,6 +172,104 @@ export const EditModal: React.FC<EditModalProps> = ({
                         />
                       </div>
                     </div>
+                    <div className='mb-3 grid grid-cols-1 items-start gap-2 space-x-3 space-y-0 rounded-md border p-4 shadow'>
+                      <div className='col-span-3 mb-2  flex items-center'>
+                        <IconSum />
+                        <Label htmlFor='terms' className='ml-3 text-lg'>
+                          Summary.
+                        </Label>
+                      </div>
+                      <div className='grid gap-4'>
+                        <Table className='w-[80rem] '>
+                          <TableBody>
+                            <TableRow>
+                              <TableCell className='text-center text-base'>
+                                น้ำหนักชั่งเข้า
+                              </TableCell>
+                              <TableCell className='text-left'>
+                                {summary.sumWeightIn}
+                              </TableCell>
+                              <TableCell className='text-center text-base'>
+                                น้ำหนักชั่งออก
+                              </TableCell>
+                              <TableCell className='text-left'>
+                                {summary.sumWeightOut}
+                              </TableCell>
+                              <TableCell className='text-center text-base'>
+                                น้ำหนักสุทธิ
+                              </TableCell>
+                              <TableCell className='text-left'>
+                                {summary.sumWeightNet}
+                              </TableCell>
+                              <TableCell className='text-center text-base'>
+                                หักความชื้น
+                              </TableCell>
+                              <TableCell className='text-left'>
+                                {summary.sumHumiduty ? summary.sumHumiduty : 0}
+                              </TableCell>
+                            </TableRow>
+                            <TableRow>
+                              <TableCell className='text-center text-base'>
+                                หักสิ่งเจือปน
+                              </TableCell>
+                              <TableCell className='text-left'>
+                                {summary.sumadulteration
+                                  ? summary.sumadulteration
+                                  : 0}
+                              </TableCell>
+                              <TableCell className='text-center text-base'>
+                                หักอื่นๆ
+                              </TableCell>
+                              <TableCell className='text-left'>
+                                {summary.sumOther ? summary.sumOther : 0}
+                              </TableCell>
+                              <TableCell className='text-center text-base'>
+                                น้ำหนักคงเหลือ
+                              </TableCell>
+                              <TableCell className='text-left'>
+                                {summary.sumWeightBalace
+                                  ? summary.sumWeightBalace
+                                  : 0}
+                              </TableCell>
+                              <TableCell className='text-center text-base'>
+                                จำนวนเงิน
+                              </TableCell>
+                              <TableCell className='text-left'>
+                                {summary.sumAmount}
+                              </TableCell>
+                            </TableRow>
+                            <TableRow>
+                              <TableCell className='text-center text-base'>
+                                หักเงินค่าชั่ง
+                              </TableCell>
+                              <TableCell className='text-left'>
+                                {summary.sumCol7}
+                              </TableCell>
+                              <TableCell className='text-center text-base'>
+                                หักค่าลง
+                              </TableCell>
+                              <TableCell className='text-left'>
+                                {summary.sumShiping}
+                              </TableCell>
+                              <TableCell className='text-center text-base'>
+                                หักเงินอื่นๆ
+                              </TableCell>
+                              <TableCell className='text-left'>
+                                {summary.sumMoney}
+                              </TableCell>
+                              <TableCell className='text-center text-base'>
+                                เงินคงเหลือ
+                              </TableCell>
+                              <TableCell className='text-left'>
+                                {summary.sumBalance}
+                              </TableCell>
+                            </TableRow>
+                          </TableBody>
+                          <TableFooter></TableFooter>
+                        </Table>
+                      </div>
+                    </div>
+
                     <div className='mb-3 grid grid-cols-1 items-start gap-2 space-x-3 space-y-0 rounded-md border p-4 shadow'>
                       <div className='col-span-3 mb-2  flex items-center'>
                         <IconChecklist />
@@ -243,11 +361,10 @@ export const EditModal: React.FC<EditModalProps> = ({
                         </Table>
                       </div>
                     </div>
-                    <br />
 
-                    <br />
                     <DialogFooter>
                       <Button
+                        disabled={!rule[0]?.canView}
                         loading={onloading}
                         type='submit'
                         variant='button'

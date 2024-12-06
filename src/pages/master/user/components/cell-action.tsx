@@ -17,19 +17,20 @@ import { useNavigate } from 'react-router-dom'
 import { ApiContext } from '@/components/layouts/api-context'
 import { ApiType } from 'types/api'
 import { IconSettingsDown } from '@tabler/icons-react'
+import usePermission from '@/hooks/use-permission'
 
 type UserRoleBanch = {
-  id : string
-  userId : number
-  branchId : number
-  roleBranchesId : number
-  branch : {  
-    id : string 
-    branchName: string,
-    code : string
-  },
+  id: string
+  userId: number
+  branchId: number
+  roleBranchesId: number
+  branch: {
+    id: string
+    branchName: string
+    code: string
+  }
   roleBranches: {
-    id: string,
+    id: string
     name: string
   }
 }
@@ -59,7 +60,7 @@ const initialValue = {
   password: '',
   userImage: '',
   district: '',
-  subDistrict: ''
+  subDistrict: '',
 }
 
 export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
@@ -73,6 +74,8 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
   const navigate = useNavigate()
   const { setRefresh } = useContext(ApiContext) as ApiType
 
+  const rule: any = usePermission('user')
+
   function updateAction(row: any) {
     findUser(row.id).then((data) => setUser(data))
     setIsEdit(true)
@@ -80,10 +83,9 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
     console.log('update row', row)
   }
 
-  const closeModal =  () => {
+  const closeModal = () => {
     setIsEdit(false)
     navigate('/master/user', { replace: true })
-    
   }
 
   const onConfirm = async () => {
@@ -109,7 +111,7 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
     <>
       <EditModal
         isOpen={isEdit}
-        onClose={closeModal}      
+        onClose={closeModal}
         data={editValue}
         rolebranch={user}
       />
@@ -124,16 +126,22 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
         <DropdownMenuTrigger asChild>
           <Button variant='ghost' className='h-8 w-8 p-0'>
             <span className='sr-only'>Open menu</span>
-            <IconSettingsDown className="h-4 w-4 text-button" />
+            <IconSettingsDown className='h-4 w-4 text-button' />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end'>
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
-          <DropdownMenuItem onClick={() => updateAction(row)}>
+          <DropdownMenuItem
+            disabled={!rule[0]?.canUpdate}
+            onClick={() => updateAction(row)}
+          >
             <Edit className='mr-2 h-4 w-4' /> Update
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => deleteAction(row)}>
+          <DropdownMenuItem
+            disabled={!rule[0]?.canDelete}
+            onClick={() => deleteAction(row)}
+          >
             <Trash className='mr-2 h-4 w-4' /> Delete
           </DropdownMenuItem>
         </DropdownMenuContent>

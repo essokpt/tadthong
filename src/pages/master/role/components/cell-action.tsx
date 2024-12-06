@@ -14,10 +14,11 @@ import { useContext, useEffect, useState } from "react";
 import { deleteRole, getPermissions } from "@/services/roleApi";
 import { EditModal } from "./edit-modal";
 import { RoleType } from "./type";
-import { Permission } from "types/permission";
+import { AccessPermission, Permission } from "types/permission";
 import { ApiContext } from "@/components/layouts/api-context";
 import { ApiType } from "types/api";
-import { IconSettingsDown } from "@tabler/icons-react";
+import { IconEye, IconSettingsDown } from "@tabler/icons-react";
+import usePermission from "@/hooks/use-permission";
 
 // interface CellActionProps {
 //   data: Employee;
@@ -44,10 +45,41 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
   const [isMounted, setIsMounted] = useState(false)
   const [editValue, setEditValue] = useState<RoleType>(initialValue)
   const [permissions, setPermissions] = useState<Permission[]>([])
+  const [editble, setEditble] = useState(false);
+
+  const [newPermissionsRole, setNewPermissionsRole] = useState<
+    AccessPermission[]
+  >([])
 
   const { setRefresh } = useContext(ApiContext) as ApiType
+  const rule: any = usePermission('managerole')
 
+  const addACLForm = (row: any) => {
+    console.log('permission:', row.accessPermissions);
+    
+    const temp = permissions?.map((data) => {
+       const seleted:any = row.accessPermissions?.find((item:any) => item.permission == data.name)
+      // console.log('permission seleted:', seleted);
+      
+      let acl = {
+        id: parseInt(data.id),
+        permission: data.name,
+        description: data.description,
+        roleBranchesId: row.id,
+        canCreate: seleted? seleted.canCreate : false,
+        canView:  seleted? seleted.canView : false,
+        canUpdate:  seleted? seleted.canUpdate : false,
+        canDelete:  seleted? seleted.canDelete : false,
+      }
+      return acl
+    
+    })
+    setNewPermissionsRole(temp) // Save the copy to state
+  }
+
+  
   function updateAction(row:any) { 
+    addACLForm(row)
     checkUserPermission(row)  
     setIsEdit(true) 
     setEditValue(row)
@@ -100,7 +132,9 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
           isOpen={isEdit}
           onClose={() => setIsEdit(false)}        
           data={editValue}
-          role={permissions}
+          role={newPermissionsRole}
+          editble={!editble}
+          permissions={permissions}
       />
       <AlertModal
         isOpen={open}
@@ -118,13 +152,26 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-
           <DropdownMenuItem
-            onClick={() => updateAction(row)}
+            disabled={!rule[0]?.canView}
+            onClick={() => {
+              setEditble(false)
+              updateAction(row)
+            }}
+          >
+            <IconEye className="mr-2 h-4 w-4" /> View
+          </DropdownMenuItem>
+          <DropdownMenuItem
+           disabled={!rule[0]?.canUpdate}
+            onClick={() => { 
+              setEditble(true)
+              updateAction(row)
+            }}
           >
             <Edit className="mr-2 h-4 w-4" /> Update
           </DropdownMenuItem>
-          <DropdownMenuItem disabled={row.status == 'New'} onClick={() => deleteAction(row)}>
+          <DropdownMenuItem disabled={row.status == 'New' ||  !rule[0]?.canDelete}
+           onClick={() => deleteAction(row)}>
 
             <Trash className="mr-2 h-4 w-4" /> Delete
           </DropdownMenuItem>

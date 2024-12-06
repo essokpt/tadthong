@@ -77,8 +77,8 @@ import { CreateModal } from './create-modal'
 interface EditModalProps {
   isOpen: boolean
   onClose: () => void
-
   data: BomType
+  editble: boolean
 }
 
 interface ChangeEvent<T = Element> extends SyntheticEvent<T> {
@@ -119,10 +119,11 @@ export const EditModal: React.FC<EditModalProps> = ({
   isOpen,
   onClose,
   data,
+  editble,
 }) => {
   const [isMounted, setIsMounted] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [updateLoading, setUpdateLoading] = useState(false)
+  //const [updateLoading, setUpdateLoading] = useState(false)
   const [openModal, setOpenModal] = useState(false)
 
   const [itemMaster, setItemMaster] = useState<ItemType[]>([])
@@ -196,7 +197,7 @@ export const EditModal: React.FC<EditModalProps> = ({
   }
 
   async function updateBomItem(id: any) {
-    setUpdateLoading(true)
+    //setUpdateLoading(true)
     const updateItem = data.bomItems.findIndex((item) => item.id == id)
     console.log('updateBomItem:', data.bomItems[updateItem])
 
@@ -207,9 +208,6 @@ export const EditModal: React.FC<EditModalProps> = ({
         console.log('updateBomItem success')
       }
     }
-    setTimeout(() => {
-      setUpdateLoading(false)
-    }, 1000)
   }
 
   async function updateGeneralData(payload: any) {
@@ -335,7 +333,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                           <FormItem className='space-y-1'>
                             <FormLabel>Bom Name</FormLabel>
                             <FormControl>
-                              <Input {...field} />
+                              <Input {...field} readOnly={editble} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -419,7 +417,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                           <FormItem className='space-y-1'>
                             <FormLabel>Description</FormLabel>
                             <FormControl>
-                              <Input {...field} />
+                              <Input {...field} readOnly={editble} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -433,7 +431,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                           <FormItem className='space-y-1'>
                             <FormLabel>Status</FormLabel>
                             <FormControl>
-                              <Input {...field} readOnly />
+                              <Input {...field} readOnly={editble} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -539,7 +537,6 @@ export const EditModal: React.FC<EditModalProps> = ({
                               <TableCell className='w-[8rem]'>
                                 <div className='flex items-center gap-3'>
                                   <IconEdit
-                                   
                                     size={20}
                                     onClick={() => updateBomItem(item.id)}
                                   />
@@ -556,7 +553,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                           <TableRow>
                             <TableCell className='item-center' colSpan={9}>
                               <Badge
-                                className='text-white hover:bg-primary'
+                                className={`${editble ? 'hidden' : 'text-white hover:bg-primary'}`}
                                 variant={'default'}
                                 onClick={() => setOpenModal(true)}
                               >
@@ -569,6 +566,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                       </Table>
                     </div>
                     <Button
+                      disabled={editble}
                       className='float-end mb-3 mt-2 h-10 w-full gap-3 border'
                       loading={isLoading}
                       type='submit'

@@ -14,7 +14,8 @@ import { deleteVender } from "@/services/vendersApi";
 import { ApiContext } from "@/components/layouts/api-context";
 import { ApiType } from "types/api";
 import { Venders } from "./schema";
-import { IconSettingsDown } from "@tabler/icons-react";
+import { IconEye, IconSettingsDown } from "@tabler/icons-react";
+import usePermission from "@/hooks/use-permission";
 
 interface DataTableRowActionsProps{
     row: Venders
@@ -29,7 +30,10 @@ const initialValue = {
     fax: '',
     tax: '', 
     email: '',
-    venderType : '',
+    venderType : {
+      id: 0,
+      typeName: ''
+    },
     contactName: '',
     remark: '',
     district : '',
@@ -47,6 +51,9 @@ const initialValue = {
     latitude: '',
     longtitude: '',
     bankAccount: '',
+    paymentType: '',
+    venderTypeId: 0,
+    venderFileAttach: [],
     venderBillings: []
 }
 
@@ -54,15 +61,18 @@ const initialValue = {
 export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [editble, setEditble] = useState(false);
   const [deleteId, setDeleteId] = useState(null)
   const [deleteTitle, setdeleteTitle] = useState(null)
   const [isEdit, setIsEdit] = useState(false);
   const [editValue, setEditValue] = useState<Venders>(initialValue)
   const { setRefresh } = useContext(ApiContext) as ApiType
+  const rule: any = usePermission('vender')
 
-  function updateAction(row:any) {   
-    setIsEdit(true) 
+  function updateAction(row:any) {
+    //setEditble(true)  
     setEditValue(row)
+    setIsEdit(true) 
     console.log('update row',row);  
   }
 
@@ -91,6 +101,7 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
           isOpen={isEdit}
           onClose={() => setIsEdit(false)}         
           data={editValue}
+          editble={!editble}
       />
       <AlertModal
         isOpen={open}
@@ -108,13 +119,27 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-
           <DropdownMenuItem
-            onClick={() => updateAction(row)}
+            disabled={!rule[0]?.canView}
+            onClick={() => {
+              setEditble(false)
+              updateAction(row)
+            }}
+          >
+            <IconEye className="mr-2 h-4 w-4" /> View
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            disabled={!rule[0]?.canUpdate}
+            onClick={() => { 
+              setEditble(true)
+              updateAction(row)
+            }}
           >
             <Edit className="mr-2 h-4 w-4" /> Update
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => deleteAction(row)}>
+          <DropdownMenuItem 
+            disabled={!rule[0]?.canDelete}
+            onClick={() => deleteAction(row)}>
             <Trash className="mr-2 h-4 w-4" /> Delete
           </DropdownMenuItem>
         </DropdownMenuContent>

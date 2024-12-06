@@ -11,6 +11,7 @@ import { Edit } from "lucide-react";
 import { useState } from "react";
 import { EditModal } from "./edit-modal";
 import { IconSettingsDown } from "@tabler/icons-react";
+import usePermission from "@/hooks/use-permission";
 
 interface DataTableRowActionsProps{
     row: Transfer
@@ -58,14 +59,13 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
   const [isEdit, setIsEdit] = useState(false);
   const [editValue, setEditValue] = useState<Transfer>(initialValue)
 
+  const rule: any = usePermission('inventory')
+
   function updateAction(row:any) {   
     setIsEdit(true) 
     setEditValue(row)
     console.log('update row',row);  
   }
-
-  
-
   
   return (
     <>
@@ -93,6 +93,7 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
           <DropdownMenuItem
+            disabled={!rule[0]?.canView}
             onClick={() => updateAction(row)}
           >
             <Edit className="mr-2 h-4 w-4" /> Detail

@@ -41,6 +41,7 @@ export interface ItemList {
     weighingMoney: number
     shipDown : number
     cashOther :  number
+    uomType: string
   }
 
 

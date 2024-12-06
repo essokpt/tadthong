@@ -57,14 +57,14 @@ Start the server
   pnpm run dev
 ```
 
-## Author
+<!-- ## Author
 
 Crafted with 🤍 by [@satnaing](https://github.com/satnaing)
 
 ## License
 
 Licensed under the [MIT License](https://choosealicense.com/licenses/mit/)
-
+ -->
 
 
 add column to sql server 

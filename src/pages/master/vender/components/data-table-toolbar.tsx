@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { SearchIcon } from 'lucide-react';
 import { DataTableViewOptions } from './data-table-view-options';
+import usePermission from '@/hooks/use-permission';
 //import { DataTableViewOptions } from './data-table-view-options'
 
 // import { priorities, statuses } from '../mockdata/data'
@@ -23,7 +24,7 @@ export function DataTableToolbar<TData>({
 }: DataTableToolbarProps<TData>) {
   const [query, setQuery] = useState('')
   const navigate = useNavigate()
-
+  const rule:any = usePermission('vender')
   const reset = () => {
     searchData('')
     setQuery('')
@@ -58,6 +59,7 @@ export function DataTableToolbar<TData>({
       </div>
       {link && (
       <Button
+      disabled={!rule[0]?.canCreate}
         variant='outline'
         size='sm'
         className='h-8 border bg-button text-white'

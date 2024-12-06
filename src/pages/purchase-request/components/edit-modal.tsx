@@ -3,7 +3,7 @@ import { Button } from '@/components/custom/button'
 import { useForm } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
 import { Label } from '@radix-ui/react-label'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+//import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Table,
   TableBody,
@@ -36,9 +36,11 @@ import {
   IconEye,
   IconFile,
   IconInfoCircle,
+  IconPlus,
   IconTrash,
 } from '@tabler/icons-react'
 import {
+  createPurchaseRequestItem,
   deletePurchaseRequestItem,
   purchaseRequestDeleteFileAttach,
   purchaseRequestDownloadFileAttach,
@@ -49,15 +51,17 @@ import {
 import { getLocation } from '@/services/locationApi'
 import { LocationType } from '@/pages/location/components/type'
 import FileDrag from '@/components/custom/fileDrag'
-import { PlusCircleIcon } from 'lucide-react'
 import { downloadFileData } from '@/lib/utils'
 import { AlertModal } from '@/components/custom/alert-modal'
 import { CreateModal } from './create-modal'
+import { Badge } from '@/components/ui/badge'
+import usePermission from '@/hooks/use-permission'
 
 interface EditModalProps {
   isOpen: boolean
   onClose: () => void
   data: PurchaseRequest
+  editble: boolean
 }
 // interface ChangeEvent<T = Element> extends SyntheticEvent<T> {
 //   target: EventTarget & T
@@ -101,6 +105,7 @@ export const EditModal: React.FC<EditModalProps> = ({
   isOpen,
   onClose,
   data,
+  editble
 }) => {
   const [isMounted, setIsMounted] = useState(false)
   const { handleSubmit, register } = useForm()
@@ -108,13 +113,14 @@ export const EditModal: React.FC<EditModalProps> = ({
   const [locations, setLocation] = useState<LocationType[]>([])
   const [editValue, setEditValue] = useState<ItemLists>(initalValue)
 
-  const [files, setFiles] = useState('')
+  //const [files, setFiles] = useState('')
   const [openEdit, setOpenEdit] = useState(false)
   const [open, setOpen] = useState(false)
   const [openDeleteItem, setOpenDeleteItem] = useState(false)
   const [deleteTitle, setdeleteTitle] = useState(null)
   const [deleteId, setdeleteId] = useState(null)
   const [deleteItemId, setdeleteItemId] = useState(null)
+  const rule: any = usePermission('purchaseRequest')
 
   async function downloadFile(filename: any) {
     const response: any = await purchaseRequestDownloadFileAttach(filename)
@@ -127,6 +133,11 @@ export const EditModal: React.FC<EditModalProps> = ({
       '_blank',
       'noreferrer'
     )
+  }
+
+  function addNewItem() {
+    setEditValue(initalValue)
+    setOpenEdit(true)
   }
 
   function deleteAction(row: any) {
@@ -152,48 +163,9 @@ export const EditModal: React.FC<EditModalProps> = ({
     setTimeout(() => {
       setOnloading(false)
       setOpen(false)
-      //setRefresh(true)
       data.purchaseRequestFileAttach.filter((a) => a.id !== deleteId)
     }, 1000)
   }
-
-  // function handleChangeQuantity(e: ChangeEvent<HTMLInputElement>) {
-  //   console.log('handleChangeQuantity value', e.target.id)
-
-  //   const findIndex: any = data.purchaseRequestItems.findIndex(
-  //     (item) => item.id == e.target.id
-  //   )
-  //   if (findIndex != -1) {
-  //     data.purchaseRequestItems[findIndex].quantity = parseInt(e.target.value)
-  //     updateItem(findIndex)
-  //   }
-  // }
-
-  // function handleChangePrice(e: ChangeEvent<HTMLInputElement>) {
-  //   console.log('handleChangePrice value', e.target.id)
-
-  //   const findIndex: any = data.purchaseRequestItems.findIndex(
-  //     (item) => item.id == e.target.id
-  //   )
-  //   if (findIndex != -1) {
-  //     data.purchaseRequestItems[findIndex].price = parseFloat(e.target.value)
-  //     updateItem(findIndex)
-  //   }
-  // }
-
-  // function updateItem(item:any) {
-  //   if (item != -1) {
-  //     data.purchaseRequestItems[item].total =  data.purchaseRequestItems[item].quantity *  data.purchaseRequestItems[item].price
-  //     data.purchaseRequestItems[item].includeVat =  data.purchaseRequestItems[item].total *  0.07
-  //     data.purchaseRequestItems[item].amount =  data.purchaseRequestItems[item].total +  data.purchaseRequestItems[item].includeVat
-
-  //   }
-  // }
-
-  // function addFile(payload: any) {
-  //   setFiles(payload)
-  //   console.log('File data:', payload)
-  // }
 
   async function uploadFile(payload: any) {
     if (payload) {
@@ -215,7 +187,6 @@ export const EditModal: React.FC<EditModalProps> = ({
       }
       setTimeout(() => {
         setOnloading(false)
-        setFiles('')
       }, 3000)
     }
   }
@@ -281,15 +252,41 @@ export const EditModal: React.FC<EditModalProps> = ({
     payload.includeVat = parseFloat(payload.total) * 0.07
     payload.amount = parseFloat(payload.total) + parseFloat(payload.includeVat)
 
-    console.log('updatePurchaseItem data:', payload)
-    const res: any = await updatePurchaseRequestItem(payload)
+    if (payload.id == '') {
+      payload.id = '0'
+      console.log('Add new purchase item data:', payload, data.id)
 
-    if (res.status == 200) {
-      console.log('editPurchaseItem:', res.data.result.value)
+      const res: any = await createPurchaseRequestItem(parseInt(data.id), [
+        payload,
+      ])
+      if (res.length > 0) {
+        console.log('Add new purchase item success:', res)
 
-      data.purchaseRequestItems.length = 0
-      for (let index = 0; index < res.data.result.value.length; index++) {
-        data.purchaseRequestItems?.push(res.data.result.value[index])
+        data.purchaseRequestItems.length = 0
+        for (let index = 0; index < res.length; index++) {
+          data.purchaseRequestItems?.push(res[index])
+        }
+      }
+
+      if (res.status == 200) {
+        console.log('editPurchaseItem:', res.data.result.value)
+
+        data.purchaseRequestItems.length = 0
+        for (let index = 0; index < res.data.result.value.length; index++) {
+          data.purchaseRequestItems?.push(res.data.result.value[index])
+        }
+      }
+    } else {
+      console.log('update purchase item data:', payload)
+      const res: any = await updatePurchaseRequestItem(payload)
+
+      if (res.status == 200) {
+        console.log('editPurchaseItem:', res.data.result.value)
+
+        data.purchaseRequestItems.length = 0
+        for (let index = 0; index < res.data.result.value.length; index++) {
+          data.purchaseRequestItems?.push(res.data.result.value[index])
+        }
       }
     }
     setTimeout(() => {
@@ -316,7 +313,6 @@ export const EditModal: React.FC<EditModalProps> = ({
           </DialogHeader>
           <Separator className='bg-primary' />
 
-         
           <Card>
             <CardContent className='m-3 h-auto space-y-2'>
               <div className='grid gap-4'>
@@ -562,21 +558,20 @@ export const EditModal: React.FC<EditModalProps> = ({
                           </TableRow>
                         ))}
                       </TableBody>
-                      {/* <TableFooter>                        
+                      <TableFooter>
                         <TableRow>
-                          <TableCell colSpan={5}> </TableCell>
-                          <TableCell className='text-left'>
-                            {data.sumQty}
-                          </TableCell>
-                          <TableCell></TableCell>
-                          <TableCell>{data.total}</TableCell>
-                          <TableCell></TableCell>
-                          <TableCell>{data.sumVat?.toFixed(2)}</TableCell>
-                          <TableCell colSpan={2} className='text-center'>
-                            {data.amount}
+                          <TableCell>
+                            <Badge
+                              className={`${editble ? 'hidden' : 'text-white hover:bg-primary'}`}
+                              variant={'default'}
+                              onClick={addNewItem}
+                            >
+                              <IconPlus size={20} className='mr-2 h-4 w-4' />
+                              Add Item
+                            </Badge>
                           </TableCell>
                         </TableRow>
-                      </TableFooter> */}
+                      </TableFooter>
                     </Table>
                   </div>
 
@@ -650,7 +645,11 @@ export const EditModal: React.FC<EditModalProps> = ({
 
                   <br />
                   <DialogFooter>
-                    <Button loading={onloading} type='submit'>
+                    <Button
+                      disabled={!rule[0].canUpdate}
+                      loading={onloading}
+                      type='submit'
+                    >
                       Save changes
                     </Button>
                   </DialogFooter>

@@ -14,7 +14,8 @@ import { EditModal } from "./edit-modal";
 import { deleteItem } from "@/services/itemApi";
 import { ApiContext } from "@/components/layouts/api-context";
 import { ApiType } from "types/api";
-import { IconSettingsDown } from "@tabler/icons-react";
+import { IconEye, IconSettingsDown } from "@tabler/icons-react";
+import usePermission from "@/hooks/use-permission";
 
 interface DataTableRowActionsProps{
     row: Item
@@ -59,6 +60,8 @@ const initialValue = {
     itemCategoryId: '',
     itemTypeId: '',
     itemGroupId: '',
+    alternateUom: '',
+    convertFactor: 0,
     itemType : {
       id : 0,
       name : ''
@@ -91,8 +94,10 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
   const [deleteTitle, setdeleteTitle] = useState(null)
   const [isEdit, setIsEdit] = useState(false);
   const [editValue, setEditValue] = useState<Item>(initialValue)
+  const [editble, setEditble] = useState(false);
 
   const { setRefresh } = useContext(ApiContext) as ApiType
+  const rule: any = usePermission('item')
 
   function updateAction(row:any) {   
     setIsEdit(true) 
@@ -131,6 +136,7 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
           isOpen={isEdit}
           onClose={closeEditModal}
           data={editValue}
+          editble={!editble}
       />
       <AlertModal
         isOpen={open}
@@ -148,13 +154,27 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-
           <DropdownMenuItem
-            onClick={() => updateAction(row)}
+            disabled={!rule[0]?.canView}
+            onClick={() => {
+              setEditble(false)
+              updateAction(row)
+            }}
+          >
+            <IconEye className="mr-2 h-4 w-4" /> View
+          </DropdownMenuItem>
+          <DropdownMenuItem
+           disabled={!rule[0]?.canUpdate}
+            onClick={() => { 
+              setEditble(true)
+              updateAction(row)
+            }}
           >
             <Edit className="mr-2 h-4 w-4" /> Update
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => deleteAction(row)}>
+          <DropdownMenuItem 
+           disabled={!rule[0]?.canDelete}
+          onClick={() => deleteAction(row)}>
             <Trash className="mr-2 h-4 w-4" /> Delete
           </DropdownMenuItem>
         </DropdownMenuContent>

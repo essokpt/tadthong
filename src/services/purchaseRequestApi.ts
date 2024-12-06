@@ -130,10 +130,10 @@ export async function createPurchaseRequest(data:any) {
     }
   }
 
-  export async function createPurchaseRequestItem(data:any) {
+  export async function createPurchaseRequestItem(purchaseRequestId:number, data:any) {
     // console.error('login',data);
      try {
-       const response = await api.post(`${endpoint}/CreateItem`, data);
+       const response = await api.post(`${endpoint}/CreateItem/${purchaseRequestId}`, data);
      
        const res = await response.data
        console.log('createPurchaseRequest',res);

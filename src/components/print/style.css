@@ -83,6 +83,7 @@ body{
     font-weight: 500;
     font-size: 27px;
     color: var(--blue-color);
+    
 }
 .invoice-head-middle, .invoice-head-bottom{
     padding: 16px 0;

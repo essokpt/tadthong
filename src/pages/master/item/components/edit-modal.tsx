@@ -58,6 +58,7 @@ interface EditModalProps {
   isOpen: boolean
   onClose: () => void
   data: Item
+  editble: boolean
 }
 
 interface ItemsType {
@@ -84,6 +85,7 @@ export const EditModal: React.FC<EditModalProps> = ({
   isOpen,
   onClose,
   data,
+  editble,
 }) => {
   const [open, setOpen] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
@@ -265,325 +267,335 @@ export const EditModal: React.FC<EditModalProps> = ({
                         <div className='col-span-3'>
                           <hr />
                         </div>
-                        
+
+                        <Input
+                          readOnly={editble}
+                          className='hidden'
+                          {...register('id')}
+                          defaultValue={data.id}
+                        />
+
+                        <div className='grid'>
+                          <Label
+                            className='py-1 text-[0.8rem] text-muted-foreground'
+                            htmlFor='code'
+                          >
+                            Code
+                          </Label>
                           <Input
-                            className='hidden'
-                            {...register('id')}
-                            defaultValue={data.id}
+                            readOnly={editble}
+                            className='text-[0.8rem]'
+                            {...register('code')}
+                            defaultValue={data.code}
                           />
-
-                          <div className='grid'>
-                            <Label
-                              className='py-1 text-[0.8rem] text-muted-foreground'
-                              htmlFor='code'
+                        </div>
+                        <div className='col-span-2 grid'>
+                          <Label
+                            className='py-1 text-[0.8rem] text-muted-foreground'
+                            htmlFor='Item Name'
+                          >
+                            Item Name
+                          </Label>
+                          <Input
+                            readOnly={editble}
+                            className='text-[0.8rem]'
+                            {...register('name')}
+                            defaultValue={data.name}
+                          />
+                        </div>
+                        <div className='col-span-3 grid'>
+                          <Label
+                            className='py-1 text-[0.8rem] text-muted-foreground'
+                            htmlFor='description'
+                          >
+                            Description
+                          </Label>
+                          <Input
+                            readOnly={editble}
+                            className='text-[0.8rem]'
+                            {...register('description')}
+                            defaultValue={data.description}
+                          />
+                        </div>
+                        <div className='grid'>
+                          <Label
+                            className='py-1 text-[0.8rem] text-muted-foreground'
+                            htmlFor='itemCategoryId'
+                          >
+                            Category
+                          </Label>
+                          <select
+                            {...register('itemCategoryId')}
+                            defaultValue={data.itemCategoryId}
+                            // id={item.id}
+                            // onChange={handleChangeBranch}
+                            className='flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1'
+                          >
+                            <option
+                              className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
+                              value={data.itemCategory?.name}
                             >
-                              Code
-                            </Label>
-                            <Input
-                              className='text-[0.8rem]'
-                              {...register('code')}
-                              defaultValue={data.code}
-                            />
-                          </div>
-                          <div className='grid col-span-2'>
-                            <Label
-                              className='py-1 text-[0.8rem] text-muted-foreground'
-                              htmlFor='Item Name'
-                            >
-                              Item Name
-                            </Label>
-                            <Input
-                              className='text-[0.8rem]'
-                              {...register('name')}
-                              defaultValue={data.name}
-                            />
-                          </div>
-                          <div className='grid col-span-3'>
-                            <Label
-                              className='py-1 text-[0.8rem] text-muted-foreground'
-                              htmlFor='description'
-                            >
-                              Description
-                            </Label>
-                            <Input
-                              className='text-[0.8rem]'
-                              {...register('description')}
-                              defaultValue={data.description}
-                            />
-                          </div>
-                          <div className='grid'>
-                            <Label
-                              className='py-1 text-[0.8rem] text-muted-foreground'
-                              htmlFor='itemCategoryId'
-                            >
-                              Category
-                            </Label>
-                            <select
-                              {...register('itemCategoryId')}
-                              defaultValue={data.itemCategoryId}
-                              // id={item.id}
-                              // onChange={handleChangeBranch}
-                              className='flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1'
-                            >
+                              {data.itemCategory?.name}
+                            </option>
+                            {itemCategory?.map((item) => (
                               <option
                                 className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
-                                value={data.itemCategory?.name}
+                                value={item.id}
                               >
-                                {data.itemCategory?.name}
+                                {item.name}
                               </option>
-                              {itemCategory?.map((item) => (
-                                <option
-                                  className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
-                                  value={item.id}
-                                >
-                                  {item.name}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
+                            ))}
+                          </select>
+                        </div>
 
-                          <div className='grid'>
-                            <Label
-                              className='py-1 text-[0.8rem] text-muted-foreground'
-                              htmlFor='brand'
-                            >
-                              Brand
-                            </Label>
-                            <Input
-                              className='text-[0.8rem]'
-                              {...register('brand')}
-                              defaultValue={data.brand}
-                            />
-                          </div>
+                        <div className='grid'>
+                          <Label
+                            className='py-1 text-[0.8rem] text-muted-foreground'
+                            htmlFor='brand'
+                          >
+                            Brand
+                          </Label>
+                          <Input
+                            readOnly={editble}
+                            className='text-[0.8rem]'
+                            {...register('brand')}
+                            defaultValue={data.brand}
+                          />
+                        </div>
 
-                          <div className='grid'>
-                            <Label
-                              className='py-1 text-[0.8rem] text-muted-foreground'
-                              htmlFor='size'
-                            >
-                              Size
-                            </Label>
-                            <Input
-                              className='text-[0.8rem]'
-                              {...register('size')}
-                              defaultValue={data.size}
-                            />
-                          </div>
+                        <div className='grid'>
+                          <Label
+                            className='py-1 text-[0.8rem] text-muted-foreground'
+                            htmlFor='size'
+                          >
+                            Size
+                          </Label>
+                          <Input
+                            readOnly={editble}
+                            className='text-[0.8rem]'
+                            {...register('size')}
+                            defaultValue={data.size}
+                          />
+                        </div>
 
-                          <div className='grid'>
-                            <Label
-                              className='py-1 text-[0.8rem] text-muted-foreground'
-                              htmlFor='stockingUom'
+                        <div className='grid'>
+                          <Label
+                            className='py-1 text-[0.8rem] text-muted-foreground'
+                            htmlFor='stockingUom'
+                          >
+                            Stocking-Uom
+                          </Label>
+                          <select
+                            {...register('stockingUom')}
+                            defaultValue={data.stockingUom}
+                            // id={item.id}
+                            // onChange={handleChangeBranch}
+                            className='flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1'
+                          >
+                            <option
+                              className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
+                              value={data.stockingUom}
                             >
-                              Stocking-Uom
-                            </Label>
-                            <select
-                              {...register('stockingUom')}
-                              defaultValue={data.stockingUom}
-                              // id={item.id}
-                              // onChange={handleChangeBranch}
-                              className='flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1'
-                            >
+                              {data.stockingUom}
+                            </option>
+                            {uom.map((item) => (
                               <option
                                 className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
-                                value={data.stockingUom}
+                                value={item.code}
                               >
-                                {data.stockingUom}
+                                {item.code}
                               </option>
-                              {uom.map((item) => (
-                                <option
-                                  className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
-                                  value={item.code}
-                                >
-                                  {item.code}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                          <div className='grid'>
-                            <Label
-                              className='py-1 text-[0.8rem] text-muted-foreground'
-                              htmlFor='alternateUom'
+                            ))}
+                          </select>
+                        </div>
+                        <div className='grid'>
+                          <Label
+                            className='py-1 text-[0.8rem] text-muted-foreground'
+                            htmlFor='alternateUom'
+                          >
+                            Alternate Uom
+                          </Label>
+                          <select
+                            {...register('alternateUom')}
+                            defaultValue={data.stockingUom}
+                            // id={item.id}
+                            // onChange={handleChangeBranch}
+                            className='flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1'
+                          >
+                            <option
+                              className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
+                              value={data.alternateUom}
                             >
-                              Alternate Uom
-                            </Label>
-                            <select
-                              {...register('alternateUom')}
-                              defaultValue={data.stockingUom}
-                              // id={item.id}
-                              // onChange={handleChangeBranch}
-                              className='flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1'
-                            >
+                              {data.alternateUom}
+                            </option>
+                            {uom.map((item) => (
                               <option
                                 className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
-                                value={data.alternateUom}
+                                value={item.code}
                               >
-                                {data.alternateUom}
+                                {item.code}
                               </option>
-                              {uom.map((item) => (
-                                <option
-                                  className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
-                                  value={item.code}
-                                >
-                                  {item.code}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
+                            ))}
+                          </select>
+                        </div>
 
-                          <div className='grid'>
-                            <Label
-                              className='py-1 text-[0.8rem] text-muted-foreground'
-                              htmlFor='model'
-                            >
-                              Model
-                            </Label>
-                            <Input
-                              className='text-[0.8rem]'
-                              {...register('model')}
-                              defaultValue={data.model}
-                            />
-                          </div>
-                          <div className='grid '>
-                            <Label
-                              className='py-1 text-[0.8rem] text-muted-foreground'
-                              htmlFor='feature'
-                            >
-                              Feature
-                            </Label>
-                            <Input
-                              className='text-[0.8rem]'
-                              {...register('feature')}
-                              defaultValue={data.feature}
-                            />
-                          </div>
+                        <div className='grid'>
+                          <Label
+                            className='py-1 text-[0.8rem] text-muted-foreground'
+                            htmlFor='model'
+                          >
+                            Model
+                          </Label>
+                          <Input
+                            readOnly={editble}
+                            className='text-[0.8rem]'
+                            {...register('model')}
+                            defaultValue={data.model}
+                          />
+                        </div>
+                        <div className='grid '>
+                          <Label
+                            className='py-1 text-[0.8rem] text-muted-foreground'
+                            htmlFor='feature'
+                          >
+                            Feature
+                          </Label>
+                          <Input
+                            readOnly={editble}
+                            className='text-[0.8rem]'
+                            {...register('feature')}
+                            defaultValue={data.feature}
+                          />
+                        </div>
 
-                          <div className='grid'>
-                            <Label
-                              className='py-1 text-[0.8rem] text-muted-foreground'
-                              htmlFor='material'
-                            >
-                              Material
-                            </Label>
-                            <Input
-                              className='text-[0.8rem]'
-                              {...register('material')}
-                              defaultValue={data.material}
-                            />
-                          </div>
-                          <div className='grid'>
-                            <Label
-                              className='py-1 text-[0.8rem] text-muted-foreground'
-                              htmlFor='specification'
-                            >
-                              Specification
-                            </Label>
-                            <Input
-                              className='text-[0.8rem]'
-                              {...register('specification')}
-                              defaultValue={data.specification}
-                            />
-                          </div>
+                        <div className='grid'>
+                          <Label
+                            className='py-1 text-[0.8rem] text-muted-foreground'
+                            htmlFor='material'
+                          >
+                            Material
+                          </Label>
+                          <Input
+                            readOnly={editble}
+                            className='text-[0.8rem]'
+                            {...register('material')}
+                            defaultValue={data.material}
+                          />
+                        </div>
+                        <div className='grid'>
+                          <Label
+                            className='py-1 text-[0.8rem] text-muted-foreground'
+                            htmlFor='specification'
+                          >
+                            Specification
+                          </Label>
+                          <Input
+                            readOnly={editble}
+                            className='text-[0.8rem]'
+                            {...register('specification')}
+                            defaultValue={data.specification}
+                          />
+                        </div>
 
-                          <div className='grid'>
-                            <Label
-                              className='py-1 text-[0.8rem] text-muted-foreground'
-                              htmlFor='itemTypeId'
+                        <div className='grid'>
+                          <Label
+                            className='py-1 text-[0.8rem] text-muted-foreground'
+                            htmlFor='itemTypeId'
+                          >
+                            Type
+                          </Label>
+                          <select
+                            {...register('itemTypeId')}
+                            defaultValue={data.itemTypeId}
+                            // id={item.id}
+                            // onChange={handleChangeBranch}
+                            className='flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1'
+                          >
+                            <option
+                              className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
+                              value={data.itemType?.name}
                             >
-                              Type
-                            </Label>
-                            <select
-                              {...register('itemTypeId')}
-                              defaultValue={data.itemTypeId}
-                              // id={item.id}
-                              // onChange={handleChangeBranch}
-                              className='flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1'
-                            >
+                              {data.itemType?.name}
+                            </option>
+                            {itemType?.map((item) => (
                               <option
                                 className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
-                                value={data.itemType?.name}
+                                value={item.id}
                               >
-                                {data.itemType?.name}
+                                {item.name}
                               </option>
-                              {itemType?.map((item) => (
-                                <option
-                                  className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
-                                  value={item.id}
-                                >
-                                  {item.name}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
+                            ))}
+                          </select>
+                        </div>
 
-                          <div className='grid'>
-                            <Label
-                              className='py-1 text-[0.8rem] text-muted-foreground'
-                              htmlFor='itemGroupId'
+                        <div className='grid'>
+                          <Label
+                            className='py-1 text-[0.8rem] text-muted-foreground'
+                            htmlFor='itemGroupId'
+                          >
+                            Group
+                          </Label>
+                          <select
+                            {...register('itemGroupId')}
+                            defaultValue={data.itemGroupId}
+                            // id={item.id}
+                            // onChange={handleChangeBranch}
+                            className='flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1'
+                          >
+                            <option
+                              className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
+                              value={data.itemGroup?.name}
                             >
-                              Group
-                            </Label>
-                            <select
-                              {...register('itemGroupId')}
-                              defaultValue={data.itemGroupId}
-                              // id={item.id}
-                              // onChange={handleChangeBranch}
-                              className='flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1'
-                            >
+                              {data.itemGroup?.name}
+                            </option>
+                            {itemGroup?.map((item) => (
                               <option
                                 className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
-                                value={data.itemGroup?.name}
+                                value={item.id}
                               >
-                                {data.itemGroup?.name}
+                                {item.name}
                               </option>
-                              {itemGroup?.map((item) => (
-                                <option
-                                  className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
-                                  value={item.id}
-                                >
-                                  {item.name}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
+                            ))}
+                          </select>
+                        </div>
 
-                          <div className='grid'>
-                            <Label
-                              className='py-1 text-[0.8rem] text-muted-foreground'
-                              htmlFor='status'
-                            >
-                              Status
-                            </Label>
-                            <select
-                              {...register('status')}
-                              defaultValue={data.status}
-                              // id={item.id}
-                              // onChange={handleChangeBranch}
-                              className='flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1'
-                            >
-                              {/* <option
+                        <div className='grid'>
+                          <Label
+                            className='py-1 text-[0.8rem] text-muted-foreground'
+                            htmlFor='status'
+                          >
+                            Status
+                          </Label>
+                          <select
+                            {...register('status')}
+                            defaultValue={data.status}
+                            // id={item.id}
+                            // onChange={handleChangeBranch}
+                            className='flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1'
+                          >
+                            {/* <option
                               className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
                               value={data.status}
                             >
                               {data.status}
                             </option> */}
 
-                              <option
-                                className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
-                                value='Active'
-                              >
-                                Active
-                              </option>
-                              <option
-                                className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
-                                value='Inactive'
-                              >
-                                Inactive
-                              </option>
-                            </select>
-                          </div>
+                            <option
+                              className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
+                              value='Active'
+                            >
+                              Active
+                            </option>
+                            <option
+                              className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
+                              value='Inactive'
+                            >
+                              Inactive
+                            </option>
+                          </select>
                         </div>
-                     
+                      </div>
+
                       <div className='m-2 grid grid-cols-3 gap-2 rounded-md border p-4 shadow'>
                         <div className='col-span-3 mb-3 mt-3 flex items-center '>
                           <IconInfoCircle />
@@ -602,6 +614,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                             Purchase LeadTime
                           </Label>
                           <Input
+                            readOnly={editble}
                             className='text-[0.8rem]'
                             {...register('purchaseLeadTime')}
                             defaultValue={data.purchaseLeadTime}
@@ -615,6 +628,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                             Manufacturing LeadTime
                           </Label>
                           <Input
+                            readOnly={editble}
                             className='text-[0.8rem]'
                             {...register('manufacturingLeadTime')}
                             defaultValue={data.manufacturingLeadTime}
@@ -628,6 +642,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                             Weight
                           </Label>
                           <Input
+                            readOnly={editble}
                             className='text-[0.8rem]'
                             {...register('weight')}
                             defaultValue={data.weight}
@@ -641,6 +656,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                             Safety Stock
                           </Label>
                           <Input
+                            readOnly={editble}
                             className='text-[0.8rem]'
                             {...register('safetyStock')}
                             defaultValue={data.safetyStock}
@@ -655,6 +671,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                             Cubic Volumn
                           </Label>
                           <Input
+                            readOnly={editble}
                             className='text-[0.8rem]'
                             {...register('cubicVolumn')}
                             defaultValue={data.cubicVolumn}
@@ -668,6 +685,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                             Lenght
                           </Label>
                           <Input
+                            readOnly={editble}
                             className='text-[0.8rem]'
                             {...register('lenght')}
                             defaultValue={data.lenght}
@@ -682,6 +700,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                             Width
                           </Label>
                           <Input
+                            readOnly={editble}
                             className='text-[0.8rem]'
                             {...register('width')}
                             defaultValue={data.width}
@@ -695,6 +714,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                             Height
                           </Label>
                           <Input
+                            readOnly={editble}
                             className='text-[0.8rem]'
                             {...register('height')}
                             defaultValue={data.height}
@@ -737,6 +757,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                             ShefLife Day
                           </Label>
                           <Input
+                            readOnly={editble}
                             className='text-[0.8rem]'
                             {...register('shefLifeDay')}
                             defaultValue={data.shefLifeDay}
@@ -750,6 +771,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                             Special Instruction
                           </Label>
                           <Input
+                            readOnly={editble}
                             className='text-[0.8rem]'
                             {...register('specialInstruction')}
                             defaultValue={data.specialInstruction}
@@ -764,6 +786,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                             Standard Cost
                           </Label>
                           <Input
+                            readOnly={editble}
                             className='text-[0.8rem]'
                             {...register('standardCost')}
                             defaultValue={data.standardCost}
@@ -778,6 +801,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                             Average Cost
                           </Label>
                           <Input
+                            readOnly={editble}
                             className='text-[0.8rem]'
                             {...register('averageCost')}
                             defaultValue={data.averageCost}
@@ -791,6 +815,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                             Convert Factor
                           </Label>
                           <Input
+                            readOnly={editble}
                             className='text-[0.8rem]'
                             {...register('convertFactor')}
                             defaultValue={data.convertFactor}
@@ -839,9 +864,10 @@ export const EditModal: React.FC<EditModalProps> = ({
 
                         <br />
                         <br />
-                        
+
                         <div className='col-span-3 float-end mt-6 grid'>
                           <Button
+                            disabled={editble}
                             variant='button'
                             className='float-end '
                             loading={onloading}

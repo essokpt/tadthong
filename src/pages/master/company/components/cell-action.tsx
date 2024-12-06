@@ -23,6 +23,7 @@ const initBranch = {
     code: "",
     companyName: "",
     address: "",
+    subDistrict: "",
     district: "",
     province: "",
     zipcode: "",

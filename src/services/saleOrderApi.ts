@@ -86,9 +86,9 @@ export async function findSaleOrder(id:any){
 export async function findInvoiceById(id:any){
   try {
     const response = await api.get(`${endpoint}/Invoice/${id}`);  
-    const res = await response.data
-    console.log('findInvoiceById:',res);
     
+    const res = await response.data   
+    console.log('findInvoiceById:',res); 
     return res
   } catch (error) {
     console.error(error);

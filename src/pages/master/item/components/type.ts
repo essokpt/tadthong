@@ -39,7 +39,8 @@ export interface ItemType{
     lotControlFlag : boolean
     shefLifeDay : string
     specialInstruction : string
-    alternalUom: string
+    alternateUom: string
+    convertFactor: number
     priceMaster : PriceType []
     venders : VenderType []   
     itemMasterFileAttach: [{
