@@ -53,6 +53,7 @@ import {
   deleteFileAttach,
   deleteSaleOrderItem,
   downloadFileAttach,
+  getCarRegistration,
   updateSaleOrder,
   updateSaleOrderItem,
   uploadFiles,
@@ -73,7 +74,7 @@ import FileDrag from '@/components/custom/fileDrag'
 import { ApiContext } from '@/components/layouts/api-context'
 import { ApiType } from 'types/api'
 import { CreateModal } from './create-modal'
-import { ItemList } from './type'
+import { CarRegistration, ItemList } from './type'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Check, ChevronsUpDown } from 'lucide-react'
@@ -154,6 +155,7 @@ export const EditModal: React.FC<EditModalProps> = ({
   const [customers, setCustomer] = useState<CustomerType[]>([])
   const [locations, setLocation] = useState<LocationType[]>([])
   const [editValue, setEditValue] = useState<ItemList>(initalValue)
+  const [carRegistration, setCarRegistration] = useState<CarRegistration[]>([])
 
   //new
   //const [files, setFiles] = useState('')
@@ -335,6 +337,8 @@ export const EditModal: React.FC<EditModalProps> = ({
     setIsMounted(true)
     getCustomer().then((data) => setCustomer(data))
     getLocation().then((data) => setLocation(data))
+    getCarRegistration().then((data) => setCarRegistration(data))
+
   }, [])
 
   if (!isMounted) {
@@ -563,7 +567,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                           </FormItem>
                         )}
                       />
-                      <FormField
+                      {/* <FormField
                         control={form.control}
                         name='carRegistration'
                         render={({ field }) => (
@@ -576,7 +580,72 @@ export const EditModal: React.FC<EditModalProps> = ({
                             <FormMessage />
                           </FormItem>
                         )}
-                      />
+                      /> */}
+                         <FormField
+                      control={form.control}
+                      name='carRegistration'
+                      render={({ field }) => (
+                        <FormItem className='mt-2 grid space-y-1.5'>
+                          <FormLabel>Car Registration</FormLabel>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant='outline'
+                                  role='combobox'
+                                  className={cn(
+                                    'justify-between',
+                                    !field.value && 'text-muted-foreground'
+                                  )}
+                                >
+                                  {field.value
+                                    ? carRegistration.find(
+                                        (item) => item.carNo === field.value
+                                      )?.carNo
+                                    : 'Select cat registration'}
+                                  <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className='w-[200px] p-0'>
+                              <Command>
+                                <CommandInput placeholder='Search cat registration...' />
+                                <CommandList>
+                                  <CommandEmpty>
+                                    No cat registration found.
+                                  </CommandEmpty>
+                                  <CommandGroup>
+                                    {carRegistration.map((item) => (
+                                      <CommandItem
+                                        value={item.carNo}
+                                        key={item.id}
+                                        onSelect={() => {
+                                          form.setValue(
+                                            'carRegistration',
+                                            item.carNo
+                                          )
+                                        }}
+                                      >
+                                        <Check
+                                          className={cn(
+                                            'mr-2 h-4 w-4',
+                                            item.carNo === field.value
+                                              ? 'opacity-100'
+                                              : 'opacity-0'
+                                          )}
+                                        />
+                                        {item.carNo}
+                                      </CommandItem>
+                                    ))}
+                                  </CommandGroup>
+                                </CommandList>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                       <FormField
                         control={form.control}
                         name='driverName'
@@ -649,7 +718,35 @@ export const EditModal: React.FC<EditModalProps> = ({
                         </TableCaption>
                         <TableHeader>
                           <TableRow>
-                            <TableHead className='w-[7rem]'>
+                          <TableHead className='w-[7rem]'>
+                          รหัสสินค้า
+                            </TableHead>
+                            <TableHead className='w-[10rem]'>
+                            สินค้า
+                            </TableHead>
+                            <TableHead>จำนวน</TableHead>
+                          <TableHead>หักความชื้น</TableHead>
+                          <TableHead>หักเจือปน</TableHead>
+                          <TableHead>หักอื่นๆ</TableHead>
+
+                          <TableHead>ราคาต่อหน่วย</TableHead>
+                          <TableHead>หักเงินค่าชั่ง</TableHead>
+                          <TableHead>หักค่าลง</TableHead>
+                          <TableHead>หักเงินอื่นๆ</TableHead>
+
+                          <TableHead>มูลค่า</TableHead>
+                          <TableHead>ราคาลูกค้า</TableHead>
+                          <TableHead>จำนวนลูกค้า</TableHead>
+                          <TableHead>ผลต่างราคา</TableHead>
+                          <TableHead>ผลต่างจำนวน</TableHead>
+                          <TableHead>มูลค่าลูกค้า</TableHead>
+                          <TableHead>ความชื้นต้นทาง</TableHead>
+                          <TableHead>ความชื้นลูกค้า</TableHead>
+                          <TableHead>เลขใบชั่งลูกค้า</TableHead>
+                            <TableHead className='items-center'>
+                              Action
+                            </TableHead>
+                            {/* <TableHead className='w-[7rem]'>
                               Item Code
                             </TableHead>
                             <TableHead className='w-[10rem]'>
@@ -674,7 +771,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                             <TableHead>Customer Queue No.</TableHead>
                             <TableHead className='items-center'>
                               Action
-                            </TableHead>
+                            </TableHead> */}
                           </TableRow>
                         </TableHeader>
                         <TableBody>

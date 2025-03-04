@@ -38,16 +38,46 @@ export async function searchCustomer(str:any){
   }
 }
 
+export async function customerDownloadFileAttach(filename:any){
+  try {
+    const response = await api.get(`${endpoint}/DownloadFile?filename=${filename}`, {
+      responseType: "blob",
+    });  
+   // const res = await response.data
+    return response
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 export async function createCustomer(data:any) {
    // console.error('login',data);
     try {
       const response = await api.post(endpoint, data);
-      console.log('createCustomer',response.status);
+     // console.log('createCustomer',response.status);
       return response
     } catch (error) {
      return error
     }
   }
+
+  export async function customerUploadFiles(files:any) {
+    try {
+    
+     const headers = {
+       'Content-Type': 'application/x-www-form-urlencoded',
+     }
+      const response = await api.post(`${endpoint}/UploadFile`, files ,
+     {
+       headers: headers 
+     });
+      console.log('uploadFiles',response);
+      return response
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
 export async function createCustomerBilling(data:any) {
     try {
       const response = await api.post(`${endpoint}/Billing`, data);
@@ -94,6 +124,17 @@ export async function deleteCustomerBilling(id:any) {
       try {
         const response = await api.delete(`${endpoint}/Billing/?id=${id}`);
         console.log('deleteCustomerBilling',response.status);
+        return response
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+export async function customerDeleteFileAttach(id:any) {
+  // console.error('login',data);
+      try {
+        const response = await api.delete(`${endpoint}/DeleteFileAttach?id=${id}`);
+        console.log('customerDeleteFileAttach',response.status);
         return response
       } catch (error) {
         console.error(error);

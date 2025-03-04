@@ -117,6 +117,8 @@ export const ReceiveModal: React.FC<ReceiveModalProps> = ({
         data.purchaseOrderItems[index].ref = data.code
         data.purchaseOrderItems[index].stockBy = data.user.firstName
         // data.purchaseOrderItems[index].status = 'Stock In'
+        data.purchaseOrderItems[index].userId = parseInt(userid)
+
       }
     }
 

@@ -31,6 +31,8 @@ import {
   getVenderType,
   updateVender,
   updateVenderBilling,
+  venderDeleteFileAttach,
+  venderDownloadFileAttach,
   venderUploadFiles,
 } from '@/services/vendersApi'
 import { Venders } from './schema'
@@ -46,7 +48,7 @@ import useThaiAddress from '@/hooks/use-thaiAddress'
 import useDebounce from '@/hooks/use-debounce'
 import { ThaiAddress } from 'types/thaiaddress'
 import { MagnifyingGlassIcon } from '@radix-ui/react-icons'
-import { cn } from '@/lib/utils'
+import { cn, downloadFileData } from '@/lib/utils'
 import FileDrag from '@/components/custom/fileDrag'
 import { IVenderType } from './type'
 
@@ -84,7 +86,7 @@ export const EditModal: React.FC<EditModalProps> = ({
   editble,
 }) => {
   const [venderTypes, setVenderType] = useState<IVenderType[]>([])
-  const [isMounted, setIsMounted] = useState(false)
+ // const [isMounted, setIsMounted] = useState(false)
   const { handleSubmit, register, setValue } = useForm()
   const [open, setOpen] = useState(false)
   const [openModal, setOpenModal] = useState(false)
@@ -111,9 +113,53 @@ export const EditModal: React.FC<EditModalProps> = ({
     console.log('upload file data:', formData)
 
     const res: any = await venderUploadFiles(formData)
-    if (res.status == 200) {
-      console.log('uploadFiles -success', res.status)
+    if (res) {
+      data.venderFileAttach.length = 0
+      for (let index = 0; index < res.length; index++) {
+        data.venderFileAttach?.push(res[index])
+      }
+      console.log('uploadFiles -success', res)
     }
+  }
+
+  async function downloadFile(filename: any) {
+   const response: any = await venderDownloadFileAttach(filename)
+   downloadFileData(filename, response.data)
+  }
+
+  const openFile = (file: any) => {
+    window.open(
+      `http://tadthongback.c-space.store/files/Vender/${file}`,
+      '_blank',
+      'noreferrer'
+    )
+  }
+
+  function deleteAction(row: any) {
+    setOpenDeleteModal(true)
+    setDeleteId(row.id)
+    setdeleteTitle(row.fileName)
+    //console.log('deleteFile:', row.id)
+  }
+  async function deleteFile() {
+    setIsLoading(true)
+    console.log('deleteFile:', deleteId)
+
+    const res: any = await venderDeleteFileAttach(deleteId)
+
+    if (res.status == 200) {
+      console.log('venderDeleteFileAttach:', res)
+      const deleteIndex = data.venderFileAttach.findIndex(
+        (x) => x.id == deleteId
+      )
+      if (deleteId != -1) {
+        data.venderFileAttach.splice(deleteIndex, 1)
+      }
+    }
+    setTimeout(() => {
+      setIsLoading(false)
+      setOpenDeleteModal(false)
+    }, 1000)
   }
 
   function updateBilling(payload: any) {
@@ -130,7 +176,6 @@ export const EditModal: React.FC<EditModalProps> = ({
 
   function deleteBilling(payload: any) {
     console.log('deleteBilling', payload)
-
     setDeleteId(payload.id)
     setdeleteTitle(payload.code)
     setOpenDeleteModal(true)
@@ -255,13 +300,13 @@ export const EditModal: React.FC<EditModalProps> = ({
   }
 
   useEffect(() => {
-    setIsMounted(true)
+   // setIsMounted(true)
     getVenderType().then((data) => setVenderType(data))
   }, [])
 
-  if (!isMounted) {
-    return null
-  }
+  // if (!isMounted) {
+  //   return null
+  // }
 
   return (
     <>
@@ -855,8 +900,7 @@ export const EditModal: React.FC<EditModalProps> = ({
               </Table>
             </TabsContent>
             <TabsContent value='file' className='h-[35rem]'>
-              {/* <Card className='min-h-full overflow-scroll '>
-                  <CardContent className='h-[35rem] space-y-2'> */}
+            
               <div className='grid gap-4'>
                 <FileDrag uploadData={(e) => addFile(e)} />
 
@@ -881,7 +925,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                             size='icon'
                             variant='ghost'
                             className='rounded-full'
-                            //onClick={() => downloadFile(item.path)}
+                            onClick={() => downloadFile(item.path)}
                           >
                             <IconDownload size={20} />
                           </Button>
@@ -889,7 +933,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                             size='icon'
                             variant='ghost'
                             className='rounded-full'
-                            // onClick={() => openFile(item.path)}
+                            onClick={() => openFile(item.path)}
                           >
                             <IconEye size={20} />
                           </Button>
@@ -898,7 +942,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                             size='icon'
                             variant='ghost'
                             className='rounded-full'
-                            //onClick={() => deleteAction(item)}
+                            onClick={() => deleteAction(item)}
                           >
                             <IconTrash size={20} />
                           </Button>
@@ -934,6 +978,14 @@ export const EditModal: React.FC<EditModalProps> = ({
           isOpen={openDeleteModal}
           onClose={() => setOpenDeleteModal(false)}
           onConfirm={confirmDeleteBilling}
+          loading={isLoading}
+          title={deleteTitle}
+        />
+
+         <AlertModal
+          isOpen={openDeleteModal}
+          onClose={() => setOpenDeleteModal(false)}
+          onConfirm={deleteFile}
           loading={isLoading}
           title={deleteTitle}
         />

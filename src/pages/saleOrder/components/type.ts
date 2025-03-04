@@ -44,4 +44,16 @@ export interface ItemList {
     uomType: string
   }
 
+  export interface UomType{ 
+    name: string   
+      
+}
+
+export interface CarRegistration{ 
+  id: number
+  carNo: string   
+  description: string  
+}
+
+
 

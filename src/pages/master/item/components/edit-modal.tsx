@@ -42,7 +42,6 @@ import { ApiType } from 'types/api'
 import { LocationType } from '@/pages/location/components/type'
 import { getLocation } from '@/services/locationApi'
 import FileDrag from '@/components/custom/fileDrag'
-import { PlusCircleIcon } from 'lucide-react'
 import {
   IconDownload,
   IconEye,
@@ -96,7 +95,6 @@ export const EditModal: React.FC<EditModalProps> = ({
   const [itemGroup, setGroup] = useState<ItemGroup[]>([])
   const [itemCategory, setCategory] = useState<ItemCategory[]>([])
   const [locations, setLocation] = useState<LocationType[]>([])
-  const [files, setFiles] = useState('')
   const [deleteTitle, setdeleteTitle] = useState(null)
   const [deleteId, setdeleteId] = useState(null)
 
@@ -155,31 +153,28 @@ export const EditModal: React.FC<EditModalProps> = ({
     }, 1000)
   }
 
-  function addFile(payload: any) {
-    setFiles(payload)
-    console.log('File data:', payload)
-  }
-
-  async function uploadFile() {
-    if (files) {
+  
+  async function uploadFile(file:any) {
+    if (file.length>0) {
       setOnloading(true)
       const formData = new FormData()
-      for (let i = 0; i < files?.length; i++) {
-        formData.append('files', files[i])
+      for (let i = 0; i < file?.length; i++) {
+        formData.append('files', file[i])
         formData.append('itemMasterId', data.id.toString())
       }
 
       const res: any = await itemMasterUploadFiles(formData)
       if (res) {
+        data.itemMasterFileAttach.length = 0
         for (let index = 0; index < res.length; index++) {
           data.itemMasterFileAttach?.push(res[index])
         }
         console.log('uploadFiles -success', res.status)
-        setFiles('')
+        
       }
       setTimeout(() => {
         setOnloading(false)
-        setFiles('')
+        
       }, 3000)
     }
   }
@@ -437,6 +432,20 @@ export const EditModal: React.FC<EditModalProps> = ({
                               </option>
                             ))}
                           </select>
+                        </div>
+                        <div className='grid '>
+                          <Label
+                            className='py-1 text-[0.8rem] text-muted-foreground'
+                            htmlFor='convertFactor'
+                          >
+                            Convert Factor
+                          </Label>
+                          <Input
+                            readOnly={editble}
+                            className='text-[0.8rem]'
+                            {...register('convertFactor')}
+                            defaultValue={data.convertFactor}
+                          />
                         </div>
 
                         <div className='grid'>
@@ -807,20 +816,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                             defaultValue={data.averageCost}
                           />
                         </div>
-                        <div className='grid '>
-                          <Label
-                            className='py-1 text-[0.8rem] text-muted-foreground'
-                            htmlFor='convertFactor'
-                          >
-                            Convert Factor
-                          </Label>
-                          <Input
-                            readOnly={editble}
-                            className='text-[0.8rem]'
-                            {...register('convertFactor')}
-                            defaultValue={data.convertFactor}
-                          />
-                        </div>
+                       
                         {/* <div className='grid grid-cols-3 gap-2 py-2'> */}
                         <div className='mt-6 flex items-start space-x-2 space-y-0 rounded-md border p-2 shadow'>
                           <Checkbox
@@ -863,7 +859,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                         </div>
 
                         <br />
-                        <br />
+                       
 
                         <div className='col-span-3 float-end mt-6 grid'>
                           <Button
@@ -894,8 +890,8 @@ export const EditModal: React.FC<EditModalProps> = ({
                 <Card className='min-h-full overflow-scroll '>
                   <CardContent className='h-[35rem] space-y-2'>
                     <div className='grid gap-4'>
-                      <FileDrag uploadData={(e) => addFile(e)} />
-                      <div className='float-end'>
+                      <FileDrag uploadData={(e) => uploadFile(e)} />
+                      {/* <div className='float-end'>
                         <Button
                           loading={onloading}
                           variant='button'
@@ -906,7 +902,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                           <PlusCircleIcon className='mr-2 h-4 w-4' />
                           Confirm Upload
                         </Button>
-                      </div>
+                      </div> */}
 
                       <Table className='overflow-scroll'>
                         <TableCaption>A list of file attached.</TableCaption>

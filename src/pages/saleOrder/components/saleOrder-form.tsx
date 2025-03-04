@@ -46,7 +46,11 @@ import { LocationType } from '@/pages/location/components/type'
 
 import { getCustomer } from '@/services/customerApi'
 import { CustomerType } from '@/pages/master/customer/components/type'
-import { createSaleOrder, uploadFiles } from '@/services/saleOrderApi'
+import {
+  createSaleOrder,
+  getCarRegistration,
+  uploadFiles,
+} from '@/services/saleOrderApi'
 import { CreateModal } from './create-modal'
 import FileDrag from '@/components/custom/fileDrag'
 import {
@@ -63,6 +67,7 @@ import { Check, ChevronsUpDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
+import { CarRegistration } from './type'
 
 type ItemList = {
   id: number
@@ -123,7 +128,7 @@ const initalValue = {
   weighingMoney: 0,
   shipDown: 0,
   cashOther: 0,
-  uomType: ''
+  uomType: '',
 }
 
 const formSchema = z.object({
@@ -146,6 +151,8 @@ const formSchema = z.object({
 export function SaleOrderForm() {
   const [items, setItem] = useState<ItemList[]>([])
   const [openModal, setOpenModal] = useState(false)
+  const [carRegistration, setCarRegistration] = useState<CarRegistration[]>([])
+
   const [locations, setLocation] = useState<LocationType[]>([])
   const [customers, setCustomer] = useState<CustomerType[]>([])
   const [editValue, setEditValue] = useState<ItemList>(initalValue)
@@ -263,6 +270,7 @@ export function SaleOrderForm() {
     setItem([])
     getCustomer().then((data) => setCustomer(data))
     getLocation().then((data) => setLocation(data))
+    getCarRegistration().then((data) => setCarRegistration(data))
   }, [])
 
   return (
@@ -479,7 +487,74 @@ export function SaleOrderForm() {
                         </FormItem>
                       )}
                     />
+
                     <FormField
+                      control={form.control}
+                      name='carRegistration'
+                      render={({ field }) => (
+                        <FormItem className='mt-2 grid space-y-1.5'>
+                          <FormLabel>Car Registration</FormLabel>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant='outline'
+                                  role='combobox'
+                                  className={cn(
+                                    'justify-between',
+                                    !field.value && 'text-muted-foreground'
+                                  )}
+                                >
+                                  {field.value
+                                    ? carRegistration.find(
+                                        (item) => item.carNo === field.value
+                                      )?.carNo
+                                    : 'Select cat registration'}
+                                  <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className='w-[200px] p-0'>
+                              <Command>
+                                <CommandInput placeholder='Search cat registration...' />
+                                <CommandList>
+                                  <CommandEmpty>
+                                    No cat registration found.
+                                  </CommandEmpty>
+                                  <CommandGroup>
+                                    {carRegistration.map((item) => (
+                                      <CommandItem
+                                        value={item.carNo}
+                                        key={item.id}
+                                        onSelect={() => {
+                                          form.setValue(
+                                            'carRegistration',
+                                            item.carNo
+                                          )
+                                        }}
+                                      >
+                                        <Check
+                                          className={cn(
+                                            'mr-2 h-4 w-4',
+                                            item.carNo === field.value
+                                              ? 'opacity-100'
+                                              : 'opacity-0'
+                                          )}
+                                        />
+                                        {item.carNo}
+                                      </CommandItem>
+                                    ))}
+                                  </CommandGroup>
+                                </CommandList>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* <FormField
                       control={form.control}
                       name='carRegistration'
                       render={({ field }) => (
@@ -492,7 +567,7 @@ export function SaleOrderForm() {
                           <FormMessage />
                         </FormItem>
                       )}
-                    />
+                    /> */}
                     <FormField
                       control={form.control}
                       name='driverName'
@@ -564,7 +639,29 @@ export function SaleOrderForm() {
                       <TableCaption>A list of your recent items.</TableCaption>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Item Code</TableHead>
+                          <TableHead>รหัสสินค้า</TableHead>
+                          <TableHead>สินค้า</TableHead>
+                          <TableHead>จำนวน</TableHead>
+                          <TableHead>หักความชื้น</TableHead>
+                          <TableHead>หักเจือปน</TableHead>
+                          <TableHead>หักอื่นๆ</TableHead>
+
+                          <TableHead>ราคาต่อหน่วย</TableHead>
+                          <TableHead>หักเงินค่าชั่ง</TableHead>
+                          <TableHead>หักค่าลง</TableHead>
+                          <TableHead>หักเงินอื่นๆ</TableHead>
+
+                          <TableHead>มูลค่า</TableHead>
+                          <TableHead>ราคาลูกค้า</TableHead>
+                          <TableHead>จำนวนลูกค้า</TableHead>
+                          <TableHead>ผลต่างราคา</TableHead>
+                          <TableHead>ผลต่างจำนวน</TableHead>
+                          <TableHead>มูลค่าลูกค้า</TableHead>
+                          <TableHead>ความชื้นต้นทาง</TableHead>
+                          <TableHead>ความชื้นลูกค้า</TableHead>
+                          <TableHead>เลขใบชั่งลูกค้า</TableHead>
+                          <TableHead className='items-center'>Action</TableHead>
+                          {/* <TableHead>Item Code</TableHead>
                           <TableHead>Item Name</TableHead>
                           <TableHead>Quantity</TableHead>
                           <TableHead>Humidity</TableHead>
@@ -585,7 +682,7 @@ export function SaleOrderForm() {
                           <TableHead>SourceHumidity</TableHead>
                           <TableHead>Customer Humidity</TableHead>
                           <TableHead>Customer Queue No.</TableHead>
-                          <TableHead className='items-center'>Action</TableHead>
+                          <TableHead className='items-center'>Action</TableHead> */}
                         </TableRow>
                       </TableHeader>
                       <TableBody>

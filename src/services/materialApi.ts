@@ -68,12 +68,25 @@ export async function createMaterial(data:any) {
    // console.error('login',data);
     try {
       const response = await api.post(endpoint, data);
-      console.log('createMaterial',response.status);
+    //  const res = await response.data
+      console.log('createMaterial',response);
       return response
     } catch (error) {
       console.error(error);
     }
   }
+
+  export async function createMaterialItem(importMaterialId: number, data:any) {
+    // console.error('login',data);
+     try {
+       const response = await api.post(`${endpoint}/CreateItem/${importMaterialId}`, data);
+       console.log('createMaterialItem',response);
+       return response
+     } catch (error) {
+       console.error(error);
+     }
+   }
+ 
 
   export async function updateMaterial(data:any) {
     // console.error('login',data);

@@ -65,7 +65,8 @@ const initialValue = {
                 id: 0,
                 code: '',
                 name: '',
-                stockingUom: ''
+                stockingUom: '',
+                convertFactor: 0
             },
             quantity: 0,
             unitPrice: 0,
@@ -79,6 +80,7 @@ const initialValue = {
             destinationHumidity: 0,
             destinationWeighingScale: '',
             remark: '',
+             uomType: '',
             saleOrder: {
                 id: 0,
                 code: ''

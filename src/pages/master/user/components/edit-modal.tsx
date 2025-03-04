@@ -8,26 +8,6 @@ import { Label } from '@radix-ui/react-label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent } from '@/components/ui/card'
 import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
-// import {
-//   Select,
-//   SelectContent,
-//   SelectItem,
-//   SelectTrigger,
-//   SelectValue,
-// } from '@/components/ui/select'
-import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -40,6 +20,7 @@ import {
   TableBody,
   TableCaption,
   TableCell,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -52,25 +33,15 @@ import {
   uploadUserImage,
 } from '@/services/userApi'
 import { PasswordInput } from '@/components/custom/password-input'
-import { getBranch } from '@/services/branchApi'
-import { BranchType } from '../../branch/components/type'
-import { getRoles } from '@/services/roleApi'
-import { RoleType } from '../../role/components/type'
+
 import {
-  IconDeviceFloppy,
+  IconEdit,
   IconLogin,
   IconMap,
   IconTrash,
   IconUserSquare,
 } from '@tabler/icons-react'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
+
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate } from 'react-router-dom'
@@ -82,7 +53,8 @@ import useDebounce from '@/hooks/use-debounce'
 import useThaiAddress from '@/hooks/use-thaiAddress'
 import { MagnifyingGlassIcon } from '@radix-ui/react-icons'
 import { cn } from '@/lib/utils'
-import { Check, ChevronsUpDown } from 'lucide-react'
+import { PlusCircleIcon } from 'lucide-react'
+import { CreateModal } from './create-modal'
 
 type UserRoleBanch = {
   id: string
@@ -111,6 +83,24 @@ interface EditModalProps {
   rolebranch: UserRoleBanch[]
 }
 
+type BranchRole = {
+  id: number
+  branchId: number
+  branchName: string
+  roleId: number
+  roleName: string
+  name: string
+}
+
+const intial = {
+  id: 0,
+  branchId: 0,
+  branchName: '',
+  roleId: 0,
+  roleName: '',
+  name: '',
+}
+
 const formSchema = z.object({
   branch: z.string(),
   roleBranches: z.string(),
@@ -129,11 +119,11 @@ export const EditModal: React.FC<EditModalProps> = ({
   const [deleteId, setDeleteId] = useState(null)
   const [deleteTitle, setdeleteTitle] = useState(null)
   const [onloading, setOnloading] = useState(false)
-  const [branches, setBranch] = useState<BranchType[]>([])
-  const [roles, setRoles] = useState<RoleType[]>([])
+  
   const [addressThai, setAddressThai] = useState<ThaiAddress[]>()
   const [isOpenAddress, setIsOpenAddress] = useState(false)
-
+  const [editValue, setEditValue] = useState<BranchRole>(intial)
+  const [openModal, setOpenModal] = useState(false)
   const { userInputCallback, dataValue } = useThaiAddress()
   const debounceValue = useDebounce(userInputCallback, 800)
 
@@ -148,47 +138,31 @@ export const EditModal: React.FC<EditModalProps> = ({
     },
   })
 
-  async function addUserRoleBranch(user: any) {
-    setOnloading(true)
-    const selectBranch: any = branches.find(
-      (item) => item.branchName == user.branch
-    )
-    const selectRole: any = roles.find((item) => item.name == user.roleBranches)
+  // async function addUserRoleBranch(user: any) {
+  //   setOnloading(true)
+  //   const selectBranch: any = branches.find(
+  //     (item) => item.branchName == user.branch
+  //   )
+  //   const selectRole: any = roles.find((item) => item.name == user.roleBranches)
 
-    user.userId = parseInt(data.id)
-    user.branchId = selectBranch.id
-    user.roleBranchesId = selectRole.id
+  //   user.userId = parseInt(data.id)
+  //   user.branchId = selectBranch.id
+  //   user.roleBranchesId = selectRole.id
 
-    console.log('addUserRoleBranch ', user)
-    const res: any = await createBranchUser(user)
-    if (res.status == 200) {
-      console.log('createBranchUser -success', res.status)
-      setOnloading(false)
-      form.reset()
-      setTimeout(() => {
-        //onClose()
-      }, 1000)
-    }
-    setOnloading(false)
-  }
+  //   console.log('addUserRoleBranch ', user)
+  //   const res: any = await createBranchUser(user)
+  //   if (res.status == 200) {
+  //     console.log('createBranchUser -success', res.status)
+  //     setOnloading(false)
+  //     form.reset()
+  //     setTimeout(() => {
+        
+  //     }, 1000)
+  //   }
+  //   setOnloading(false)
+  // }
 
-  function handleChangeBranch(e: ChangeEvent<HTMLSelectElement>) {
-    const findBranch = branches.find((i) => i.id == parseInt(e.target.value))
-    if (findBranch) {
-      const roleIndex = rolebranch.findIndex((i) => i.id == e.target.id)
-      rolebranch[roleIndex].branchId = findBranch.id
-      console.log('edit role', rolebranch)
-    }
-  }
-
-  function handleChangeRole(e: ChangeEvent<HTMLSelectElement>) {
-    const select = roles.find((i) => i.id == parseInt(e.target.value))
-    if (select) {
-      const roleIndex = rolebranch.findIndex((i) => i.id == e.target.id)
-      rolebranch[roleIndex].roleBranchesId = select.id
-      console.log('edit role', rolebranch)
-    }
-  }
+ 
 
   const deleteItem = async (item: any) => {
     console.log('delete use role branch', item)
@@ -202,11 +176,13 @@ export const EditModal: React.FC<EditModalProps> = ({
     console.log('delete use role branch', deleteId)
 
     const res: any = await deleteBranchUser(deleteId)
-
     if (res.status == 200) {
+      console.log(res)
+      updateUserRoleBranchData(res)
+     
       setTimeout(() => {
-        onClose()
-      }, 1000)
+        //onClose()
+      }, 3000)
     }
     setTimeout(() => {
       setOnloading(false)
@@ -214,17 +190,22 @@ export const EditModal: React.FC<EditModalProps> = ({
     }, 1000)
   }
 
-  const editItem = async (item: any) => {
-    const updateRole = rolebranch.find((i) => i.id == item)
-    //rolebranch[roleIndex].roleBranchesId = select.id
-    console.log('editItem', updateRole)
-    const res: any = await editUserRoleBranch(updateRole)
-
-    if (res.status == 200) {
-      setTimeout(() => {
-        onClose()
-      }, 1000)
+  const updateUserRoleBranchData = (data: any) => {
+    rolebranch.length = 0
+    for (let index = 0; index < data.data.length; index++) {
+      rolebranch.push(data.data[index])
     }
+  }
+
+  const editItem = async (item: any) => {
+    console.log('editItem', item)
+    item.branchName = item.branch.branchName
+    item.roleName = item.roleBranches.name
+
+    setEditValue(item)
+    setOpenModal(true)
+    // const updateRole = rolebranch.find((i) => i.id == item)
+    // console.log('editItem', updateRole)
   }
   async function updateData(data: any) {
     setOnloading(true)
@@ -277,6 +258,32 @@ export const EditModal: React.FC<EditModalProps> = ({
     }
   }
 
+  async function addNewData(payload: any) {
+    setOnloading(true)
+    payload.userId = parseInt(data.id)
+    if (payload.id > 0) {
+      console.log('edit ', payload)
+      const res: any = await editUserRoleBranch(payload)
+
+      if (res.status == 200) {
+        updateUserRoleBranchData(res)
+        setTimeout(() => {}, 3000)
+      }
+    } else {
+      // payload.userId = parseInt(data.id)
+      console.log('addNewData', payload)
+      const res: any = await createBranchUser(payload)
+      if (res.status == 200) {
+        console.log('createBranchUser -success', res.status)
+        updateUserRoleBranchData(res)
+        form.reset()
+        setTimeout(() => {}, 3000)
+      }
+    }
+
+    setOnloading(false)
+  }
+
   const SearchAddress: React.FC<{ dataValue?: ThaiAddress[] }> = ({
     dataValue,
   }) => {
@@ -315,8 +322,7 @@ export const EditModal: React.FC<EditModalProps> = ({
 
   useEffect(() => {
     setIsMounted(true)
-    getBranch().then((data) => setBranch(data))
-    getRoles().then((data) => setRoles(data))
+   
   }, [])
 
   if (!isMounted) {
@@ -688,7 +694,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                   <CardContent className='h-[35rem] space-y-2'>
                     <div className='-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-x-12 lg:space-y-0'>
                       <div className='grid gap-4'>
-                        <Form {...form}>
+                        {/* <Form {...form}>
                           <form
                             onSubmit={form.handleSubmit(addUserRoleBranch)}
                             className='w-2/3 space-y-6'
@@ -763,37 +769,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                                   </FormItem>
                                 )}
                               />
-                              {/* <FormField
-                                control={form.control}
-                                name='branch'
-                                render={({ field }) => (
-                                  <FormItem>
-                                    <FormLabel>New Branch</FormLabel>
-                                    <Select
-                                      onValueChange={field.onChange}
-                                      defaultValue={field.value}
-                                    >
-                                      <FormControl>
-                                        <SelectTrigger>
-                                          <SelectValue placeholder='Select branch' />
-                                        </SelectTrigger>
-                                      </FormControl>
-                                      <SelectContent>
-                                        {branches.map((item) => (
-                                          <SelectItem
-                                            key={item.id}
-                                            value={item.branchName}
-                                          >
-                                            {item.branchName}
-                                          </SelectItem>
-                                        ))}
-                                      </SelectContent>
-                                    </Select>
-
-                                    <FormMessage />
-                                  </FormItem>
-                                )}
-                              /> */}
+                              
                               <FormField
                                 control={form.control}
                                 name='roleBranches'
@@ -861,37 +837,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                                   </FormItem>
                                 )}
                               />
-                              {/* <FormField
-                                control={form.control}
-                                name='roleBranches'
-                                render={({ field }) => (
-                                  <FormItem>
-                                    <FormLabel>New Role</FormLabel>
-                                    <Select
-                                      onValueChange={field.onChange}
-                                      defaultValue={field.value}
-                                    >
-                                      <FormControl>
-                                        <SelectTrigger>
-                                          <SelectValue placeholder='Select role' />
-                                        </SelectTrigger>
-                                      </FormControl>
-                                      <SelectContent>
-                                        {roles.map((item) => (
-                                          <SelectItem
-                                            key={item.id}
-                                            value={item.name}
-                                          >
-                                            {item.name}
-                                          </SelectItem>
-                                        ))}
-                                      </SelectContent>
-                                    </Select>
-
-                                    <FormMessage />
-                                  </FormItem>
-                                )}
-                              /> */}
+                              
                               <div className='float-end mt-5'>
                                 <Button
                                   type='submit'
@@ -903,7 +849,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                               </div>
                             </div>
                           </form>
-                        </Form>
+                        </Form> */}
                       </div>
                     </div>
                     <Table>
@@ -921,9 +867,9 @@ export const EditModal: React.FC<EditModalProps> = ({
                       <TableBody>
                         {rolebranch?.map((item) => (
                           <TableRow key={item.id}>
-                            
                             <TableCell>
-                              <select
+                              {item.branch?.branchName}
+                              {/* <select
                                 id={item.id}
                                 onChange={handleChangeBranch}
                                 className='flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1'
@@ -940,10 +886,11 @@ export const EditModal: React.FC<EditModalProps> = ({
                                     {item.branchName}
                                   </option>
                                 ))}
-                              </select>
+                              </select> */}
                             </TableCell>
                             <TableCell>
-                              <select
+                              {item.roleBranches?.name}
+                              {/* <select
                                 id={item.id}
                                 onChange={handleChangeRole}
                                 className='flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1'
@@ -960,7 +907,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                                     {item.name}
                                   </option>
                                 ))}
-                              </select>
+                              </select> */}
                             </TableCell>
 
                             <TableCell className='justify-content-center'>
@@ -968,9 +915,9 @@ export const EditModal: React.FC<EditModalProps> = ({
                                 size='icon'
                                 variant='ghost'
                                 className='rounded-full'
-                                onClick={() => editItem(item.id)}
+                                onClick={() => editItem(item)}
                               >
-                                <IconDeviceFloppy size={20} />
+                                <IconEdit size={20} />
                               </Button>
                               <Button
                                 size='icon'
@@ -984,6 +931,24 @@ export const EditModal: React.FC<EditModalProps> = ({
                           </TableRow>
                         ))}
                       </TableBody>
+                      <TableFooter>
+                        <TableRow>
+                          <TableCell colSpan={4}>
+                            <Button
+                              variant='button'
+                              size='sm'
+                              className='float-end h-8 border '
+                              onClick={() => {
+                                setEditValue(intial)
+                                setOpenModal(true)
+                              }}
+                            >
+                              <PlusCircleIcon className='mr-2 h-4 w-4' />
+                              Add Role
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      </TableFooter>
                     </Table>
                   </CardContent>
                 </Card>
@@ -999,6 +964,14 @@ export const EditModal: React.FC<EditModalProps> = ({
           onConfirm={onConfirm}
           loading={onloading}
           title={deleteTitle}
+        />
+
+        <CreateModal
+          value={editValue}
+          isOpen={openModal}
+          onClose={() => setOpenModal(false)}
+          loading={onloading}
+          createData={(e) => addNewData(e)}
         />
       </Dialog>
     </>

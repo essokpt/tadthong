@@ -24,8 +24,8 @@ import 'jspdf-autotable'
 import { jsPDF } from 'jspdf'
 import logo from '@/assets/logo.jpg'
 import '@/assets/fonts/Sarabun-Regular-normal'
-import { findCompany } from '@/services/companyApi'
-import { CompanyType } from '@/pages/master/company/components/type'
+//import { findCompany } from '@/services/companyApi'
+//import { CompanyType } from '@/pages/master/company/components/type'
 import usePermission from '@/hooks/use-permission'
 
 interface DataTableRowActionsProps {
@@ -117,7 +117,7 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
   const [printY, setPrintY] = useState(0)
   const [deleteTitle, setdeleteTitle] = useState(null)
   const [approveTitle, setApproveTitle] = useState(null)
-  const [company, setCompany] = useState<CompanyType>()
+ // const [company, setCompany] = useState<CompanyType>()
   const [isEdit, setIsEdit] = useState(false)
   const [editValue, setEditValue] = useState<PurchaseOrder>(initialValue)
 
@@ -186,27 +186,27 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
 
   async function print(data: PurchaseOrder) {
     console.log('Print value:', data)
-    findCompany(1).then((data) => {
-      setCompany(data)
-    })
-    setEditValue(data)
+    // findCompany(1).then((data) => {
+    //   setCompany(data)
+    // })
+   // setEditValue(data)
     const doc = new jsPDF()
     setPrintX(0)
     setPrintY(10)
-    printHeader(doc)
+    printHeader(doc,data)
     doc.output('dataurlnewwindow')
   }
 
-  function printHeader(doc: any) {
+  function printHeader(doc: any, value: PurchaseOrder) {
     let bodyItems = []
-    for (let index = 0; index < editValue.purchaseOrderItems.length; index++) {
+    for (let index = 0; index < value.purchaseOrderItems.length; index++) {
       let item = [
         index + 1,
-        editValue.purchaseOrderItems[index].itemMaster.code,
-        editValue.purchaseOrderItems[index].itemMaster.name,
-        editValue.purchaseOrderItems[index].quantity,
-        editValue.purchaseOrderItems[index].price,
-        editValue.purchaseOrderItems[index].amount,
+        value.purchaseOrderItems[index].itemMaster.code,
+        value.purchaseOrderItems[index].itemMaster.name,
+        value.purchaseOrderItems[index].quantity,
+        value.purchaseOrderItems[index].price,
+        value.purchaseOrderItems[index].amount,
       ]
       bodyItems.push(item)
     }
@@ -225,12 +225,13 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
     doc.text("บริษัท ตาดทอง 88 จำกัด (สํานักงานใหญ่)", printX + 50, printY + 10)
     doc.setFontSize(10)
     doc.text(
-      `${company?.address} ตำบล${company?.subDistrict} ${company?.district}  จังหวัด${company?.province}  ${company?.zipcode}`,
+      `เลขที่ 222 หมู่ 4 ตำบลตาดทอง อำเภอศรีธาตุ จงหวัดอุดรธานี 41230`,
       printX + 50,
       printY + 15
     )
     doc.text(
-      `โทร.${company?.phone} เลขประจำตัวผู้เสียภาษีอากร ${company?.tax}`,
+      "โทร. 092-9242266 เลขประจำตัวผู้เสียภาษีอากร 0105563144363",
+      //`โทร.${company?.phone} เลขประจำตัวผู้เสียภาษีอากร ${company?.tax}`,
       printX + 50,
       printY + 20
     )
@@ -241,41 +242,41 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
     // setPrintY(printY+20)
     doc.setFontSize(10)
     doc.text('ชื่อผู้จำหน่าย', printX + 15, printY + 50)
-    doc.text(`:${editValue.vender.companyName}`, printX + 50, printY + 50)
+    doc.text(`:${value.vender.companyName}`, printX + 50, printY + 50)
 
     doc.rect(printX + 71,printY + 33,63,10)
     doc.setFontSize(10)
     doc.text('เลขที่ใบสั่งซื้อ', printX + 120, printY + 50)
-    doc.text(`: ${editValue.code}`, printX + 160, printY + 50)
+    doc.text(`: ${value.code}`, printX + 160, printY + 50)
 
     doc.setFontSize(10)
     doc.text('ที่อยู่', printX + 15, printY + 60)
-    doc.text(`${editValue.vender.address} `, printX + 50, printY + 60)
+    doc.text(`${value.vender.address} `, printX + 50, printY + 60)
     doc.text(
-      `ตำบล${editValue.vender.subDistrict} ${editValue.vender.district} จังหวัด${editValue.vender.province}  ${editValue.vender?.zipcode}`,
+      `ตำบล${value.vender.subDistrict} ${value.vender.district} จังหวัด${value.vender.province}  ${value.vender?.zipcode}`,
       printX + 20,
       printY + 70
     )
 
     doc.setFontSize(10)
     doc.text('วันที่', printX + 120, printY + 60)
-    doc.text(`: ${editValue.createAt}`, printX + 160, printY + 60)
+    doc.text(`: ${value.createAt}`, printX + 160, printY + 60)
 
     doc.setFontSize(10)
     doc.text('อ้างอิงเลขที่ในใบเสนอราคา', printX + 120, printY + 70)
-    doc.text(`: ${editValue.user.firstName}`, printX + 160, printY + 70)
+    doc.text(`: ${value.user.firstName}`, printX + 160, printY + 70)
 
     doc.setFontSize(10)
     doc.text('เลขประจำตัวผู้เสียภาษี', printX + 15, printY + 80)
-    doc.text(`:${editValue.code}`, printX + 50, printY + 80)
+    doc.text(`:${value.code}`, printX + 50, printY + 80)
 
     doc.setFontSize(10)
     doc.text('กำหนดวันส่งสินค้า', printX + 120, printY + 80)
-    doc.text(`: ${editValue.deliveryDate}`, printX + 160, printY + 80)
+    doc.text(`: ${value.deliveryDate}`, printX + 160, printY + 80)
 
     doc.setFontSize(10)
     doc.text('ชื่อผู้ติดต่อ', printX + 15, printY + 90)
-    doc.text(`:${editValue.vender.contactName}`, printX + 50, printY + 90)
+    doc.text(`:${value.vender.contactName}`, printX + 50, printY + 90)
 
     doc.autoTable({
       startY: printY + 95,
@@ -310,13 +311,13 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
 
      doc.text('หมายเหตุ : ', printX + 15, finalY + 8)
      doc.text('รวมเป็นเงิน', printX + 132, finalY + 8)  
-     doc.text(editValue.amount?.toString(), printX + 180, finalY + 8)
+     doc.text(value.amount?.toString(), printX + 180, finalY + 8)
 
      doc.text('ส่วนลด', printX + 132, finalY + 15) 
-     doc.text(editValue.discount > 0 ? editValue.discount.toString() : '0', printX + 180, finalY + 15)
+     doc.text(value.discount > 0 ? value.discount.toString() : '0', printX + 180, finalY + 15)
 
      doc.text('รวมเป็นเงิน', printX + 132, finalY + 22)
-     doc.text((editValue.amount - editValue.discount).toString(), printX + 180, finalY + 22)
+     doc.text((value.amount - value.discount).toString(), printX + 180, finalY + 22)
 
      doc.text('ภาษีมูลค่าเพิ่ม(7%)', printX + 132, finalY + 29)
      doc.text('55', printX + 180, finalY + 29)
@@ -326,7 +327,7 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
      doc.line(printX + 174, finalY + 3, printX + 174, finalY + 40)
 
      doc.text('รวมเป็นเงินทั้งสิน', printX + 132, finalY + 36)
-     doc.text(editValue.vat > 0 ? editValue.vat.toString() : '0', printX + 180, finalY + 36)
+     doc.text(value.vat > 0 ? value.vat.toString() : '0', printX + 180, finalY + 36)
     
     //footer   
 

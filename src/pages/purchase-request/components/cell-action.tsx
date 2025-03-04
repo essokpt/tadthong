@@ -99,18 +99,18 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
   const rule: any = usePermission('purchaseRequest')
 
 
-  function printHeader(doc:any){
+  function printHeader(doc:any, value:PurchaseRequest){
     let bodyItems = [];  
-    for (let index = 0; index < editValue.purchaseRequestItems.length; index++) {
+    for (let index = 0; index < value.purchaseRequestItems.length; index++) {
       let item = [
         index+1, 
-        editValue.purchaseRequestItems[index].quantity,
-        editValue.purchaseRequestItems[index].itemMaster.code,
-        editValue.purchaseRequestItems[index].specification,
-        editValue.purchaseRequestItems[index].price,
-        editValue.purchaseRequestItems[index].total,
-        editValue.purchaseRequestItems[index].includeVat,
-        editValue.purchaseRequestItems[index].amount
+        value.purchaseRequestItems[index].quantity,
+        value.purchaseRequestItems[index].itemMaster.code,
+        value.purchaseRequestItems[index].specification,
+        value.purchaseRequestItems[index].price,
+        value.purchaseRequestItems[index].total,
+        value.purchaseRequestItems[index].includeVat,
+        value.purchaseRequestItems[index].amount
       ]
       bodyItems.push(item);
       
@@ -121,7 +121,7 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
     }
  
     //summary
-    bodyItems.push(['','','','','Total', editValue.total,editValue.sumVat, editValue.amount]);
+    bodyItems.push(['','','','','Total', value.total,value.sumVat, value.amount]);
 
 
     doc.addImage(logo, 'JPG', 15, 5, 30, 30)
@@ -135,27 +135,27 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
    // setPrintY(printY+20)
     doc.setFontSize(10)
     doc.text('ชื่อผู้ขาย',printX + 15, printY + 40)
-    doc.text(`: ${editValue.user.firstName}`,printX + 45, printY + 40)
+    doc.text(`: ${value.user.firstName}`,printX + 45, printY + 40)
 
     doc.setFontSize(10)
     doc.text('วันที่',printX + 145, printY + 40)
-    doc.text(`: ${editValue.createAt}`,printX + 165, printY + 40)
+    doc.text(`: ${value.createAt}`,printX + 165, printY + 40)
 
     doc.setFontSize(10)
     doc.text('เหตุผลในการขอซื้อ',printX + 15, printY + 50)
-    doc.text(`: ${editValue.cause}`,printX + 45, printY + 50)
+    doc.text(`: ${value.cause}`,printX + 45, printY + 50)
 
     doc.setFontSize(10)
     doc.text('ผู้จัดหา/จัดซื้อ',printX + 145, printY + 50)
-    doc.text(`: ${editValue.user.firstName}`,printX + 165, printY + 50)
+    doc.text(`: ${value.user.firstName}`,printX + 165, printY + 50)
 
     doc.setFontSize(10)
     doc.text('ผู้รับผิดชอบ/จัดเก็บ',printX + 15, printY + 60)
-    doc.text(`: ${editValue.user.firstName}`,printX + 45, printY + 60)
+    doc.text(`: ${value.user.firstName}`,printX + 45, printY + 60)
 
     doc.setFontSize(10)
     doc.text('ผู้ใช้งาน',printX + 145, printY + 60)
-    doc.text(`: ${editValue.user.firstName}`,printX + 165, printY + 60)
+    doc.text(`: ${value.user.firstName}`,printX + 165, printY + 60)
 
     doc.autoTable({
       startY: printY + 70,
@@ -182,7 +182,7 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
 
   let finalY = doc.lastAutoTable.finalY || 5
   doc.text('Remark : ',printX + 15, finalY + 10)
-  doc.text(`${editValue.remark}`,printX + 32, finalY + 10)
+  doc.text(`${value.remark}`,printX + 32, finalY + 10)
 
   //footer
   doc.text('ผู้ขอซื้อ ',printX + 55, printY + 200)
@@ -195,7 +195,7 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
   
   doc.setFontSize(10)
   doc.text('Date : ',printX + 45, printY + 225)
-  doc.text(`${editValue.createAt}`,printX + 55, printY + 225) 
+  doc.text(`${value.createAt}`,printX + 55, printY + 225) 
 
   doc.text('Date : ',printX + 120, printY + 225)
   doc.line(printX + 130, printY + 225, printX + 170, printY + 225) 
@@ -205,11 +205,11 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
   async function print(data:PurchaseRequest) {
     console.log('Print value:', data);
     
-    setEditValue(data)
+    //setEditValue(data)
     const doc = new jsPDF();
     setPrintX(0);
     setPrintY(10);
-    printHeader(doc); 
+    printHeader(doc, data); 
     doc.output('dataurlnewwindow');
   }
 

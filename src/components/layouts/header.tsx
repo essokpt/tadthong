@@ -24,7 +24,7 @@ interface HeaderProps {
         )}
        
         {icon}
-        <h2 className='text-3xl font-bold tracking-tight'>{label}</h2>
+        <h3 className='text-2xl font-bold tracking-tight'>{label}</h3>
       </div>
     )
   }

@@ -77,6 +77,8 @@ export const EditModal: React.FC<EditModalProps> = ({
     let today = new Date()
     if (action === 'approved') {
       payload.status = 'approved'
+      let userId = localStorage.getItem('userId');
+      payload.userId = userId? parseInt(userId) : 0
     }
     if (action === 'reject') {
       payload.status = 'reject'
@@ -199,7 +201,9 @@ export const EditModal: React.FC<EditModalProps> = ({
                                 น้ำหนักสุทธิ
                               </TableCell>
                               <TableCell className='text-left'>
-                                {summary.sumWeightNet}
+                                {summary.sumWeightNet
+                                  ? summary.sumWeightNet
+                                  : 0}
                               </TableCell>
                               <TableCell className='text-center text-base'>
                                 หักความชื้น
@@ -235,7 +239,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                                 จำนวนเงิน
                               </TableCell>
                               <TableCell className='text-left'>
-                                {summary.sumAmount}
+                                {summary.sumAmount ? summary.sumAmount : 0}
                               </TableCell>
                             </TableRow>
                             <TableRow>
@@ -243,25 +247,25 @@ export const EditModal: React.FC<EditModalProps> = ({
                                 หักเงินค่าชั่ง
                               </TableCell>
                               <TableCell className='text-left'>
-                                {summary.sumCol7}
+                                {summary.sumCol7 ? summary.sumCol7 : 0}
                               </TableCell>
                               <TableCell className='text-center text-base'>
                                 หักค่าลง
                               </TableCell>
                               <TableCell className='text-left'>
-                                {summary.sumShiping}
+                                {summary.sumShiping ? summary.sumShiping : 0}
                               </TableCell>
                               <TableCell className='text-center text-base'>
                                 หักเงินอื่นๆ
                               </TableCell>
                               <TableCell className='text-left'>
-                                {summary.sumMoney}
+                                {summary.sumMoney ? summary.sumMoney : 0}
                               </TableCell>
                               <TableCell className='text-center text-base'>
                                 เงินคงเหลือ
                               </TableCell>
                               <TableCell className='text-left'>
-                                {summary.sumBalance}
+                                {summary.sumBalance ? summary.sumBalance : 0}
                               </TableCell>
                             </TableRow>
                           </TableBody>

@@ -24,7 +24,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+//import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Table,
   TableBody,
@@ -47,7 +47,7 @@ import { WorkOrder } from '../components/schema'
 import { getLocation } from '@/services/locationApi'
 import { LocationType } from '@/pages/location/components/type'
 import { updateProduction, updateWorkOrderItems } from '@/services/workOrderApi'
-import { IconRefresh } from '@tabler/icons-react'
+import { IconInfoCircle, IconRefresh } from '@tabler/icons-react'
 import { UpdateProductionWip } from '@/services/itemApi'
 import { format } from 'date-fns'
 import {
@@ -138,7 +138,7 @@ export const EditModal: React.FC<EditModalProps> = ({
   async function updateData(payload: z.infer<typeof formSchema>) {
     setOnloading(true)
     console.log('updateData:', payload)
-
+    const userid: any = localStorage.getItem('userId')
     const res: any = await updateProduction(payload)
 
     if (res.status == 200) {
@@ -167,6 +167,7 @@ export const EditModal: React.FC<EditModalProps> = ({
         LocationId: payload.locationId,
         warehouseId: data.location.warehouseId,
         branchesId: localStorage.getItem('branchId'),
+        userId: parseInt(userid),
       }
 
       console.log('createInventoryHistory:', history)
@@ -215,18 +216,20 @@ export const EditModal: React.FC<EditModalProps> = ({
           </DialogHeader>
           <Separator className='bg-primary' />
 
-          <Tabs defaultValue='general' className='w-full'>
-            <TabsList className='grid w-full grid-cols-2'>
-              <TabsTrigger value='general'>General Information</TabsTrigger>
-              <TabsTrigger value='materiallist'>Usage Detail</TabsTrigger>
-            </TabsList>
-            <TabsContent value='general'>
-              <Card>
-                <CardContent className='h-[35rem] space-y-2'>
-                  <Form {...form}>
-                    <form onSubmit={form.handleSubmit(updateData)}>
-                      <div className='grid gap-4'>
-                        <div className='grid grid-cols-2 gap-2'>
+          <Card>
+            <CardContent className='m-2 h-[35rem] space-y-2 overflow-scroll'>
+              <div className='grid gap-4'>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(updateData)}>
+                    <div className='grid gap-4'>
+                      <div className='mb-3  grid items-start gap-2 space-x-3 space-y-0 rounded-md border p-4 shadow'>
+                        <div className='mb-2  flex items-center'>
+                          <IconInfoCircle />
+                          <Label htmlFor='terms' className='ml-3 text-lg'>
+                            General Information.
+                          </Label>
+                        </div>
+                        <div className='grid gap-2'>
                           <FormField
                             control={form.control}
                             name='code'
@@ -286,35 +289,8 @@ export const EditModal: React.FC<EditModalProps> = ({
                               </FormItem>
                             )}
                           />
-                          {/* <div className='grid'>
-                            <Label
-                              className='py-1 text-[0.8rem]'
-                              htmlFor='received'
-                            >
-                              Received
-                            </Label>
-                            <Input
-                              readOnly
-                              className='text-[0.8rem]'
-                              defaultValue={data.received}
-                            />
-                          </div> */}
 
-                          {/* <FormField
-                            control={form.control}
-                            name='received'
-                            render={({ field }) => (
-                              <FormItem className='space-y-1 '>
-                                <FormLabel>Received</FormLabel>
-                                <FormControl>
-                                  <Input type='number' {...field} readOnly />
-                                </FormControl>
-
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          /> */}
-                            <div className='grid'>
+                          <div className='grid'>
                             <Label
                               className='py-1 text-[0.8rem]'
                               htmlFor='received'
@@ -328,7 +304,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                             />
                           </div>
 
-                          <FormField
+                          {/* <FormField
                             control={form.control}
                             name='balance'
                             render={({ field }) => (
@@ -341,7 +317,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                                 <FormMessage />
                               </FormItem>
                             )}
-                          />
+                          /> */}
 
                           <FormField
                             control={form.control}
@@ -350,10 +326,12 @@ export const EditModal: React.FC<EditModalProps> = ({
                               <FormItem className='space-y-1'>
                                 <FormLabel>Receipt Request</FormLabel>
                                 <FormControl>
-                                  <Input type='number' {...field} 
-                                  disabled={data.balance == 0} 
-                                  min={1}
-                                  max={data.balance} 
+                                  <Input
+                                    type='number'
+                                    {...field}
+                                    disabled={data.balance == 0}
+                                    min={1}
+                                    max={data.balance}
                                   />
                                 </FormControl>
 
@@ -434,7 +412,6 @@ export const EditModal: React.FC<EditModalProps> = ({
                             )}
                           />
                         </div>
-
                         <div className='grid'>
                           <Button
                             loading={onloading}
@@ -447,224 +424,66 @@ export const EditModal: React.FC<EditModalProps> = ({
                           </Button>
                         </div>
                       </div>
-                    </form>
-                  </Form>
-                  {/* <form onSubmit={handleSubmit(updateData)}>
-                      <div className='grid grid-cols-2 gap-2 '>
-                        <Input
-                          className='hidden'
-                          {...register('id')}
-                          defaultValue={data.id}
-                        />
-                        <Input
-                          className='hidden'
-                          {...register('userId')}
-                          defaultValue={data.userId}
-                        />
-                        <Input
-                          className='hidden'
-                          {...register('itemMasterId')}
-                          defaultValue={data.itemMasterId}
-                        />
-                        <Input
-                          className='hidden'
-                          {...register('locationId')}
-                          defaultValue={data.locationId}
-                        />
-                        <div className='grid'>
-                          <Label
-                            className='py-1 text-[0.8rem] text-muted-foreground'
-                            htmlFor='code'
-                          >
-                            Code
-                          </Label>
-                          <Input
-                            readOnly
-                            className='text-[0.8rem]'
-                            {...register('code')}
-                            defaultValue={data.code}
-                          />
-                        </div>
-                        <div className='grid'>
-                          <Label
-                            className='py-1 text-[0.8rem] text-muted-foreground'
-                            htmlFor='code'
-                          >
-                            Item Code
-                          </Label>
-                          <Input
-                            readOnly
-                            className='text-[0.8rem]'
-                            defaultValue={data.itemMaster.code}
-                          />
-                        </div>
-                        <div className='grid'>
-                          <Label
-                            className='py-1 text-[0.8rem] text-muted-foreground'
-                            htmlFor='quantity'
-                          >
-                            Quantity
-                          </Label>
-                          <Input
-                            readOnly
-                            className='text-[0.8rem]'
-                            defaultValue={data.quantity}
-                            {...register('quantity')}
-                          />
-                        </div>
-                        <div className='grid'>
-                          <Label
-                            className='py-1 text-[0.8rem] text-muted-foreground'
-                            htmlFor='itemMaster'
-                          >
-                            Item Name
-                          </Label>
-                          <Input
-                            readOnly
-                            className='text-[0.8rem]'
-                            defaultValue={data.itemMaster.name}
-                          />
-                        </div>
-                        <div className='grid'>
-                          <Label
-                            className='py-1 text-[0.8rem] text-muted-foreground'
-                            htmlFor='received'
-                          >
-                            Received
-                          </Label>
-                          <Input
-                            readOnly
-                            className='text-[0.8rem]'
-                            defaultValue={data.received}
-                          />
-                        </div>
+                    </div>
 
-                        <div className='grid'>
-                          <Label
-                            className='py-1 text-[0.8rem] text-muted-foreground'
-                            htmlFor='balance'
-                          >
-                            Balance
-                          </Label>
-                          <Input
-                            readOnly
-                            className='text-[0.8rem]'
-                            {...register('balance')}
-                            defaultValue={data.balance}
-                          />
-                        </div>
-
-                        <div className='grid'>
-                          <Label
-                            className='py-1 text-[0.8rem] text-muted-foreground'
-                            htmlFor='received'
-                          >
-                            Receipt Request
-                          </Label>
-                          <Input
-                            disabled={data.balance == 0}
-                            type='number'
-                            max={data.balance}
-                            className='text-[0.8rem]'
-                            {...register('received')}
-                            defaultValue={data.balance}
-                          />
-                        </div>
-
-                        <div className='grid'>
-                          <Label
-                            className='py-1 text-[0.8rem] text-muted-foreground'
-                            htmlFor='location'
-                          >
-                            Location
-                          </Label>
-                          <select
-                            // id={item.id}
-                            onChange={handleChangeLocation}
-                            className='flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1'
-                          >
-                            <option className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'>
-                              {data.location.name}
-                            </option>
-                            {locations.map((item) => (
-                              <option
-                                className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
-                                value={item.id}
-                              >
-                                {item.name}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
+                    <div className='mb-3  grid  items-start gap-2 space-x-3 space-y-0 rounded-md border p-4 shadow'>
+                      <div className='mb-2  flex items-center'>
+                        <IconInfoCircle />
+                        <Label htmlFor='terms' className='ml-3 text-lg'>
+                          Usage Detail.
+                        </Label>
                       </div>
+                      <Table>
+                        <TableCaption>
+                          A list of your recent items.
+                        </TableCaption>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Item Code</TableHead>
+                            <TableHead>Item Name</TableHead>
+                            <TableHead>Specifications</TableHead>
+                            <TableHead>Quantity</TableHead>
 
-                      <br />
-                      <DialogFooter>
-                        <Button
-                          loading={onloading}
-                          type='submit'
-                          variant='button'
-                        >
-                          Save changes
-                        </Button>
-                      </DialogFooter>
-                    </form> */}
-                </CardContent>
-              </Card>
-            </TabsContent>
-            <TabsContent value='materiallist'>
-              <Card>
-                <CardContent className='h-[35rem] space-y-2'>
-                  <div className='grid gap-4'>
-                    <Table>
-                      <TableCaption>A list of your recent items.</TableCaption>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Item Code</TableHead>
-                          <TableHead>Item Name</TableHead>
-                          <TableHead>Specifications</TableHead>
-                          <TableHead>Quantity</TableHead>
+                            <TableHead>Issued</TableHead>
+                            <TableHead>Balance</TableHead>
 
-                          <TableHead>Issued</TableHead>
-                          <TableHead>Balance</TableHead>
+                            <TableHead>Picking Request</TableHead>
+                            <TableHead>Last Picking Date</TableHead>
+                            <TableHead>Remark</TableHead>
+                            {/* <TableHead className='items-center'>Action</TableHead> */}
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {data.workOrderUsages?.map((item) => (
+                            <TableRow key={item.id}>
+                              <TableCell className='font-medium'>
+                                {item.itemMaster?.code}
+                              </TableCell>
+                              <TableCell>{item.itemMaster?.name}</TableCell>
+                              <TableCell>-</TableCell>
+                              <TableCell>{item.quantity}</TableCell>
 
-                          <TableHead>Picking Request</TableHead>
-                          <TableHead>Last Picking Date</TableHead>
-                          <TableHead>Remark</TableHead>
-                          {/* <TableHead className='items-center'>Action</TableHead> */}
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {data.workOrderUsages?.map((item) => (
-                          <TableRow key={item.id}>
-                            <TableCell className='font-medium'>
-                              {item.itemMaster?.code}
-                            </TableCell>
-                            <TableCell>{item.itemMaster?.name}</TableCell>
-                            <TableCell>-</TableCell>
-                            <TableCell>{item.quantity}</TableCell>
-
-                            <TableCell>{item.pickingQuantity}</TableCell>
-                            <TableCell>{item.pickingBalance}</TableCell>
-                            <TableCell>
-                              <Input
-                                disabled={item.pickingBalance == 0}
-                                className='w-[100px]'
-                                type='number'
-                                min={1}
-                                max={item.pickingBalance}
-                                id={item.id}
-                                defaultValue={item.pickingBalance}
-                                onChange={handleChangePicking}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              {item.pickingDate
-                                ? format(item.pickingDate, 'dd-MM-yyyy')
-                                : ''}
-                            </TableCell>
-                            <TableCell>{item.remark}</TableCell>
-                            {/* <TableCell className='w-[8rem]'>
+                              <TableCell>{item.pickingQuantity}</TableCell>
+                              <TableCell>{item.pickingBalance}</TableCell>
+                              <TableCell>
+                                <Input
+                                  disabled={item.pickingBalance == 0}
+                                  className='w-[100px]'
+                                  type='number'
+                                  min={1}
+                                  max={item.pickingBalance}
+                                  id={item.id}
+                                  defaultValue={item.pickingBalance}
+                                  onChange={handleChangePicking}
+                                />
+                              </TableCell>
+                              <TableCell>
+                                {item.pickingDate
+                                  ? format(item.pickingDate, 'dd-MM-yyyy')
+                                  : ''}
+                              </TableCell>
+                              <TableCell>{item.remark}</TableCell>
+                              {/* <TableCell className='w-[8rem]'>
                               <Button
                                 size='icon'
                                 variant='ghost'
@@ -676,29 +495,30 @@ export const EditModal: React.FC<EditModalProps> = ({
 
                             
                             </TableCell> */}
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                        <TableFooter>
+                          <TableRow>
+                            <TableCell colSpan={10} className='text-right'>
+                              <Button
+                                loading={onloading}
+                                onClick={updateItem}
+                                variant='button'
+                              >
+                                <IconRefresh size={20} className='mr-2' />
+                                Update
+                              </Button>
+                            </TableCell>
                           </TableRow>
-                        ))}
-                      </TableBody>
-                      <TableFooter>
-                        <TableRow>
-                          <TableCell colSpan={10} className='text-right'>
-                            <Button
-                              loading={onloading}
-                              onClick={updateItem}
-                              variant='button'
-                            >
-                              <IconRefresh size={20} className='mr-2' />
-                              Update
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      </TableFooter>
-                    </Table>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
+                        </TableFooter>
+                      </Table>
+                    </div>
+                  </form>
+                </Form>
+              </div>
+            </CardContent>
+          </Card>
         </DialogContent>
       </Dialog>
     </>

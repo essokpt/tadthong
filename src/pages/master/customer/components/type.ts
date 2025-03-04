@@ -50,6 +50,11 @@ export interface CustomerType{
     paymenTerm : string
     createAt : string
     customerBillings : CustomerBilling []
+    customerFileAttach: {
+      id: number
+      fileName: string
+      path: string   
+     },
   }
 
   // existing.FaxExt = cus.FaxExt;

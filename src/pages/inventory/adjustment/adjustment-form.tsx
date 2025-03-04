@@ -51,6 +51,7 @@ import { SelectItemModal } from './selectItem-modal'
 import { AdjustItem } from './adjust-item-schema'
 import {
   createInventoryAdjust,
+  createInventoryHistory,
   getAdjustmentReason,
 } from '@/services/inventoryApi'
 import { PageHeader } from '@/components/layouts/header'
@@ -136,13 +137,35 @@ export function AdjustForm({ className, ...props }: SignUpFormProps) {
 
   async function onSubmit(data: any) {
     setIsLoading(true)
-
+    const userid:any = localStorage.getItem('userId')
     data.inventoryAdjustItems = selectedAdjustItems
     console.log('create transfer', data)
 
     const respone: any = await createInventoryAdjust(data)
     console.log('respone', respone)
     if (respone.status == 200) {
+       // save history
+        const history = {
+          StockType: 'Adjustment',
+          Ref: respone.data.code,
+          StockBy: localStorage.getItem('user'),
+          ReceiveQuantity: selectedAdjustItems[0].receiveQuantity,
+          Unit: 'pcs',
+          Status: 'Completed',
+          ItemMasterId: data.Ite,
+          LocationId: selectedAdjustItems[0].locationId,
+          warehouseId: selectedAdjustItems[0].warehouseDestinationId,
+          branchesId: localStorage.getItem('branchId'),
+          userId: parseInt(userid)
+        }
+  
+        console.log('createInventoryHistory:', history)
+        await createInventoryHistory([history])
+        setTimeout(() => {
+          setIsLoading(false)
+         
+        }, 1000)
+
       setIsLoading(false)
       navigate('/adjustment', { replace: true })
     }

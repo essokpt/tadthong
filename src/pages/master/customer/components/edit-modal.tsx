@@ -12,6 +12,9 @@ import {
 } from '@/components/ui/dialog'
 import {
   createCustomerBilling,
+  customerDeleteFileAttach,
+  customerDownloadFileAttach,
+  customerUploadFiles,
   deleteCustomerBilling,
   updateCustomer,
   updateCustomerBilling,
@@ -32,7 +35,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Customer } from './schema'
-import { IconEdit, IconTrash } from '@tabler/icons-react'
+import { IconDownload, IconEdit, IconEye, IconTrash } from '@tabler/icons-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { PlusCircleIcon } from 'lucide-react'
 import { BillingModal } from './billing-modal'
@@ -40,11 +43,12 @@ import { CustomerBilling } from './billing-schema'
 import { ApiContext } from '@/components/layouts/api-context'
 import { ApiType } from 'types/api'
 import { AlertModal } from '@/components/custom/alert-modal'
-import { cn } from '@/lib/utils'
+import { cn, downloadFileData } from '@/lib/utils'
 import { ThaiAddress } from 'types/thaiaddress'
 import useThaiAddress from '@/hooks/use-thaiAddress'
 import useDebounce from '@/hooks/use-debounce'
 import { MagnifyingGlassIcon } from '@radix-ui/react-icons'
+import FileDrag from '@/components/custom/fileDrag'
 // import { CaretSortIcon } from '@radix-ui/react-icons'
 // import { cn } from '@/lib/utils'
 // import useThaiAddress from '@/hooks/use-thaiAddress'
@@ -102,6 +106,67 @@ export const EditModal: React.FC<AlertModalProps> = ({
   const { setRefresh } = useContext(ApiContext) as ApiType
   const { userInputCallback, dataValue } = useThaiAddress()
   const debounceValue = useDebounce(userInputCallback, 500)
+
+  async function addFile(payload: any) {
+    //setFiles(payload)
+    const formData = new FormData()
+    for (let i = 0; i < payload?.length; i++) {
+      formData.append('files', payload[i])
+      formData.append('customerId', data.id.toString())
+    }
+
+    const res: any = await customerUploadFiles(formData)
+    if (res.status == 200) {
+      console.log('uploadFiles -success', res.status)
+      data.customerFileAttach.length = 0
+
+      for (let index = 0; index < res.data.length; index++) {
+        data.customerFileAttach.push(payload[0]);
+        console.log('upload file data:', res.data[index])
+      }
+    }
+   
+  }
+
+  async function downloadFile(filename: any) {
+    const response: any = await customerDownloadFileAttach(filename)
+    downloadFileData(filename, response.data)
+  }
+
+  const openFile = (file: any) => {
+    window.open(
+      `http://tadthongback.c-space.store/files/Customer/${file}`,
+      '_blank',
+      'noreferrer'
+    )
+  }
+
+  function deleteAction(row: any) {
+    setOpenDeleteModal(true)
+    setDeleteId(row.id)
+    setdeleteTitle(row.fileName)
+    //console.log('deleteFile:', row.id)
+  }
+  async function deleteFile() {
+    setIsLoading(true)
+    console.log('deleteFile:', deleteId)
+
+    const res: any = await customerDeleteFileAttach(deleteId)
+
+    if (res.status == 200) {
+      console.log('venderDeleteFileAttach:', res)
+      const deleteIndex = data.customerFileAttach.findIndex(
+        (x) => x.id == deleteId
+      )
+      if (deleteId != -1) {
+        data.customerFileAttach.splice(deleteIndex, 1)
+      }
+    }
+    setTimeout(() => {
+      setIsLoading(false)
+      setOpenDeleteModal(false)
+    }, 1000)
+  }
 
   function updateBilling(payload: any) {
     console.log('updateBilling', payload)
@@ -264,11 +329,12 @@ export const EditModal: React.FC<AlertModalProps> = ({
 
           <div className='grid gap-4'>
             <Tabs defaultValue='information' className='w-full'>
-              <TabsList className='grid w-full grid-cols-2'>
+              <TabsList className='grid w-full grid-cols-3'>
                 <TabsTrigger value='information'>
                   General Information
                 </TabsTrigger>
                 <TabsTrigger value='account'>Billing</TabsTrigger>
+                <TabsTrigger value='file'>File Attached</TabsTrigger>
               </TabsList>
               <TabsContent value='information' className='h-full'>
                 <form onSubmit={handleSubmit(updateData)}>
@@ -870,7 +936,7 @@ export const EditModal: React.FC<AlertModalProps> = ({
                           <TableRow>
                             <TableCell>
                               <Button
-                              disabled={editble}
+                                disabled={editble}
                                 variant='button'
                                 size='sm'
                                 className='w-13 h-8'
@@ -887,6 +953,71 @@ export const EditModal: React.FC<AlertModalProps> = ({
                   </CardContent>
                 </Card>
               </TabsContent>
+              <TabsContent value='file' className='h-[35rem]'>
+                <div className='grid gap-4'>
+                  <FileDrag uploadData={(e) => addFile(e)} />
+
+                  <Table className='overflow-scroll'>
+                    <TableCaption>A list of file attached.</TableCaption>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>File Name</TableHead>
+
+                        <TableHead className='items-center'>Action</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {data.customerFileAttach?.map((item) => (
+                        <TableRow key={item.id}>
+                          <TableCell className='font-medium'>
+                            {item.fileName}
+                          </TableCell>
+
+                          <TableCell className='w-[8rem]'>
+                            <Button
+                              size='icon'
+                              variant='ghost'
+                              className='rounded-full'
+                              onClick={() => downloadFile(item.path)}
+                            >
+                              <IconDownload size={20} />
+                            </Button>
+                            <Button
+                              size='icon'
+                              variant='ghost'
+                              className='rounded-full'
+                              onClick={() => openFile(item.path)}
+                            >
+                              <IconEye size={20} />
+                            </Button>
+
+                            <Button
+                              size='icon'
+                              variant='ghost'
+                              className='rounded-full'
+                              onClick={() => deleteAction(item)}
+                            >
+                              <IconTrash size={20} />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                    <TableFooter>
+                      <TableRow>
+                        <TableCell colSpan={10} className='text-right'>
+                          {/* <Button loading={false} >
+                            <IconRefresh size={20} />
+                            Add
+                          </Button> */}
+                        </TableCell>
+                      </TableRow>
+                    </TableFooter>
+                  </Table>
+                </div>
+                {/* </CardContent>
+                </Card> */}
+              </TabsContent>
             </Tabs>
           </div>
         </DialogContent>
@@ -902,6 +1033,14 @@ export const EditModal: React.FC<AlertModalProps> = ({
           isOpen={openDeleteModal}
           onClose={() => setOpenDeleteModal(false)}
           onConfirm={confirmDeleteBilling}
+          loading={isLoading}
+          title={deleteTitle}
+        />
+
+        <AlertModal
+          isOpen={openDeleteModal}
+          onClose={() => setOpenDeleteModal(false)}
+          onConfirm={deleteFile}
           loading={isLoading}
           title={deleteTitle}
         />

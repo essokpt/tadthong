@@ -70,7 +70,8 @@ const initialValue = {
           id: 0,
           code: '',
           name: '',
-          stockingUom: ''
+          stockingUom: '',
+          convertFactor: 0,
         },
         quantity: 0,
         unitPrice: 0,
@@ -84,6 +85,7 @@ const initialValue = {
         destinationHumidity: 0,
         destinationWeighingScale: '',
         remark: '',
+        uomType: '',
         saleOrder: {
           id: 0,
           code: '',
@@ -152,31 +154,38 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
 
   async function print(data: Invoice) {
     console.log('Print value:', data)
-    const res: any = await findCompany(1)
-    if (res.status == 200) {
-      console.log('findCompany -success', res)
-      setCompany(res)
-    }
-   
+    findCompany(1).then((data) =>  setCompany(data))
+      
     setEditValue(data)
     const doc = new jsPDF()
     setPrintX(0)
     setPrintY(10)
-    printHeader(doc)
+    printHeader(doc,data)
     doc.output('dataurlnewwindow')
   }
 
-  function printHeader(doc: any) {
+  function printHeader(doc: any, value: Invoice) {
     let bodyItems = []
-    for (let index = 0; index < editValue.invoiceItems.length; index++) {
+    for (let index = 0; index < value.invoiceItems.length; index++) {
+      let isAltenateUom = value.invoiceItems[index].saleOrderItems.uomType?.includes('(alternate-uom)')
+      console.log('find uom:', isAltenateUom);
+      let quantity = 0
+      let unitprice = 0
+      if(isAltenateUom)  {
+        quantity = value.invoiceItems[index].saleOrderItems.quantity *  value.invoiceItems[index].saleOrderItems.itemMaster.convertFactor
+        unitprice = value.invoiceItems[index].saleOrderItems.unitPrice / value.invoiceItems[index].saleOrderItems.itemMaster.convertFactor
+      }else{
+        quantity = value.invoiceItems[index].saleOrderItems.quantity
+        unitprice = value.invoiceItems[index].saleOrderItems.unitPrice
+      }
       let item = [
         index + 1,
-        editValue.invoiceItems[index].saleOrderItems.itemMaster.code,
-        editValue.invoiceItems[index].saleOrderItems.itemMaster.name,
-        editValue.invoiceItems[index].saleOrderItems.quantity,
-        editValue.invoiceItems[index].saleOrderItems.itemMaster.stockingUom,
-        editValue.invoiceItems[index].saleOrderItems.unitPrice,
-        editValue.invoiceItems[index].saleOrderItems.amount,
+        value.invoiceItems[index].saleOrderItems.itemMaster.code,
+        value.invoiceItems[index].saleOrderItems.itemMaster.name,
+        quantity,         
+        value.invoiceItems[index].saleOrderItems.uomType,
+        unitprice,
+        value.invoiceItems[index].saleOrderItems.amount,
 
       ]
       bodyItems.push(item)
@@ -187,21 +196,23 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
     }
 
     //summary
-    // bodyItems.push(['','','','','Total', editValue.total,editValue.sumVat, editValue.amount]);
+    // bodyItems.push(['','','','','Total', value.total,value.sumVat, value.amount]);
 
     doc.addImage(logo, 'JPG', 15, 5, 30, 30)
     doc.setFont('Sarabun-Regular', 'normal')
 
     doc.setFontSize(15)
-    doc.text(company.companyName, printX + 50, printY + 10)
+    doc.text("บริษัท ตาดทอง 88 จำกัด (สํานักงานใหญ่)", printX + 50, printY + 10)
     doc.setFontSize(10)
     doc.text(
-      `${company?.address} ตำบล${company?.subDistrict} ${company?.district}  จังหวัด${company?.province}  ${company?.zipcode}`,
+      `เลขที่ 222 หมู่ 4 ตำบลตาดทอง อำเภอศรีธาตุ จงหวัดอุดรธานี 41230`,
+      //`${company?.address} ตำบล${company?.subDistrict} ${company?.district}  จังหวัด${company?.province}  ${company?.zipcode}`,
       printX + 50,
       printY + 15
     )
     doc.text(
-      `โทร.${company?.phone} เลขประจำตัวผู้เสียภาษีอากร ${company?.tax}`,
+      "โทร. 092-9242266 เลขประจำตัวผู้เสียภาษีอากร 0105563144363",
+      //`โทร.${company?.phone} เลขประจำตัวผู้เสียภาษีอากร ${company?.tax}`,
       printX + 50,
       printY + 20
     )
@@ -214,40 +225,40 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
 
     doc.setFontSize(10)
     doc.text('ลูกค้า', printX + 15, printY + 50)
-    doc.text(`: ${editValue.customer?.companyName}`, printX + 50, printY + 50)
+    doc.text(`: ${value.customer?.companyName}`, printX + 50, printY + 50)
     
     doc.setFontSize(10)
     doc.text('เลขที่ No.', printX + 120, printY + 50)
-    doc.text(`: ${editValue.code}`, printX + 160, printY + 50)
+    doc.text(`: ${value.code}`, printX + 160, printY + 50)
 
     doc.setFontSize(10)
     doc.text('ที่อยู่', printX + 15, printY + 60)
-    doc.text(`${editValue.customer.address} `, printX + 50, printY + 60)
+    doc.text(`${value.customer.address} `, printX + 50, printY + 60)
     doc.text(
-      `ตำบล${editValue.customer.subDistrict} ${editValue.customer.district} จังหวัด${editValue.customer.province}  ${editValue.customer?.zipcode}`,
+      `ตำบล${value.customer.subDistrict} ${value.customer.district} จังหวัด${value.customer.province}  ${value.customer?.zipcode}`,
       printX + 20,
       printY + 70
     )
 
     doc.setFontSize(10)
     doc.text('วันที่', printX + 120, printY + 60)
-    doc.text(`: ${editValue.createAt}`, printX + 160, printY + 60)
+    doc.text(`: ${value.createAt}`, printX + 160, printY + 60)
 
     doc.setFontSize(10)
     doc.text('หน้า', printX + 120, printY + 70)
 
     doc.setFontSize(10)
     doc.text('เลขประจำตัวผู้เสียภาษี', printX + 15, printY + 80)
-    doc.text(`: ${editValue.customer?.tax}`, printX + 50, printY + 80)
+    doc.text(`: ${value.customer?.tax}`, printX + 50, printY + 80)
 
     doc.setFontSize(10)
     doc.text('PO No.', printX + 120, printY + 80)
 
     doc.setFontSize(10)
     doc.text('สำนักงาน/สาขา', printX + 15, printY + 90)
-    doc.text(`: ${editValue.customer?.code}`, printX + 50, printY + 90)
+    doc.text(`: ${value.customer?.code}`, printX + 50, printY + 90)
     doc.text('Payment Term', printX + 120, printY + 90)
-    doc.text(`: ${editValue.paymentTerm}`, printX + 160, printY + 70)
+    doc.text(`: ${value.paymentTerm}`, printX + 160, printY + 70)
 
 
     doc.autoTable({
@@ -265,12 +276,12 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
         // cellPadding: 1.5
       },
       columnStyles: {
-        0: { halign: 'center', valign: 'middle', cellWidth: 15, rowSpan: 2 },
+        0: { halign: 'center', valign: 'middle', cellWidth: 15, },
         1: { halign: 'center', valign: 'middle', cellWidth: 20 },
         2: { halign: 'center', valign: 'middle', cellWidth: 60 },
         3: { halign: 'left', valign: 'middle', cellWidth: 20 },
         4: { halign: 'right', valign: 'middle', cellWidth: 20 },
-         5: { halign: 'right', valign: 'middle', cellWidth: 25,  },
+        5: { halign: 'right', valign: 'middle', cellWidth: 25,  },
       },
       head: [
         ['ลำดับ', 'รหัสสินค้า', 'รายละเอียด', 'จำนวน', 'หน่วย', 'ราคาต่อหน่วย', 'จำนวนเงิน'],
@@ -292,7 +303,7 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
 
     doc.text('รวมเงิน', printX + 111, finalY + 7)
     doc.text('TOTAL', printX + 111, finalY + 11)
-    doc.text(editValue.total>0 ? editValue.total.toString() : '0', printX + 180, finalY + 9)
+    doc.text(value.total>0 ? value.total.toString() : '0', printX + 180, finalY + 9)
     doc.line(109, finalY + 13, printX + 196, finalY + 13)
 
     doc.text('ส่วนลด', printX + 111, finalY + 17)
@@ -302,12 +313,12 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
 
     doc.text('มูลค่าสินค้าหลังหักส่วนลด', printX + 111, finalY + 28)
     doc.text('TOTAL AMOUNT AFTER DISCOUNT', printX + 111, finalY + 32)
-    doc.text(editValue.total>0 ? editValue.total.toString() : '0', printX + 180, finalY + 30)
+    doc.text(value.total>0 ? value.total.toString() : '0', printX + 180, finalY + 30)
     doc.line(109, finalY + 33, printX + 196, finalY + 33)
 
     doc.text('ภาษีมูลค่าเพิ่ม', printX + 111, finalY + 37)
     doc.text('VAT 7%', printX + 111, finalY + 41)
-    doc.text((editValue.total>0 ? (editValue.total * 0.07).toString() : '0'), printX + 180, finalY + 39)
+    doc.text((value.total>0 ? (value.total * 0.07).toString() : '0'), printX + 180, finalY + 39)
     doc.line(109, finalY + 43, printX + 196, finalY + 43)
     
     doc.text('ยอดรวมสุทธิ', printX + 111, finalY + 46)

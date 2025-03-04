@@ -11,14 +11,14 @@ import { Edit, Trash } from 'lucide-react'
 import { useContext, useState } from 'react'
 import { deleteCustomer } from '@/services/customerApi'
 import { EditModal } from './edit-modal'
-import { CustomerType } from './type'
 import { ApiContext } from '@/components/layouts/api-context'
 import { ApiType } from 'types/api'
 import { IconEye, IconSettingsDown } from '@tabler/icons-react'
 import usePermission from '@/hooks/use-permission'
+import { Customer } from './schema'
 
 interface DataTableRowActionsProps {
-  row: CustomerType
+  row: Customer
 }
 
 const initCustomerEdit = {
@@ -54,6 +54,11 @@ const initCustomerEdit = {
   paymenTerm: '',
   createAt: '',
   customerBillings: [],
+  customerFileAttach: [{
+    id: 0,
+    fileName: '',
+    path: ''
+  }],
 }
 
 export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
@@ -64,7 +69,7 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
   const [deleteTitle, setdeleteTitle] = useState(null)
   const [editble, setEditble] = useState(false);
   const [customerEdit, setCustomerEdit] =
-    useState<CustomerType>(initCustomerEdit)
+    useState<Customer>(initCustomerEdit)
 
   const { setRefresh } = useContext(ApiContext) as ApiType
   const rule: any = usePermission('customer')

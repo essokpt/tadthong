@@ -412,8 +412,8 @@ export default function Company() {
           ) : (
             <Tabs defaultValue='information' className='w-full'>
               <TabsList className='grid w-full grid-cols-2'>
-                <TabsTrigger value='information'>Information</TabsTrigger>
-                <TabsTrigger value='files'>File Attachment</TabsTrigger>
+                <TabsTrigger value='information'>Information(ข้อมูลทั่วไป)</TabsTrigger>
+                <TabsTrigger value='files'>File Attachment(แนบเอกสาร)</TabsTrigger>
               </TabsList>
               <TabsContent value='information' className='h-full'>
                 <Form {...form}>
@@ -422,7 +422,7 @@ export default function Company() {
                       <div className='col-span-3 mb-2  flex items-center'>
                         <IconHomeInfinity />
                         <Label htmlFor='terms' className='ml-3 text-lg'>
-                          Information.
+                          Information.(ข้อมูลทั่วไป)
                         </Label>
                       </div>
 
@@ -431,7 +431,7 @@ export default function Company() {
                         name='companyName'
                         render={({ field }) => (
                           <FormItem className='col-span-2 space-y-1'>
-                            <FormLabel>Company Name</FormLabel>
+                            <FormLabel>Company Name(ชื่อบริษัท)</FormLabel>
                             <FormControl>
                               <Input {...field} />
                             </FormControl>
@@ -445,7 +445,7 @@ export default function Company() {
                         name='code'
                         render={({ field }) => (
                           <FormItem className='space-y-1 '>
-                            <FormLabel>Code</FormLabel>
+                            <FormLabel>Code(รหัสบริษัท)</FormLabel>
                             <FormControl>
                               <Input {...field} />
                             </FormControl>
@@ -459,7 +459,7 @@ export default function Company() {
                         name='foundedDate'
                         render={({ field }) => (
                           <FormItem className='flex flex-col space-y-3'>
-                            <FormLabel>Founded Date</FormLabel>
+                            <FormLabel>Founded Date(วันที่ก่อตั้ง)</FormLabel>
                             <Popover>
                               <PopoverTrigger asChild>
                                 <FormControl>
@@ -531,7 +531,7 @@ export default function Company() {
                       <div className='col-span-2 mb-2  flex items-center'>
                         <IconMap />
                         <Label htmlFor='terms' className='ml-3 text-lg'>
-                          Company Address.
+                          Company Address.(ที่อยู่บริษัท)
                         </Label>
                       </div>
                       <FormField
@@ -539,7 +539,7 @@ export default function Company() {
                         name='address'
                         render={({ field }) => (
                           <FormItem className='col-span-2 space-y-1'>
-                            <FormLabel>Address</FormLabel>
+                            <FormLabel>Address(ที่อยู่)</FormLabel>
                             <FormControl>
                               <Input {...field} />
                             </FormControl>
@@ -550,7 +550,7 @@ export default function Company() {
 
                       <div className='relative mt-2 '>
                         <Label className='py-1 ' htmlFor='district'>
-                          Sub-District
+                          Sub-District(ตำบล/แขวง)
                         </Label>
                         <div className='flex items-center  px-3 '>
                           <MagnifyingGlassIcon className='mr-2 h-4 w-4 shrink-0 border-separate opacity-50' />
@@ -571,7 +571,7 @@ export default function Company() {
                         name='district'
                         render={({ field }) => (
                           <FormItem className='space-y-1'>
-                            <FormLabel>District</FormLabel>
+                            <FormLabel>District(อำเภอ/เขต)</FormLabel>
                             <FormControl>
                               <Input {...field} />
                             </FormControl>
@@ -584,7 +584,7 @@ export default function Company() {
                         name='province'
                         render={({ field }) => (
                           <FormItem className='space-y-1'>
-                            <FormLabel>City/Province</FormLabel>
+                            <FormLabel>City/Province(จังหวัด)</FormLabel>
                             <FormControl>
                               <Input {...field} />
                             </FormControl>
@@ -597,7 +597,7 @@ export default function Company() {
                         name='country'
                         render={({ field }) => (
                           <FormItem className='space-y-1'>
-                            <FormLabel>Country</FormLabel>
+                            <FormLabel>Country(ประเทศ)</FormLabel>
                             <FormControl>
                               <Input {...field} />
                             </FormControl>
@@ -610,7 +610,7 @@ export default function Company() {
                         name='zipcode'
                         render={({ field }) => (
                           <FormItem className='space-y-1'>
-                            <FormLabel>Zipcode</FormLabel>
+                            <FormLabel>Zipcode(รหัสไปรษณีย์)</FormLabel>
                             <FormControl>
                               <Input {...field} />
                             </FormControl>
@@ -624,7 +624,7 @@ export default function Company() {
                       <div className='col-span-2 mb-2  flex items-center'>
                         <IconFileInvoice />
                         <Label htmlFor='terms' className='ml-3 text-lg'>
-                          Bill Address.
+                          Bill Address.(ที่อยู่วางบิล)
                         </Label>
                       </div>
                       <FormField
@@ -632,7 +632,7 @@ export default function Company() {
                         name='billAddress'
                         render={({ field }) => (
                           <FormItem className='space-y-1'>
-                            <FormLabel>Address</FormLabel>
+                            <FormLabel>Address(ที่อยู่)</FormLabel>
                             <FormControl>
                               <Input {...field} />
                             </FormControl>
@@ -646,7 +646,7 @@ export default function Company() {
                         name='tax'
                         render={({ field }) => (
                           <FormItem className='space-y-1'>
-                            <FormLabel>Tax ID</FormLabel>
+                            <FormLabel>Tax ID(เลขประจำตัวผู้เสียภาษี)</FormLabel>
                             <FormControl>
                               <Input {...field} />
                             </FormControl>
@@ -657,7 +657,7 @@ export default function Company() {
 
                       <div className='relative mt-2 '>
                         <Label className='py-1 ' htmlFor='district'>
-                          Sub-District
+                          Sub-District(ตำบล/แขวง)
                         </Label>
                         <div className='flex items-center  px-3 '>
                           <MagnifyingGlassIcon className='mr-2 h-4 w-4 shrink-0 border-separate opacity-50' />
@@ -678,7 +678,7 @@ export default function Company() {
                         name='billDistrict'
                         render={({ field }) => (
                           <FormItem className='space-y-1'>
-                            <FormLabel>District</FormLabel>
+                            <FormLabel>District(อำเภอ/เขต)</FormLabel>
                             <FormControl>
                               <Input {...field} />
                             </FormControl>
@@ -692,7 +692,7 @@ export default function Company() {
                         name='billProvince'
                         render={({ field }) => (
                           <FormItem className='space-y-1'>
-                            <FormLabel>City/Province</FormLabel>
+                            <FormLabel>City/Province(จังหวัด)</FormLabel>
                             <FormControl>
                               <Input {...field} />
                             </FormControl>
@@ -706,7 +706,7 @@ export default function Company() {
                         name='billCountry'
                         render={({ field }) => (
                           <FormItem className='space-y-1'>
-                            <FormLabel>Country</FormLabel>
+                            <FormLabel>Country(ประเทศ)</FormLabel>
                             <FormControl>
                               <Input {...field} />
                             </FormControl>
@@ -719,7 +719,7 @@ export default function Company() {
                         name='billZipcode'
                         render={({ field }) => (
                           <FormItem className='space-y-1'>
-                            <FormLabel>Zipcode</FormLabel>
+                            <FormLabel>Zipcode(รหัสไปรษณีย์)</FormLabel>
                             <FormControl>
                               <Input {...field} />
                             </FormControl>
@@ -732,7 +732,7 @@ export default function Company() {
                       <div className='col-span-3 mb-2  flex items-center'>
                         <IconPhone />
                         <Label htmlFor='terms' className='ml-3 text-lg'>
-                          Contact.
+                          Contact.(ผู้ติดต่อ)
                         </Label>
                       </div>
                       <FormField
@@ -740,7 +740,7 @@ export default function Company() {
                         name='phone'
                         render={({ field }) => (
                           <FormItem className='space-y-1'>
-                            <FormLabel>Phone</FormLabel>
+                            <FormLabel>Phone(เบอร์โทรศัพท์)</FormLabel>
                             <FormControl>
                               <Input {...field} />
                             </FormControl>
@@ -753,7 +753,7 @@ export default function Company() {
                         name='fax'
                         render={({ field }) => (
                           <FormItem className='space-y-1'>
-                            <FormLabel>Fax</FormLabel>
+                            <FormLabel>Fax(เบอร์แฟกซ์)</FormLabel>
                             <FormControl>
                               <Input {...field} />
                             </FormControl>
@@ -766,7 +766,7 @@ export default function Company() {
                         name='ext'
                         render={({ field }) => (
                           <FormItem className='space-y-1'>
-                            <FormLabel>Fax-Ext</FormLabel>
+                            <FormLabel>Fax-Ext(เบอร์แฟกซ์ ต่อ)</FormLabel>
                             <FormControl>
                               <Input {...field} />
                             </FormControl>
@@ -779,7 +779,7 @@ export default function Company() {
                         name='attn'
                         render={({ field }) => (
                           <FormItem className='space-y-1'>
-                            <FormLabel>Attn</FormLabel>
+                            <FormLabel>Attn(ขื่อผู้ติดต่อ)</FormLabel>
                             <FormControl>
                               <Input {...field} />
                             </FormControl>
@@ -792,7 +792,7 @@ export default function Company() {
                         name='email'
                         render={({ field }) => (
                           <FormItem className='space-y-1'>
-                            <FormLabel>Email</FormLabel>
+                            <FormLabel>Email(อีเมลล์)</FormLabel>
                             <FormControl>
                               <Input
                                 placeholder='name@example.com'
@@ -808,7 +808,7 @@ export default function Company() {
                         name='remark'
                         render={({ field }) => (
                           <FormItem className='space-y-1'>
-                            <FormLabel>Note</FormLabel>
+                            <FormLabel>Note(หมายเหตุ)</FormLabel>
                             <FormControl>
                               <Input {...field} />
                             </FormControl>

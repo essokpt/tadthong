@@ -48,6 +48,7 @@ import { CreateModal } from './create-modal'
 //   SelectValue,
 // } from '@/components/ui/select'
 import {
+  IconEdit,
   IconInfoCircle,
   IconLogin,
   IconMap,
@@ -154,9 +155,29 @@ export function UserForm({ className, ...props }: SignUpFormProps) {
   })
 
   function addNewData(payload: any) {
-    payload.id = selectRoleBranch.length + 1
-    console.log('addNewData', payload)
-    selectRoleBranch.push(payload)
+    if(payload.id > 0 ){
+      console.log('edit role', payload);
+      
+      setSelectRoleBranch(selectRoleBranch.map(artwork => {
+        if (artwork.id === payload.id) {
+          // Create a *new* object with changes
+          return { ...artwork, 
+            RoleBranchesId: payload.RoleBranchesId,
+            branchId: payload.branchId,
+            branchName: payload.branchName,
+            roleName: payload.roleName   
+          };
+        } else {
+          // No changes
+          return artwork;
+        }
+      }));
+      
+    }else{
+      payload.id = selectRoleBranch.length + 1
+      console.log('addNewData', payload)
+      selectRoleBranch.push(payload)
+    }
   }
 
   function onSelectResult(e: any) {
@@ -655,14 +676,19 @@ export function UserForm({ className, ...props }: SignUpFormProps) {
                         </TableCell>
 
                         <TableCell>
-                          {/* <Button
+                          <Button
                           size='icon'
                           variant='ghost'
                           className='rounded-full'
-                          onClick={() => updateRoleBranch(item)}
+                          onClick={() => {
+                            setOpenModal(true)
+                            console.log(item);
+                            
+                            setEditValue(item)
+                          }}
                         >
                           <IconEdit size={20} />
-                        </Button> */}
+                        </Button> 
                           <Button
                             size='icon'
                             variant='ghost'

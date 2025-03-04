@@ -573,6 +573,25 @@ export function ItemForm({ className, ...props }: SignUpFormProps) {
                           </FormItem>
                         )}
                       />
+                      <FormField
+                        control={form.control}
+                        name='convertFactor'
+                        render={({ field }) => (
+                          <FormItem className='space-y-1'>
+                            <FormLabel>Convert Factor</FormLabel>
+                            <FormControl>
+                              <Input
+                                type='number'
+                                {...field}
+                                onChange={(event) =>
+                                  field.onChange(parseFloat(event.target.value))
+                                }
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                       {/* <FormField
                             control={form.control}
                             name='stockingUom'
@@ -1109,25 +1128,7 @@ export function ItemForm({ className, ...props }: SignUpFormProps) {
                           </FormItem>
                         )}
                       />
-                      <FormField
-                        control={form.control}
-                        name='convertFactor'
-                        render={({ field }) => (
-                          <FormItem className='space-y-1'>
-                            <FormLabel>Convert Factor</FormLabel>
-                            <FormControl>
-                              <Input
-                                type='number'
-                                {...field}
-                                onChange={(event) =>
-                                  field.onChange(parseFloat(event.target.value))
-                                }
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                      
                       
 
                       <FormField

@@ -11,8 +11,7 @@ export const customerSchema = z.object({
     cause: z.string(),   
     quantity : z.number(),
     code: z.string(),  
-    createAt: z.string(),
-    
+    createAt: z.string(),    
     locationId: z.number(),
     location: z.object({
         id: z.number(),
@@ -38,7 +37,9 @@ export const customerSchema = z.object({
         itemMaster: z.object({
             code: z.string(),
             name: z.string(), 
-            specification : z.string()
+            specification : z.string(),
+            stockingUom : z.string(),
+            standardCost : z.number(),
         }),
         quantity: z.number(), 
         pickingQuantity: z.number(), 

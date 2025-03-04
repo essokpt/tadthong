@@ -116,34 +116,7 @@ export function UomForm({ className, ...props }: SignUpFormProps) {
                     )}
                   />
 
-                  {/* <FormField
-                    control={form.control}
-                    name='status'
-                    render={({ field }) => (
-                      <FormItem className='space-y-1'>
-                        <FormLabel>Status</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue  />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {itemStatus.map((item) => (
-                              <SelectItem key={item.value} value={item.name}>
-                                {item.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  /> */}
+                 
                 </div>
 
                 <br />

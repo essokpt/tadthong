@@ -132,14 +132,14 @@ export default function WIP() {
     let indexValue = wipValue.findIndex((x: any) => x.date == item)
     if (findValue) {
       return (
-        <TableCell className='item-center w-[6rem]' key={findValue.id}>
+        <TableCell className='items-center text-center w-[6rem]' key={findValue.id}>
           {level != 4 ? (
             findValue.value
           ) : (
-            <div className='item-center'>
+            <div className='item-right'>
               <Input
                 disabled={parseInt(findValue.value) > 0}
-                className='w-[65px]'
+                className='ml-8 w-[65px] text-right'
                 type='number'
                 id={index.toString()}
                 name={indexValue.toString()}
@@ -161,7 +161,7 @@ export default function WIP() {
         </TableCell>
       )
     } else {
-      return <TableCell className='w-[13rem]'></TableCell>
+      return <TableCell className='w-[13rem] text-right'></TableCell>
     }
   }
 
@@ -198,7 +198,7 @@ export default function WIP() {
                 
                 <TableHead
                   colSpan={dateOfMonth.length - 2}
-                  className='text-center'
+                  className='text-right'
                 >
                   {' '}
                   {monthLabel}{' '}
@@ -264,7 +264,7 @@ export default function WIP() {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={14} className='h-24 text-center'>
+                  <TableCell colSpan={14} className='h-24 text-right'>
                     <Loading timeout={500} />
                   </TableCell>
                 </TableRow>

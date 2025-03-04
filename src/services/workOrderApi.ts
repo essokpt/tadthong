@@ -120,7 +120,8 @@ export async function createWorkOrder(data:any) {
    }
 
    export async function updateWorkOrderItems(data:any) {
-    // console.error('login',data);
+    const branchId:any = localStorage.getItem('branchId')
+    data.branchId = parseInt(branchId)
      try {
        const response = await api.put(`${endpoint}/UpdateWorkOrderItems`, data);
        console.log('updateWorkOrderItems',response.status);

@@ -36,6 +36,11 @@ export const customerSchema = z.object({
   costmarkup: z.string(),
   paymenTerm: z.string(),
   createAt: z.string(),
+  customerFileAttach: z.array(z.object({
+    id: z.number(),
+    fileName: z.string(),
+    path: z.string()
+  })),
   customerBillings: z.array(
     z.object({
       id:z.number(),

@@ -42,6 +42,7 @@ import { Branches } from '../../branch/components/schema'
 import { Role } from '../../role/components/schema'
 import { cn } from '@/lib/utils'
 import { Check, ChevronsUpDown } from 'lucide-react'
+import { Input } from '@/components/ui/input'
 
 type BranchRole = {
   id: number
@@ -60,6 +61,7 @@ interface EditModalProps {
 }
 
 const formSchema = z.object({
+  id: z.number(),
   roleName: z.string().min(1),
   branchName: z.string().min(1),
 })
@@ -79,10 +81,10 @@ export const CreateModal: React.FC<EditModalProps> = ({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     values: value,
-    // defaultValues: {
-    //   role: '',
-    //   branch: '',
-    // },
+    defaultValues: {
+      id: 0,
+     
+    },
   })
 
   // async function updateData(data: any) {
@@ -106,12 +108,13 @@ export const CreateModal: React.FC<EditModalProps> = ({
     const roleid: any = roles.find((item) => item.name == data.roleName)
 
     const newValue = {
+      id : data.id,
       branchId: branchid.id,
       branchName: branchid.branchName,
       RoleBranchesId: roleid.id,
       roleName: roleid.name,
     }
-    console.log('createBom', newValue)
+    console.log('create role branch', newValue)
     createData(newValue)
     // const res: any = await createBom(data)
     // if (res.status == 200) {
@@ -146,6 +149,19 @@ export const CreateModal: React.FC<EditModalProps> = ({
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)}>
                 <div className='grid grid-cols-2 gap-2 '>
+                <FormField
+                    control={form.control}
+                    name='id'
+                    render={({ field }) => (
+                      <FormItem className='space-y-1 hidden'>
+                        <FormLabel>Id</FormLabel>
+                        <FormControl>
+                          <Input {...field} hidden />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                   <FormField
                     control={form.control}
                     name='branchName'
@@ -271,64 +287,7 @@ export const CreateModal: React.FC<EditModalProps> = ({
                     )}
                   />
 
-                  {/* <FormField
-                    control={form.control}
-                    name='branchName'
-                    render={({ field }) => (
-                      <FormItem className='space-y-1'>
-                        <FormLabel>Branch</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder='Select a branch to this item' />
-                            </SelectTrigger>
-                          </FormControl>
-
-                          <SelectContent>
-                            {branch.map((item) => (
-                              <SelectItem key={item.id} value={item.branchName}>
-                                {item.code} {item.branchName}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  /> */}
-                  {/* <FormField
-                    control={form.control}
-                    name='roleName'
-                    render={({ field }) => (
-                      <FormItem className='space-y-1'>
-                        <FormLabel>Role</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder='Select a role to this item' />
-                            </SelectTrigger>
-                          </FormControl>
-
-                          <SelectContent>
-                            {roles.map((item) => (
-                              <SelectItem key={item.id} value={item.name}>
-                                {item.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  /> */}
+                 
                 </div>
                 <br />
                 <DialogFooter>

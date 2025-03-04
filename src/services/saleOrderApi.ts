@@ -83,6 +83,16 @@ export async function findSaleOrder(id:any){
   }
 }
 
+export async function getCarRegistration(){
+  try {
+    const response = await api.get(`${endpoint}/CarRegistration`);  
+    const res = await response.data
+    return res
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 export async function findInvoiceById(id:any){
   try {
     const response = await api.get(`${endpoint}/Invoice/${id}`);  

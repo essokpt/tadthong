@@ -130,9 +130,9 @@ export const CreateModal: React.FC<EditModalProps> = ({
     // after amount = (CustomerWeight - CuttingWeight) x AfterCutPrice
     console.log('handleChangeCutQty', item.target.value)
     let qty = form.getValues('quantity')
-    let sumAfterQty = qty > 0 ? qty - parseInt(item.target.value) : 0
+    let sumAfterQty = qty - parseInt(item.target.value)
     form.setValue('afterCutQuantity', sumAfterQty)
-    //sumAfterAmount(sumAfterQty, 'qty')
+    sumAfterAmount()
   }
 
   function handleChangeQuantity(item: any) {
@@ -188,7 +188,7 @@ export const CreateModal: React.FC<EditModalProps> = ({
     let sumAmount = price - parseInt(item.target.value)
     form.setValue('afterCutPrice', sumAmount)
 
-    //sumAfterAmount(sumAmount, 'price')
+    sumAfterAmount()
   }
 
   function sumAfterAmount() {
@@ -219,7 +219,7 @@ export const CreateModal: React.FC<EditModalProps> = ({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className='max-w-screen-md'>
+        <DialogContent className='max-w-screen-md h-screen  overflow-scroll'>
           <DialogHeader>
             <DialogTitle>Item Detail</DialogTitle>
           </DialogHeader>
@@ -248,7 +248,8 @@ export const CreateModal: React.FC<EditModalProps> = ({
                     name='selectedItemMaster'
                     render={({ field }) => (
                       <FormItem className='col-span-3 mt-2 grid space-y-1.5'>
-                        <FormLabel>Item Master</FormLabel>
+                        {/* <FormLabel>Item Master</FormLabel> */}
+                        <FormLabel>สินค้า</FormLabel>
                         <Popover>
                           <PopoverTrigger asChild>
                             <FormControl>
@@ -346,7 +347,8 @@ export const CreateModal: React.FC<EditModalProps> = ({
                     name='quantity'
                     render={({ field }) => (
                       <FormItem className='space-y-1'>
-                        <FormLabel>Quantity</FormLabel>
+                        {/* <FormLabel>Quantity</FormLabel> */}
+                        <FormLabel>จำนวน</FormLabel>
                         <FormControl>
                           <Input
                             type='number'
@@ -363,10 +365,48 @@ export const CreateModal: React.FC<EditModalProps> = ({
                   />
                   <FormField
                     control={form.control}
+                    name='unitPrice'
+                    render={({ field }) => (
+                      <FormItem className='space-y-1'>
+                        {/* <FormLabel>Unit Price</FormLabel> */}
+                        <FormLabel>ราคาต่อหน่วย</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type='number'
+                            onChange={(e) => {
+                              field.onChange(e.target.value)
+                              handleChangeUnitPrice(e)
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name='amount'
+                    render={({ field }) => (
+                      <FormItem className='space-y-1'>
+                        {/* <FormLabel>Amount</FormLabel> */}
+                        <FormLabel>มูลค่า</FormLabel>
+                        <FormControl>
+                          <Input {...field} type='number' readOnly />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
                     name='humidity'
                     render={({ field }) => (
                       <FormItem className='space-y-1'>
-                        <FormLabel>Humidity</FormLabel>
+                        {/* <FormLabel>Humidity</FormLabel> */}
+                        <FormLabel>หักความชื้น</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -385,10 +425,33 @@ export const CreateModal: React.FC<EditModalProps> = ({
 
                   <FormField
                     control={form.control}
+                    name='weighingMoney'
+                    render={({ field }) => (
+                      <FormItem className='space-y-1'>
+                        {/* <FormLabel>Weighing Money</FormLabel> */}
+                        <FormLabel>หักเงินค่าชั่ง</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type='number'
+                            onChange={(e) => {
+                              field.onChange(e.target.value)
+                              handleChangeCustomerPrice()
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+<div className='grid'></div>
+                  <FormField
+                    control={form.control}
                     name='adulteration'
                     render={({ field }) => (
                       <FormItem className='space-y-1'>
-                        <FormLabel>Adulteration</FormLabel>
+                        {/* <FormLabel>Adulteration</FormLabel> */}
+                        <FormLabel>หักเจือปน</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -403,12 +466,37 @@ export const CreateModal: React.FC<EditModalProps> = ({
                       </FormItem>
                     )}
                   />
+
+<FormField
+                    control={form.control}
+                    name='shipDown'
+                    render={({ field }) => (
+                      <FormItem className='space-y-1'>
+                        {/* <FormLabel>ShipDown</FormLabel> */}
+                        <FormLabel>หักค่าลง</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type='number'
+                            onChange={(e) => {
+                              field.onChange(e.target.value)
+                              handleChangeCustomerPrice()
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className='grid'></div>
+
                   <FormField
                     control={form.control}
                     name='other'
                     render={({ field }) => (
                       <FormItem className='space-y-1'>
-                        <FormLabel>Other</FormLabel>
+                        {/* <FormLabel>Other</FormLabel> */}
+                        <FormLabel>หักอื่นๆ</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -423,75 +511,15 @@ export const CreateModal: React.FC<EditModalProps> = ({
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    control={form.control}
-                    name='unitPrice'
-                    render={({ field }) => (
-                      <FormItem className='space-y-1'>
-                        <FormLabel>Unit Price</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            type='number'
-                            onChange={(e) => {
-                              field.onChange(e.target.value)
-                              handleChangeUnitPrice(e)
-                            }}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name='weighingMoney'
-                    render={({ field }) => (
-                      <FormItem className='space-y-1'>
-                        <FormLabel>Weighing Money</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            type='number'
-                            onChange={(e) => {
-                              field.onChange(e.target.value)
-                              handleChangeCustomerPrice()
-                            }}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name='shipDown'
-                    render={({ field }) => (
-                      <FormItem className='space-y-1'>
-                        <FormLabel>ShipDown</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            type='number'
-                            onChange={(e) => {
-                              field.onChange(e.target.value)
-                              handleChangeCustomerPrice()
-                            }}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+             
 
                   <FormField
                     control={form.control}
                     name='cashOther'
                     render={({ field }) => (
                       <FormItem className='space-y-1'>
-                        <FormLabel>Cash Other</FormLabel>
+                        {/* <FormLabel>Cash Other</FormLabel> */}
+                        <FormLabel>หักเงินอื่นๆ</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -507,26 +535,15 @@ export const CreateModal: React.FC<EditModalProps> = ({
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
-                    name='amount'
-                    render={({ field }) => (
-                      <FormItem className='space-y-1'>
-                        <FormLabel>Amount</FormLabel>
-                        <FormControl>
-                          <Input {...field} type='number' readOnly />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+<div className='grid'></div>             
 
                   <FormField
                     control={form.control}
                     name='cuttingWeight'
                     render={({ field }) => (
                       <FormItem className='space-y-1'>
-                        <FormLabel>Customer Quantity</FormLabel>
+                        {/* <FormLabel>Customer Quantity</FormLabel> */}
+                        <FormLabel>จำนวนลูกค้า</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -546,7 +563,8 @@ export const CreateModal: React.FC<EditModalProps> = ({
                     name='underCutPrice'
                     render={({ field }) => (
                       <FormItem className='space-y-1'>
-                        <FormLabel>Customer Price</FormLabel>
+                        {/* <FormLabel>Customer Price</FormLabel> */}
+                        <FormLabel>ราคาลูกค้า</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -562,14 +580,29 @@ export const CreateModal: React.FC<EditModalProps> = ({
                     )}
                   />
 
-                  <div className='grid'></div>
+                  <FormField
+                    control={form.control}
+                    name='afterAmount'
+                    render={({ field }) => (
+                      <FormItem className='space-y-1'>
+                        {/* <FormLabel>Customer Amount</FormLabel> */}
+                        <FormLabel>มูลค่าลูกค้า</FormLabel>
+                        <FormControl>
+                          <Input {...field} type='number' readOnly />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+               
 
                   <FormField
                     control={form.control}
                     name='afterCutQuantity'
                     render={({ field }) => (
                       <FormItem className='space-y-1'>
-                        <FormLabel>Different Quantity</FormLabel>
+                        {/* <FormLabel>Different Quantity</FormLabel> */}
+                        <FormLabel>ผลต่างจำนวน</FormLabel>
                         <FormControl>
                           <Input {...field} type='number' readOnly />
                         </FormControl>
@@ -582,7 +615,8 @@ export const CreateModal: React.FC<EditModalProps> = ({
                     name='afterCutPrice'
                     render={({ field }) => (
                       <FormItem className='space-y-1'>
-                        <FormLabel>Different Price</FormLabel>
+                        {/* <FormLabel>Different Price</FormLabel> */}
+                        <FormLabel>ผลต่างราคา</FormLabel>
                         <FormControl>
                           <Input {...field} type='number' readOnly />
                         </FormControl>
@@ -591,26 +625,15 @@ export const CreateModal: React.FC<EditModalProps> = ({
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
-                    name='afterAmount'
-                    render={({ field }) => (
-                      <FormItem className='space-y-1'>
-                        <FormLabel>Customer Amount</FormLabel>
-                        <FormControl>
-                          <Input {...field} type='number' readOnly />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+<div className='grid'></div>     
 
                   <FormField
                     control={form.control}
                     name='sourceHumidity'
                     render={({ field }) => (
                       <FormItem className='space-y-1'>
-                        <FormLabel>Source Humidity</FormLabel>
+                        {/* <FormLabel>Source Humidity</FormLabel> */}
+                        <FormLabel>ความชื้นต้นทาง</FormLabel>
                         <FormControl>
                           <Input {...field} type='number' />
                         </FormControl>
@@ -623,7 +646,8 @@ export const CreateModal: React.FC<EditModalProps> = ({
                     name='destinationHumidity'
                     render={({ field }) => (
                       <FormItem className='space-y-1'>
-                        <FormLabel>Customer Humidity</FormLabel>
+                        {/* <FormLabel>Customer Humidity</FormLabel> */}
+                        <FormLabel>ความชื้นลูกค้า</FormLabel>
                         <FormControl>
                           <Input {...field} type='number' />
                         </FormControl>
@@ -636,7 +660,8 @@ export const CreateModal: React.FC<EditModalProps> = ({
                     name='destinationWeighingScale'
                     render={({ field }) => (
                       <FormItem className='space-y-1'>
-                        <FormLabel>Customer Queue No.</FormLabel>
+                        {/* <FormLabel>Customer Queue No.</FormLabel> */}
+                        <FormLabel>เลขใบชั่งลูกค้า</FormLabel>
                         <FormControl>
                           <Input {...field} type='number' />
                         </FormControl>
@@ -649,7 +674,8 @@ export const CreateModal: React.FC<EditModalProps> = ({
                     name='remark'
                     render={({ field }) => (
                       <FormItem className='col-span-3 space-y-1'>
-                        <FormLabel>Remark</FormLabel>
+                        {/* <FormLabel>Remark</FormLabel> */}
+                        <FormLabel>หมายเหตุ</FormLabel>
                         <FormControl>
                           <Input {...field} />
                         </FormControl>

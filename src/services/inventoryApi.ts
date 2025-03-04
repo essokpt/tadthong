@@ -85,8 +85,8 @@ export async function getOnHandStock(){
 export async function getStockHistory(){
   try {
     const branchid:any = localStorage.getItem('branchId')
-    const branchId = parseInt(branchid)
-    const response = await api.get(`${endpoint}/History/${branchId}`);  
+   //onst branchId = parseInt(branchid)
+    const response = await api.get(`${endpoint}/History/${branchid}`);  
     const res = await response.data
     console.log('getStockHistory',res);
     
@@ -132,7 +132,7 @@ export async function createInventory(data:any) {
     try {
       const response = await api.post(`${endpoint}/Adjustment`, data);
       //const res = await response.data
-      console.log('createInventoryAdjust',response.status);
+      console.log('createInventoryAdjust',response);
       return response
     } catch (error) {
       console.error(error);

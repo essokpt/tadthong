@@ -19,7 +19,7 @@ import { useNavigate } from 'react-router-dom'
 import { Label } from '@/components/ui/label'
 import { MaterilalType } from './type'
 import { Separator } from '@/components/ui/separator'
-import { createMaterial } from '@/services/materialApi'
+import { createMaterial, createMaterialItem } from '@/services/materialApi'
 import { format } from 'date-fns'
 
 import { getLocation } from '@/services/locationApi'
@@ -76,22 +76,22 @@ export function MaterialForm({ className, ...props }: SignUpFormProps) {
                 weightOut: rows[index][9],
                 typeCode: rows[index][10],
                 customerCode: rows[index][11],
-                productCode: rows[index][11],
-                col1: rows[index][12],
-                col2: rows[index][13],
-                col3: rows[index][14],
-                remark: rows[index][15],
-                priceReceipt: rows[index][16],
-                col4: rows[index][17],
-                col5: rows[index][18],
-                col6: rows[index][19],
-                col7: rows[index][20],
-                col8: rows[index][21],
-                col9: rows[index][22],
-                col10: rows[index][23],
-                col11: rows[index][24],
-                col12: rows[index][25],
-                col13: rows[index][26],
+                productCode: rows[index][12],
+                col1: rows[index][13],
+                col2: rows[index][14],
+                col3: rows[index][15],
+                remark: rows[index][16],
+                priceReceipt: rows[index][17],
+                col4: rows[index][18],
+                col5: rows[index][19],
+                col6: rows[index][20],
+                col7: rows[index][21],
+                col8: rows[index][22],
+                col9: rows[index][23],
+                col10: rows[index][24],
+                col11: rows[index][25],
+                col12: rows[index][26],
+                col13: rows[index][27],
               }
             )
 
@@ -121,25 +121,36 @@ export function MaterialForm({ className, ...props }: SignUpFormProps) {
     let today = new Date()
     let importCode = format(today, 'yyyy-MM-dd')
     let genCode = importCode.split("-")
+    const locationID:any = locations.find(item => item.name == selectLocation)
 
     data.code = `IMPORT-${genCode[0]}${genCode[1]}${genCode[2]}-`
     data.importDate = format(today, 'yyyy-MM-dd')
     data.userId = parseInt(userid)
     data.branchId = parseInt(branchid)
-    data.materials = material
+   // data.materials = material
+    data.approveDate = ''
+    data.locationId = locationID.id
+
     data.stockIn = selectLocation
     data.fileName = fileName
-    console.log('onSubmit', data)
+  
 
-    const res: any = await createMaterial(data)
-    if (res.status == 200) {
-      console.log('createMaterial -success', res.status)
-      navigate('/material', { replace: true })
-    }
-
-    setTimeout(() => {
-      setIsLoading(false)
-    }, 1000)
+    const res:any = await createMaterial(data)
+    if (res.data.id) {
+      data.id = res.data.id
+      console.log('res data', res)
+      console.log('material data', material)
+      const response: any = await createMaterialItem(res.data.id, material)
+      if (response.status == 200) {
+        console.log("createMaterialItem",response.data)
+      }
+        setTimeout(() => {
+          setIsLoading(false)
+          navigate('/material', { replace: true })
+        }, 1000)
+    //}
+  }
+   
   }
 
   useEffect(() => {

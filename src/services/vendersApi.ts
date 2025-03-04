@@ -50,6 +50,18 @@ export async function searchVender(str:any){
   }
 }
 
+export async function venderDownloadFileAttach(filename:any){
+  try {
+    const response = await api.get(`${endpoint}/DownloadFile?filename=${filename}`, {
+      responseType: "blob",
+    });  
+   // const res = await response.data
+    return response
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 export async function updateVender(data:any) {
   // console.error('login',data);
    try {
@@ -81,7 +93,7 @@ export async function venderUploadFiles(files:any) {
    {
      headers: headers 
    });
-    console.log('uploadFiles',response.status);
+    console.log('uploadFiles',response);
     return response.data
   } catch (error) {
     console.error(error);
@@ -131,6 +143,18 @@ export async function deleteVenderBillig(id:any) {
         console.error(error);
       }
     }
+
+export async function venderDeleteFileAttach(id:any) {
+  // console.error('login',data);
+      try {
+        const response = await api.delete(`${endpoint}/DeleteFileAttach?id=${id}`);
+        console.log('venderDeleteFileAttach',response.status);
+        return response
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    
 
 
 

@@ -45,7 +45,8 @@ export const schema = z.object({
                 id: z.number(),
                 code: z.string(),
                 name: z.string(),
-                stockingUom: z.string()
+                stockingUom: z.string(),
+                convertFactor: z.number()
             }),
             quantity: z.number(),
             unitPrice: z.number(),
@@ -59,6 +60,7 @@ export const schema = z.object({
             destinationHumidity: z.number(),
             destinationWeighingScale: z.string(),
             remark: z.string(),
+            uomType: z.string(),
             saleOrder: z.object({
                 id: z.number(),
                 code: z.string()

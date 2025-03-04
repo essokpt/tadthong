@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/custom/button'
 import { cn } from '@/lib/utils'
 import { Layout, LayoutBody } from '@/components/custom/layout'
-import { createCustomer } from '@/services/customerApi'
+import { createCustomer, customerUploadFiles } from '@/services/customerApi'
 import { useNavigate } from 'react-router-dom'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
@@ -40,16 +40,21 @@ import { CustomerBilling } from './billing-schema'
 import { MagnifyingGlassIcon, PlusCircledIcon } from '@radix-ui/react-icons'
 import { BillingModal } from './billing-modal'
 import { format } from 'date-fns'
-import { IconEdit, IconPencilPlus, IconTrash } from '@tabler/icons-react'
+import {
+  IconEdit,
+  IconFile,
+  IconPencilPlus,
+  IconTrash,
+} from '@tabler/icons-react'
 import { v4 as uuidv4 } from 'uuid'
 import { ThaiAddress } from 'types/thaiaddress'
 import useThaiAddress from '@/hooks/use-thaiAddress'
 import useDebounce from '@/hooks/use-debounce'
 import { PageHeader } from '@/components/layouts/header'
+import FileDrag from '@/components/custom/fileDrag'
 //import { zodResolver } from '@hookform/resolvers/zod'
 
 interface SignUpFormProps extends HTMLAttributes<HTMLDivElement> {}
-
 
 const formSchema = z.object({
   code: z.string().min(1, { message: 'Please enter your email' }),
@@ -101,12 +106,9 @@ const formSchema = z.object({
       latitude: z.string(),
       longtitude: z.string(),
       branch: z.string(),
-      
     })
   ),
 })
-
-
 
 const intial = {
   id: 0,
@@ -125,9 +127,8 @@ const intial = {
   latitude: '',
   longtitude: '',
   branch: '',
-  remark: 'new'
+  remark: 'new',
 }
-
 
 export function CustomerForm({ className, ...props }: SignUpFormProps) {
   const [isLoading, setIsLoading] = useState(false)
@@ -136,13 +137,14 @@ export function CustomerForm({ className, ...props }: SignUpFormProps) {
   const [openModal, setOpenModal] = useState(false)
   const [editBillings, setEditBilling] = useState<CustomerBilling>(intial)
   const [addressThai, setAddressThai] = useState<ThaiAddress[]>()
+  const [files, setFiles] = useState<File[]>([])
 
   const { userInputCallback, dataValue } = useThaiAddress()
   const debounceValue = useDebounce(userInputCallback, 800)
 
   let today = new Date()
   const navigate = useNavigate()
-  
+
   const form = useForm<z.infer<typeof formSchema>>({
     //resolver: zodResolver(formSchema),
     defaultValues: {
@@ -150,49 +152,73 @@ export function CustomerForm({ className, ...props }: SignUpFormProps) {
       createAt: format(today, 'yyyy-MM-dd'),
     },
   })
- 
+
   function newBilling() {
-    console.log('updateBilling')   
+    console.log('updateBilling')
     setEditBilling(intial)
     setOpenModal(true)
   }
-  
+
+  function uploadFile(payload: any) {
+    setFiles(payload)
+    console.log('File data:', payload)
+  }
+
   function updateBilling(payload: any) {
-    console.log('updateBilling', payload)   
+    console.log('updateBilling', payload)
     setEditBilling(payload)
     setOpenModal(true)
   }
 
   function deleteBilling(payload: any) {
-    setBilling( billings.filter(x => x.remark != payload.remark))
+    setBilling(billings.filter((x) => x.remark != payload.remark))
     console.log('deleteBilling', payload)
   }
 
-  function addNewBilling(payload: any) {    
-    if(payload.remark == 'new'){
+  function addNewBilling(payload: any) {
+    if (payload.remark == 'new') {
       console.log('add New Data', payload)
       payload.remark = uuidv4()
       billings.push(payload)
-    }else{
-      let existingIndex = billings.findIndex(x => x.remark == payload.remark)
-      if(existingIndex != -1){
+    } else {
+      let existingIndex = billings.findIndex((x) => x.remark == payload.remark)
+      if (existingIndex != -1) {
         billings[existingIndex] = payload
       }
     }
-     setOpenModal(false)   
-     setEditBilling(intial)
-
+    setOpenModal(false)
+    setEditBilling(intial)
   }
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
     setIsLoading(true)
     data.customerBillings = billings
     console.log('create data', data)
-    const res: any = await createCustomer(data)
-    if (res.status == 200) {
-      console.log('createCustomer -success', res.status)
-      navigate('/master/customer', { replace: true })
-    }else{
+    const response: any = await createCustomer(data)
+    console.log('create customer -success', response)
+
+    if (response.status == 200) {
+      if (response.data.id > 0) {
+        console.log('create customer -success', response)
+  
+        //data.files = files
+        if (files?.length > 0) {
+         
+          const formData = new FormData()
+          for (let i = 0; i < files?.length; i++) {
+            formData.append('files', files[i])
+            formData.append('customerId', response.data.id)
+          }
+  
+          const res: any = await customerUploadFiles(formData)
+          if (res.status == 200) {
+            console.log('uploadFiles -success', res.status)
+          }
+        }
+        navigate('/master/customer', { replace: true })
+      }   
+     
+    } else {
       setIsLoading(false)
       setBilling([])
     }
@@ -254,11 +280,9 @@ export function CustomerForm({ className, ...props }: SignUpFormProps) {
     )
   }
 
-
   return (
     <Layout>
       <LayoutBody className='flex flex-col' fixedHeight>
-       
         <PageHeader
           label='Create Customer'
           icon={<IconPencilPlus size={45} className='mt-2 ' />}
@@ -267,7 +291,9 @@ export function CustomerForm({ className, ...props }: SignUpFormProps) {
           <div className={cn('grid gap-4', className)} {...props}>
             <Tabs defaultValue='information' className='w-full'>
               <TabsList className='grid w-full grid-cols-2'>
-                <TabsTrigger value='information'>General Information</TabsTrigger>
+                <TabsTrigger value='information'>
+                  General Information
+                </TabsTrigger>
                 <TabsTrigger value='account'>Billing</TabsTrigger>
               </TabsList>
               <TabsContent value='information'>
@@ -399,7 +425,7 @@ export function CustomerForm({ className, ...props }: SignUpFormProps) {
                           </FormItem>
                         )}
                       />
-                      
+
                       <FormField
                         control={form.control}
                         name='paymentTerm'
@@ -413,7 +439,7 @@ export function CustomerForm({ className, ...props }: SignUpFormProps) {
                           </FormItem>
                         )}
                       />
-                     
+
                       <FormField
                         control={form.control}
                         name='type'
@@ -453,12 +479,12 @@ export function CustomerForm({ className, ...props }: SignUpFormProps) {
                           </FormItem>
                         )}
                       />
-                       <div className='mt-7'>
+                      <div className='mt-7'>
                         <FormField
                           control={form.control}
                           name='creditHold'
                           render={({ field }) => (
-                            <FormItem className='flex flex-row mt-7 items-start space-x-3 space-y-0 rounded-md border p-2.5 shadow'>
+                            <FormItem className='mt-7 flex flex-row items-start space-x-3 space-y-0 rounded-md border p-2.5 shadow'>
                               <FormControl>
                                 <Checkbox
                                   checked={field.value}
@@ -499,13 +525,12 @@ export function CustomerForm({ className, ...props }: SignUpFormProps) {
                         </Label>
                         <div className='flex items-center  px-3 '>
                           <MagnifyingGlassIcon className='mr-2 h-4 w-4 shrink-0 border-separate opacity-50' />
-                          
+
                           <Input
-                           { ...form.register('subDistrict')}
+                            {...form.register('subDistrict')}
                             className='mt-1 text-[0.8rem]'
                             onChange={debounceValue}
                             onClick={() => setIsOpen(false)}
-                           
                           ></Input>
                         </div>
                         <SearchAddress dataValue={dataValue} />
@@ -682,7 +707,7 @@ export function CustomerForm({ className, ...props }: SignUpFormProps) {
                         control={form.control}
                         name='remark'
                         render={({ field }) => (
-                          <FormItem className='space-y-1 col-span-3'>
+                          <FormItem className='col-span-3 space-y-1'>
                             <FormLabel>Note</FormLabel>
                             <FormControl>
                               <Input {...field} />
@@ -691,6 +716,17 @@ export function CustomerForm({ className, ...props }: SignUpFormProps) {
                           </FormItem>
                         )}
                       />
+                    </div>
+                    <div className='mb-3 grid grid-cols-3 items-start gap-2 space-x-3 space-y-0 rounded-md border p-4 shadow'>
+                      <div className='col-span-3 mb-2  flex items-center'>
+                        <IconFile />
+                        <Label htmlFor='terms' className='ml-3 text-lg'>
+                          File Attachment.
+                        </Label>
+                      </div>
+                      <div className='col-span-3 mb-2  flex items-center'>
+                        <FileDrag uploadData={(e) => uploadFile(e)} />
+                      </div>
                     </div>
                     <Button
                       className='mt-2 w-full'
@@ -747,7 +783,7 @@ export function CustomerForm({ className, ...props }: SignUpFormProps) {
                         <TableCell className='text-left'>
                           {item.branch}
                         </TableCell>
-                       
+
                         <TableCell className='text-left'>
                           {item.contactName}
                         </TableCell>
@@ -759,24 +795,24 @@ export function CustomerForm({ className, ...props }: SignUpFormProps) {
                         </TableCell>
 
                         <TableCell>
-                        <Button
-                          size='icon'
-                          variant='ghost'
-                          className='rounded-full'
-                          onClick={() => updateBilling(item)}
-                        >
-                          <IconEdit size={20} />
-                        </Button>
+                          <Button
+                            size='icon'
+                            variant='ghost'
+                            className='rounded-full'
+                            onClick={() => updateBilling(item)}
+                          >
+                            <IconEdit size={20} />
+                          </Button>
 
-                        <Button
-                          size='icon'
-                          variant='ghost'
-                          className='rounded-full'
-                          onClick={() => deleteBilling(item)}
-                        >
-                          <IconTrash size={20} />
-                        </Button>
-                      </TableCell>
+                          <Button
+                            size='icon'
+                            variant='ghost'
+                            className='rounded-full'
+                            onClick={() => deleteBilling(item)}
+                          >
+                            <IconTrash size={20} />
+                          </Button>
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
