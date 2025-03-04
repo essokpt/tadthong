@@ -138,8 +138,8 @@ export function MaterialForm({ className, ...props }: SignUpFormProps) {
     const res:any = await createMaterial(data)
     if (res.data.id) {
       data.id = res.data.id
-      console.log('res data', res)
-      console.log('material data', material)
+      // console.log('res data', res)
+      // console.log('material data', material)
       const response: any = await createMaterialItem(res.data.id, material)
       if (response.status == 200) {
         console.log("createMaterialItem",response.data)
