@@ -13,6 +13,15 @@ export async function getWeightScaleReport(fromDate:string, toDate:string, produ
   }
 }
 
+export async function getWorkOrderReport(fromDate:string, toDate:string, productId:number, woCode:string){
+  try {
+    const response = await api.get(`${endpoint}/WorkOrderReport?fromDate=${fromDate}&toDate=${toDate}&productId=${productId}&woCode=${woCode}`);  
+    const res = await response.data
+    return res
+  } catch (error) {
+    console.error(error);
+  }
+}
 
 export async function getSaleOrderReport(fromDate:string, toDate:string, productId:number, customerId:number, woCode:string){
   try {
@@ -33,6 +42,17 @@ export async function getPurchaseRequestReport(fromDate:string, toDate:string, p
     console.error(error);
   }
 }
+
+export async function getPurchaseOrderReport(fromDate:string, toDate:string, productId:number, venderId:number, poCode:string){
+  try {
+    const response = await api.get(`${endpoint}/PurchaseOrderReport?fromDate=${fromDate}&toDate=${toDate}&productId=${productId}&venderId=${venderId}&poCode=${poCode}`);  
+    const res = await response.data
+    return res
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 
 
 

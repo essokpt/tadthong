@@ -49,7 +49,7 @@ function InputCurrency<T extends FieldValues>({
       control={control}
       name={name}
       render={({ field }) => (
-        <FormItem>
+        <FormItem className="space-y-1">
           {label && <FormLabel>{label}</FormLabel>}
           <FormControl>
             <Input

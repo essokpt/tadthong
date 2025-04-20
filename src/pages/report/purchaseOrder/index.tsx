@@ -3,13 +3,13 @@ import { Layout, LayoutBody } from '@/components/custom/layout'
 import { useContext, useEffect, useState } from 'react'
 import { DataTable } from './components/dataTable'
 import { columns } from './components/columns'
-import { SaleOrderReport } from './components/schema'
+import { PurchaseOrderReport } from './components/schema'
 import { ApiContext } from '@/components/layouts/api-context'
 import { ApiType } from 'types/api'
 import { PageHeader } from '@/components/layouts/header'
 import { IconReport } from '@tabler/icons-react'
 import {
-  getSaleOrderReport,
+  getPurchaseOrderReport,
 } from '@/services/reportApi'
 import {
   Command,
@@ -42,10 +42,10 @@ import { Button } from '@/components/custom/button'
 import { CalendarIcon, Check, ChevronsUpDownIcon } from 'lucide-react'
 import { ItemType } from '@/pages/master/item/components/type'
 import { getItem } from '@/services/itemApi'
-import { getCustomer } from '@/services/customerApi'
-import { CustomerType } from '@/pages/master/customer/components/type'
-import { WorkOrderType } from '@/pages/workOrder/components/type'
-import { getWorkOrder } from '@/services/workOrderApi'
+import { Venders } from '@/pages/master/vender/components/schema'
+import { getVenders } from '@/services/vendersApi'
+import { PurchaseOrderType } from '@/pages/purchase-order/components/type'
+import { getPurchaseOrderList } from '@/services/purchaseOrderApi'
 
 const currentDate = new Date()
 
@@ -58,16 +58,16 @@ const FormSchema = z.object({
   }),
   selectedItemmaster: z.string().min(1),
   itemMasterId: z.number(),
-  selectedCustomer: z.string().min(1),
-  customerId: z.number(),
-  woCode: z.string(),
+  selectedVender: z.string().min(1),
+  venderId: z.number(),
+  poCode: z.string(),
 })
 
-export default function SaleOrderReports() {
-  const [data, setData] = useState<SaleOrderReport[]>([])
+export default function PurchaseOrderReports() {
+  const [data, setData] = useState<PurchaseOrderReport[]>([])
   const [itemMaster, setItemMaster] = useState<ItemType[]>([])
-  const [customers, setCustomer] = useState<CustomerType[]>([])
-  const [workOrders, setWorkOrder] = useState<WorkOrderType[]>([])
+  const [vendors, setVendor] = useState<Venders[]>([])
+  const [purchaseOrders, setPurchaseOrder] = useState<PurchaseOrderType[]>([])
 
   const { refresh, setRefresh } = useContext(ApiContext) as ApiType
 
@@ -79,19 +79,19 @@ export default function SaleOrderReports() {
     fromDate: string,
     toDate: string,
     productId: number,
-    customerId: number,
-    woCode: string
+    venderId: number,
+    poCode: string
   ) => {
-    console.log('getPurchaseRequestReport:', fromDate, toDate, productId)
+    console.log('getPurchaseOrderReport:', fromDate, toDate, productId)
 
-    getSaleOrderReport(
+    getPurchaseOrderReport(
       fromDate,
       toDate,
       productId,
-      customerId,
-      woCode
+      venderId,
+      poCode
     ).then((data) => {
-      console.log('getPurchaseRequestReport:', data)
+      console.log('getPurchaseOrderReport:', data)
       setData(data)
       setRefresh(false)
     })
@@ -103,15 +103,15 @@ export default function SaleOrderReports() {
       format(data.fromDate, 'yyyy-MM-dd').toString(),
       format(data.toDate, 'yyyy-MM-dd').toString(),
       data.itemMasterId,
-      data.customerId,
-      data.woCode
+      data.venderId,
+      data.poCode
     )
   }
 
   useEffect(() => {
     getItem().then((data) => setItemMaster(data))
-    getCustomer().then((data) => setCustomer(data))
-    getWorkOrder().then((data) => setWorkOrder(data))
+    getVenders().then((data) => setVendor(data))
+    getPurchaseOrderList().then((data) => setPurchaseOrder(data))
 
     getData(
       format(currentDate, 'yyyy-MM-dd').toString(),
@@ -126,7 +126,7 @@ export default function SaleOrderReports() {
     <Layout>
       <LayoutBody className='flex flex-col' fixedHeight>
         <PageHeader
-          label='Sale Order Report'
+          label='Purchase Order Report'
           icon={<IconReport size={45} className='mt-2 ' />}
         />
         <div>
@@ -223,10 +223,10 @@ export default function SaleOrderReports() {
 
                   <FormField
                     control={form.control}
-                    name='woCode'
+                    name='poCode'
                     render={({ field }) => (
                       <FormItem className='space-y-1'>
-                        <FormLabel className='mr-3'>WO-Code</FormLabel>
+                        <FormLabel className='mr-3'>PO-Code</FormLabel>
                         <Popover>
                           <PopoverTrigger asChild>
                             <FormControl>
@@ -240,28 +240,28 @@ export default function SaleOrderReports() {
                                 )}
                               >
                                 {field.value
-                                  ? workOrders.find(
+                                  ? purchaseOrders.find(
                                       (item) => item.code === field.value
                                     )?.code
-                                  : 'Select PR-Code'}
+                                  : 'Select PO-Code'}
                                 <ChevronsUpDownIcon className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                               </Button>
                             </FormControl>
                           </PopoverTrigger>
                           <PopoverContent className='w-[250px] p-0'>
                             <Command>
-                              <CommandInput placeholder='Search Purchase Request...' />
+                              <CommandInput placeholder='Search Purchase Order...' />
                               <CommandList>
                                 <CommandEmpty>
-                                  No Purchase Request found.
+                                  No Purchase Order found.
                                 </CommandEmpty>
                                 <CommandGroup>
-                                  {workOrders.map((item) => (
+                                  {purchaseOrders.map((item) => (
                                     <CommandItem
                                       value={item.code}
                                       key={item.id}
                                       onSelect={() => {
-                                        form.setValue('woCode', item.code)
+                                        form.setValue('poCode', item.code)
                                       }}
                                     >
                                       <Check
@@ -358,10 +358,10 @@ export default function SaleOrderReports() {
 
                   <FormField
                     control={form.control}
-                    name='selectedCustomer'
+                    name='selectedVender'
                     render={({ field }) => (
                       <FormItem className='space-y-1'>
-                        <FormLabel className='mr-3'>Customer</FormLabel>
+                        <FormLabel className='mr-3'>Vender</FormLabel>
                         <Popover>
                           <PopoverTrigger asChild>
                             <FormControl>
@@ -375,31 +375,32 @@ export default function SaleOrderReports() {
                                 )}
                               >
                                 {field.value
-                                  ? customers.find(
+                                  ? vendors.find(
                                       (item) => item.companyName === field.value
                                     )?.companyName
-                                  : 'Select customer...'}
+                                  : 'Select vendor'}
                                 <ChevronsUpDownIcon className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                               </Button>
                             </FormControl>
                           </PopoverTrigger>
                           <PopoverContent className='w-[250px] p-0'>
                             <Command>
-                              <CommandInput placeholder='Search customer...' />
+                              <CommandInput placeholder='Search venders...' />
                               <CommandList>
-                                <CommandEmpty>No customer found.</CommandEmpty>
+                                <CommandEmpty>No vender found.</CommandEmpty>
                                 <CommandGroup>
-                                  {customers.map((item) => (
+                                  {vendors.map((item) => (
                                     <CommandItem
                                       value={item.companyName}
                                       key={item.id}
                                       onSelect={() => {
                                         form.setValue(
-                                          'selectedCustomer',
+                                          'selectedVender',
                                           item.companyName
                                         )
                                         form.setValue(
-                                          'customerId', item.id
+                                          'venderId', 
+                                          parseInt(item.id)
                                         )
                                       }}
                                     >

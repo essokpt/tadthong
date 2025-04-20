@@ -97,9 +97,23 @@ export const sidelinks: SideLink[] = [
         role: 'report',
       },
       {
+        title: 'Purchase Order Report',
+        label: '',
+        href: '/purchaseOrder-report',
+        icon: <IconServer2 size={22} />,
+        role: 'report',
+      },
+      {
         title: 'Sale Order Report',
         label: '',
         href: '/saleOrder-report',
+        icon: <IconServer2 size={22} />,
+        role: 'report',
+      },
+      {
+        title: 'Work Order Report',
+        label: '',
+        href: '/workOrder-report',
         icon: <IconServer2 size={22} />,
         role: 'report',
       },

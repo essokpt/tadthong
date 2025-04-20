@@ -37,6 +37,7 @@ import {
 } from '@/components/ui/form'
 import { cn } from '@/lib/utils'
 import { Check, ChevronsUpDown } from 'lucide-react'
+import InputCurrency from '@/components/custom/inputCurrency'
 // import {
 //   Select,
 //   SelectContent,
@@ -97,7 +98,7 @@ export const CreateModal: React.FC<EditModalProps> = ({
 }) => {
   const [isMounted, setIsMounted] = useState(false)
   const [itemMaster, setItemMaster] = useState<ItemType[]>([])
- // const [uomList, setUomList] = useState<ItemType[]>([])
+  // const [uomList, setUomList] = useState<ItemType[]>([])
 
   const form = useForm<z.infer<typeof formSchema>>({
     //resolver: zodResolver(formSchema),
@@ -136,7 +137,7 @@ export const CreateModal: React.FC<EditModalProps> = ({
   }
 
   function handleChangeQuantity(item: any) {
-    console.log('handleChangeQuantity', item.target.value)
+    console.log('handleChangeQuantity', item)
     let price = form.getValues('unitPrice')
     let sumAmount = price * parseInt(item.target.value)
     form.setValue('amount', sumAmount)
@@ -219,7 +220,7 @@ export const CreateModal: React.FC<EditModalProps> = ({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className='max-w-screen-md h-screen  overflow-scroll'>
+        <DialogContent className='h-screen max-w-screen-md  overflow-scroll'>
           <DialogHeader>
             <DialogTitle>Item Detail</DialogTitle>
           </DialogHeader>
@@ -312,42 +313,11 @@ export const CreateModal: React.FC<EditModalProps> = ({
                     )}
                   />
 
-                  {/* <FormField
-                    control={form.control}
-                    name='uomType'
-                    render={({ field }) => (
-                      <FormItem className='space-y-1 '>
-                        <FormLabel>UOM Type</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder='Select a uom type'>
-                                {field.value}
-                              </SelectValue>
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            /<SelectItem value='New'>New</SelectItem>
-                            <SelectItem value='Active'>Active</SelectItem>
-                            <SelectItem value='Inactive'>Inactive</SelectItem>
-                            <SelectItem value='None'>None</SelectItem>
-                          </SelectContent>
-                        </Select>
-
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  /> */}
-
                   <FormField
                     control={form.control}
                     name='quantity'
                     render={({ field }) => (
                       <FormItem className='space-y-1'>
-                        {/* <FormLabel>Quantity</FormLabel> */}
                         <FormLabel>จำนวน</FormLabel>
                         <FormControl>
                           <Input
@@ -385,12 +355,18 @@ export const CreateModal: React.FC<EditModalProps> = ({
                     )}
                   />
 
-                  <FormField
+                  <InputCurrency
+                    value={0}
+                    label='มูลค่า'
+                    name='amount'
+                    readOnly
+                  />
+
+                  {/* <FormField
                     control={form.control}
                     name='amount'
                     render={({ field }) => (
                       <FormItem className='space-y-1'>
-                        {/* <FormLabel>Amount</FormLabel> */}
                         <FormLabel>มูลค่า</FormLabel>
                         <FormControl>
                           <Input {...field} type='number' readOnly />
@@ -398,7 +374,7 @@ export const CreateModal: React.FC<EditModalProps> = ({
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
+                  /> */}
 
                   <FormField
                     control={form.control}
@@ -444,7 +420,7 @@ export const CreateModal: React.FC<EditModalProps> = ({
                       </FormItem>
                     )}
                   />
-<div className='grid'></div>
+                  <div className='grid'></div>
                   <FormField
                     control={form.control}
                     name='adulteration'
@@ -467,7 +443,7 @@ export const CreateModal: React.FC<EditModalProps> = ({
                     )}
                   />
 
-<FormField
+                  <FormField
                     control={form.control}
                     name='shipDown'
                     render={({ field }) => (
@@ -511,7 +487,6 @@ export const CreateModal: React.FC<EditModalProps> = ({
                       </FormItem>
                     )}
                   />
-             
 
                   <FormField
                     control={form.control}
@@ -535,7 +510,7 @@ export const CreateModal: React.FC<EditModalProps> = ({
                     )}
                   />
 
-<div className='grid'></div>             
+                  <div className='grid'></div>
 
                   <FormField
                     control={form.control}
@@ -580,12 +555,18 @@ export const CreateModal: React.FC<EditModalProps> = ({
                     )}
                   />
 
-                  <FormField
+                  <InputCurrency
+                    value={0}
+                    label='มูลค่าลูกค้า'
+                    name='afterAmount'
+                    //placeholder={'input quantity'}
+                  />
+
+                  {/* <FormField
                     control={form.control}
                     name='afterAmount'
                     render={({ field }) => (
                       <FormItem className='space-y-1'>
-                        {/* <FormLabel>Customer Amount</FormLabel> */}
                         <FormLabel>มูลค่าลูกค้า</FormLabel>
                         <FormControl>
                           <Input {...field} type='number' readOnly />
@@ -593,8 +574,7 @@ export const CreateModal: React.FC<EditModalProps> = ({
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
-               
+                  /> */}
 
                   <FormField
                     control={form.control}
@@ -610,22 +590,16 @@ export const CreateModal: React.FC<EditModalProps> = ({
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    control={form.control}
+
+                  <InputCurrency
+                    value={0}
+                    label='ผลต่างราคา'
                     name='afterCutPrice'
-                    render={({ field }) => (
-                      <FormItem className='space-y-1'>
-                        {/* <FormLabel>Different Price</FormLabel> */}
-                        <FormLabel>ผลต่างราคา</FormLabel>
-                        <FormControl>
-                          <Input {...field} type='number' readOnly />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                    //placeholder={'input quantity'}
+                    readOnly
                   />
 
-<div className='grid'></div>     
+                  <div className='grid'></div>
 
                   <FormField
                     control={form.control}

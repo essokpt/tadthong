@@ -3,13 +3,13 @@ import { Layout, LayoutBody } from '@/components/custom/layout'
 import { useContext, useEffect, useState } from 'react'
 import { DataTable } from './components/dataTable'
 import { columns } from './components/columns'
-import { SaleOrderReport } from './components/schema'
+import { WorkOrderReport } from './components/schema'
 import { ApiContext } from '@/components/layouts/api-context'
 import { ApiType } from 'types/api'
 import { PageHeader } from '@/components/layouts/header'
 import { IconReport } from '@tabler/icons-react'
 import {
-  getSaleOrderReport,
+  getWorkOrderReport,
 } from '@/services/reportApi'
 import {
   Command,
@@ -42,8 +42,6 @@ import { Button } from '@/components/custom/button'
 import { CalendarIcon, Check, ChevronsUpDownIcon } from 'lucide-react'
 import { ItemType } from '@/pages/master/item/components/type'
 import { getItem } from '@/services/itemApi'
-import { getCustomer } from '@/services/customerApi'
-import { CustomerType } from '@/pages/master/customer/components/type'
 import { WorkOrderType } from '@/pages/workOrder/components/type'
 import { getWorkOrder } from '@/services/workOrderApi'
 
@@ -57,16 +55,13 @@ const FormSchema = z.object({
     required_error: 'A date of birth is required.',
   }),
   selectedItemmaster: z.string().min(1),
-  itemMasterId: z.number(),
-  selectedCustomer: z.string().min(1),
-  customerId: z.number(),
+  itemMasterId: z.number(), 
   woCode: z.string(),
 })
 
-export default function SaleOrderReports() {
-  const [data, setData] = useState<SaleOrderReport[]>([])
+export default function WorkOrderReports() {
+  const [data, setData] = useState<WorkOrderReport[]>([])
   const [itemMaster, setItemMaster] = useState<ItemType[]>([])
-  const [customers, setCustomer] = useState<CustomerType[]>([])
   const [workOrders, setWorkOrder] = useState<WorkOrderType[]>([])
 
   const { refresh, setRefresh } = useContext(ApiContext) as ApiType
@@ -78,20 +73,18 @@ export default function SaleOrderReports() {
   const getData = (
     fromDate: string,
     toDate: string,
-    productId: number,
-    customerId: number,
+    productId: number,    
     woCode: string
   ) => {
-    console.log('getPurchaseRequestReport:', fromDate, toDate, productId)
+    console.log('get work order Report:', fromDate, toDate, productId)
 
-    getSaleOrderReport(
+    getWorkOrderReport(
       fromDate,
       toDate,
       productId,
-      customerId,
       woCode
     ).then((data) => {
-      console.log('getPurchaseRequestReport:', data)
+      console.log('get work order Report:', data)
       setData(data)
       setRefresh(false)
     })
@@ -103,20 +96,17 @@ export default function SaleOrderReports() {
       format(data.fromDate, 'yyyy-MM-dd').toString(),
       format(data.toDate, 'yyyy-MM-dd').toString(),
       data.itemMasterId,
-      data.customerId,
       data.woCode
     )
   }
 
   useEffect(() => {
     getItem().then((data) => setItemMaster(data))
-    getCustomer().then((data) => setCustomer(data))
     getWorkOrder().then((data) => setWorkOrder(data))
 
     getData(
       format(currentDate, 'yyyy-MM-dd').toString(),
       format(currentDate, 'yyyy-MM-dd').toString(),
-      0,
       0,
       ''
     )
@@ -126,7 +116,7 @@ export default function SaleOrderReports() {
     <Layout>
       <LayoutBody className='flex flex-col' fixedHeight>
         <PageHeader
-          label='Sale Order Report'
+          label='Work Order Report'
           icon={<IconReport size={45} className='mt-2 ' />}
         />
         <div>
@@ -243,17 +233,17 @@ export default function SaleOrderReports() {
                                   ? workOrders.find(
                                       (item) => item.code === field.value
                                     )?.code
-                                  : 'Select PR-Code'}
+                                  : 'Select Work orderCode'}
                                 <ChevronsUpDownIcon className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                               </Button>
                             </FormControl>
                           </PopoverTrigger>
                           <PopoverContent className='w-[250px] p-0'>
                             <Command>
-                              <CommandInput placeholder='Search Purchase Request...' />
+                              <CommandInput placeholder='Search Work order...' />
                               <CommandList>
                                 <CommandEmpty>
-                                  No Purchase Request found.
+                                  No Work order found.
                                 </CommandEmpty>
                                 <CommandGroup>
                                   {workOrders.map((item) => (
@@ -356,74 +346,7 @@ export default function SaleOrderReports() {
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
-                    name='selectedCustomer'
-                    render={({ field }) => (
-                      <FormItem className='space-y-1'>
-                        <FormLabel className='mr-3'>Customer</FormLabel>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant='outline'
-                                role='combobox'
-                                className={cn(
-                                  'bg-forefround hover:bg-forefround justify-between sm:w-[220px] md:w-[300px]',
-                                  !field.value &&
-                                    'text-muted-foreground sm:w-[220px] md:w-[300px]'
-                                )}
-                              >
-                                {field.value
-                                  ? customers.find(
-                                      (item) => item.companyName === field.value
-                                    )?.companyName
-                                  : 'Select customer...'}
-                                <ChevronsUpDownIcon className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent className='w-[250px] p-0'>
-                            <Command>
-                              <CommandInput placeholder='Search customer...' />
-                              <CommandList>
-                                <CommandEmpty>No customer found.</CommandEmpty>
-                                <CommandGroup>
-                                  {customers.map((item) => (
-                                    <CommandItem
-                                      value={item.companyName}
-                                      key={item.id}
-                                      onSelect={() => {
-                                        form.setValue(
-                                          'selectedCustomer',
-                                          item.companyName
-                                        )
-                                        form.setValue(
-                                          'customerId', item.id
-                                        )
-                                      }}
-                                    >
-                                      <Check
-                                        className={cn(
-                                          'mr-2 h-4 w-4',
-                                          item.companyName === field.value
-                                            ? 'opacity-100'
-                                            : 'opacity-0'
-                                        )}
-                                      />
-                                      {item.companyName}
-                                    </CommandItem>
-                                  ))}
-                                </CommandGroup>
-                              </CommandList>
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
+                  
                   <div className='py-6'>
                     <Button className=' w-auto' type='submit'>
                       Search

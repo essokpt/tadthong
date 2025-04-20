@@ -3,6 +3,15 @@ import api from '../../config/SetupAxios'
 const endpoint = '/PurchaseOrder'
 
 //export const getCustomer = (url: string) =>  axios.get(url).then((res) => res.data);
+export async function getPurchaseOrderList(){
+  try {
+    const response = await api.get(`${endpoint}`);  
+    const res = await response.data
+    return res
+  } catch (error) {
+    console.error(error);
+  }
+}
 
 export async function getPurchaseOrder(pageNumber: number,pageSize:number ){
   try {

@@ -68,6 +68,8 @@ import WeightScaleApprove from '@/pages/master/weightScale/approve';
 import WeightScaleReports from '@/pages/report/weightScale';
 import PurchaseRequestReports from '@/pages/report/purchaseRequest';
 import SaleOrderReports from '@/pages/report/saleOrder';
+import WorkOrderReports from '@/pages/report/workOrder';
+import PurchaseOrderReports from '@/pages/report/purchaseOrder';
 
 export default [
   {
@@ -401,6 +403,16 @@ export default [
   {
     path: '/saleOrder-report',
     element: SaleOrderReports,
+    requireRoles: 'report',
+  },
+  {
+    path: '/workOrder-report',
+    element: WorkOrderReports,
+    requireRoles: 'report',
+  },
+  {
+    path: '/purchaseOrder-report',
+    element: PurchaseOrderReports,
     requireRoles: 'report',
   },
   {

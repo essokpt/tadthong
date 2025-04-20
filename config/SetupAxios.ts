@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 export default axios.create({
-  //baseURL: "https://localhost:7244/api",
+ // baseURL: "https://localhost:7244/api",
   baseURL: "http://tadthongback.c-space.store/api",
   headers: {
     "Access-Control-Allow-Origin": "*",
