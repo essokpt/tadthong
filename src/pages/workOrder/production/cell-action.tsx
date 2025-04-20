@@ -20,6 +20,7 @@ const initialValue = {
   createBy: '',
   quantity: 0,
   received: 0,
+  receiveRequest:0,
   balance: 0,
   createAt: '',
   userId: '',

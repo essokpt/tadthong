@@ -28,7 +28,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/custom/button'
-import { cn } from '@/lib/utils'
+import { cn, formatCurrency } from '@/lib/utils'
 import { Layout, LayoutBody } from '@/components/custom/layout'
 import { useNavigate } from 'react-router-dom'
 
@@ -53,6 +53,7 @@ interface SignUpFormProps extends HTMLAttributes<HTMLDivElement> {}
 type venderItem = {
   id: number
   selectedItem: string
+  selectedItemCode: string
   itemMasterId: number
   //itemMasterName: string
   selectedVenderType: string
@@ -64,6 +65,7 @@ type venderItem = {
 const initialValue = {
   id: 0,
   selectedItem: '',
+  selectedItemCode: '',
   itemMasterId: 0,
   selectedVenderType: '',
   venderTypeId: 0,
@@ -102,7 +104,7 @@ export function WeightScalePriceForm({ className, ...props }: SignUpFormProps) {
       priceNumber: 'P' + newCode[0] + newCode[1] + newCode[2],
       status: 'New',
       reason: '',
-      createAt: format(today, 'dd-MM-yyy'),
+      createAt: format(today, 'yyyy-MM-dd'),
     },
   })
 
@@ -202,75 +204,7 @@ export function WeightScalePriceForm({ className, ...props }: SignUpFormProps) {
                     )}
                   />
 
-                  {/* <FormField
-                    control={form.control}
-                    name='selectedItemmaster'
-                    render={({ field }) => (
-                      <FormItem className='grid space-y-3'>
-                        <FormLabel>Create Date</FormLabel>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant='outline'
-                                role='combobox'
-                                className={cn(
-                                  'bg-forefround hover:bg-forefround justify-between',
-                                  !field.value && 'text-muted-foreground'
-                                )}
-                              >
-                                {field.value
-                                  ? itemMaster.find(
-                                      (item) => item.name === field.value
-                                    )?.name
-                                  : 'Select Item master'}
-                                <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent className='w-[250px] p-0'>
-                            <Command>
-                              <CommandInput placeholder='Search Item master...' />
-                              <CommandList>
-                                <CommandEmpty>
-                                  No Item master found.
-                                </CommandEmpty>
-                                <CommandGroup>
-                                  {itemMaster.map((item) => (
-                                    <CommandItem
-                                      value={item.name}
-                                      key={item.id}
-                                      onSelect={() => {
-                                        form.setValue(
-                                          'selectedItemmaster',
-                                          item.name
-                                        )
-                                        form.setValue(
-                                          'itemMasterId',
-                                          parseInt(item.id)
-                                        )
-                                      }}
-                                    >
-                                      <Check
-                                        className={cn(
-                                          'mr-2 h-4 w-4',
-                                          item.name === field.value
-                                            ? 'opacity-100'
-                                            : 'opacity-0'
-                                        )}
-                                      />
-                                      {item.name}
-                                    </CommandItem>
-                                  ))}
-                                </CommandGroup>
-                              </CommandList>
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  /> */}
+                 
                   <FormField
                     control={form.control}
                     name='reason'
@@ -383,8 +317,9 @@ export function WeightScalePriceForm({ className, ...props }: SignUpFormProps) {
                     <TableHeader>
                       <TableRow>
                         <TableHead className='w-[10rem]'>Vender Type</TableHead>
+                        <TableHead>Item Code</TableHead>
                         <TableHead>Item Name</TableHead>
-                        <TableHead>Price</TableHead>
+                        <TableHead>Price(Baht)</TableHead>
 
                         <TableHead>Action</TableHead>
                       </TableRow>
@@ -396,9 +331,12 @@ export function WeightScalePriceForm({ className, ...props }: SignUpFormProps) {
                             {item.selectedVenderType}
                           </TableCell>
                           <TableCell className='text-left'>
+                            {item.selectedItemCode}
+                          </TableCell>
+                          <TableCell className='text-left'>
                             {item.selectedItem}
                           </TableCell>
-                          <TableCell>{item.price}</TableCell>
+                          <TableCell>{formatCurrency(item.price)}</TableCell>
 
                           <TableCell className='w-[8rem]'>
                             <IconTrash

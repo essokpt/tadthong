@@ -11,6 +11,7 @@ export interface weightScaleItem {
 
     id: number
     selectedItem: string
+    selectedItemCode : string
     itemMasterId: number
     selectedVenderType: string
     venderTypeId: number

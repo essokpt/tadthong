@@ -8,8 +8,6 @@ import { ApiContext } from '@/components/layouts/api-context'
 import { ApiType } from 'types/api'
 import { PageHeader } from '@/components/layouts/header'
 import { IconReport } from '@tabler/icons-react'
-//import { TablePagination } from '@/components/custom/pagination'
-//import { PaginationType } from 'types/pagination'
 import { getMasterReport } from '@/services/reportApi'
 import { ToolBar } from './master/components/toolbar'
 
@@ -32,10 +30,6 @@ export default function MasterReports() {
 
   const getData = () => {
     setData([])
-    // console.log(
-    //   'Get Forecasts data',
-    //   pagination.pageSize / pagination.totalRecord
-    // )
     getMasterReport(selectedYear,selectedMonth).then((data) => {
       setData(data)
       //setPagination(data.paginations)
@@ -43,14 +37,6 @@ export default function MasterReports() {
     setRefresh(false)
   }
 
-  // const getPageSize = (sizeReq: number) => {
-  //   console.log('Get Forecasts data', pagination)
-  //   getForecast(1, sizeReq).then((data) => {
-  //     setData(data.data)
-  //     setPagination(data.paginations)
-  //   })
-  //   setRefresh(false)
-  // }
 
   const handleChangeMonth = (e:any) => {
     console.log("handleChangeMonth", e);

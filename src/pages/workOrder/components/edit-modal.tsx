@@ -80,6 +80,7 @@ import { ItemType } from '@/pages/master/item/components/type'
 import { getItemBom } from '@/services/itemApi'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
+import InputCurrency from '@/components/custom/inputCurrency'
 
 interface EditModalProps {
   isOpen: boolean
@@ -576,7 +577,13 @@ export const EditModal: React.FC<EditModalProps> = ({
                           )}
                         />
 
-                        <FormField
+                        <InputCurrency
+                          value={0}
+                          label='Quantity'
+                          name='quantity'
+                          placeholder={'input quantity'}
+                        />
+                        {/* <FormField
                           control={form.control}
                           name='quantity'
                           render={({ field }) => (
@@ -589,7 +596,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                               <FormMessage />
                             </FormItem>
                           )}
-                        />
+                        /> */}
 
                         <FormField
                           control={form.control}
@@ -606,36 +613,21 @@ export const EditModal: React.FC<EditModalProps> = ({
                           )}
                         />
 
-                        <FormField
-                          control={form.control}
+                        <InputCurrency
+                          value={0}
+                          label='Received'
                           name='received'
-                          render={({ field }) => (
-                            <FormItem className='space-y-1 '>
-                              <FormLabel>Received</FormLabel>
-                              <FormControl>
-                                <Input type='number' {...field} readOnly />
-                              </FormControl>
-
-                              <FormMessage />
-                            </FormItem>
-                          )}
+                          placeholder={'input received'}
                         />
 
-                        <FormField
-                          control={form.control}
+                        <InputCurrency
+                          value={0}
+                          label='Balance'
                           name='balance'
-                          render={({ field }) => (
-                            <FormItem className='space-y-1 '>
-                              <FormLabel>Balance</FormLabel>
-                              <FormControl>
-                                <Input type='number' {...field} readOnly />
-                              </FormControl>
-
-                              <FormMessage />
-                            </FormItem>
-                          )}
+                          placeholder={'input balance'}
                         />
 
+                     
                         <FormField
                           control={form.control}
                           name='status'

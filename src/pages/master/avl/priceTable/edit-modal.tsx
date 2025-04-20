@@ -1,5 +1,5 @@
 'use client'
-import { useContext, useEffect, useState } from 'react'
+import { ChangeEvent, useContext, useEffect, useState } from 'react'
 import { Button } from '@/components/custom/button'
 import { useForm } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
@@ -19,6 +19,7 @@ import { VenderList } from './schema'
 import { ApiContext } from '@/components/layouts/api-context'
 import { ApiType } from 'types/api'
 import { updateItemVender } from '@/services/itemApi'
+import { toCurrency } from '@/lib/utils'
 
 interface EditModalProps {
   isOpen: boolean
@@ -32,9 +33,17 @@ export const EditModal: React.FC<EditModalProps> = ({
   data,
 }) => {
   const [isMounted, setIsMounted] = useState(false)
-  const { handleSubmit, register } = useForm()
+  const { handleSubmit, register, setValue } = useForm()
   const [onloading, setOnloading] = useState(false)
   const { setRefresh } = useContext(ApiContext) as ApiType
+
+  const handleChangePrice = (e: ChangeEvent<HTMLInputElement>) => {
+    console.log('handleChangeInput', e.target.id, e.target.value)
+    const numericValue = Number(e.target.value.replace(/\D/g, '')) / 100
+    const current = numericValue ? toCurrency(numericValue) : ''
+
+    setValue(e.target.id, current)
+  }
 
   async function updateData(payload: any) {
     setOnloading(true)
@@ -82,11 +91,11 @@ export const EditModal: React.FC<EditModalProps> = ({
                   defaultValue={data.vender.id}
                 />
 
-                 <Input
+                <Input
                   className='hidden'
                   {...register('itemMasterId')}
                   defaultValue={data.itemMasterId}
-                /> 
+                />
 
                 <div className='grid'>
                   <Label
@@ -119,12 +128,14 @@ export const EditModal: React.FC<EditModalProps> = ({
                     className='py-1 text-[0.8rem] text-muted-foreground'
                     htmlFor='description'
                   >
-                    Cost
+                    Cost(Baht)
                   </Label>
                   <Input
+                    id='cost'
                     className='text-[0.8rem]'
                     {...register('cost')}
                     defaultValue={data.cost}
+                    onChange={handleChangePrice}
                   />
                 </div>
                 <div className='grid'>

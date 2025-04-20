@@ -13,6 +13,7 @@ import { CellAction } from './cell-action'
 import { Loading } from '@/components/custom/loading'
 import { format } from 'date-fns'
 import { AppStatus } from '@/components/custom/status'
+import { toCurrency } from '@/lib/utils'
 interface DataTableProps {
   data: PurchaseRequest[]
 }
@@ -83,9 +84,9 @@ export function ExpandTable({ data }: DataTableProps) {
                     </TableCell>
                     <TableCell>{item.user.firstName}</TableCell>
                     {/* <TableCell>{item.vender.companyName}</TableCell> */}
-                    <TableCell>{item.sumQty}</TableCell>
-                    <TableCell>{item.total?.toFixed(2)}</TableCell>
-                    <TableCell>{item.amount?.toFixed(2)}</TableCell>
+                    <TableCell>{toCurrency(item.sumQty)}</TableCell>
+                    <TableCell>{toCurrency(item.total)}</TableCell>
+                    <TableCell>{toCurrency(item.amount)}</TableCell>
                     <TableCell>
                     <AppStatus status={item.status?.toLocaleLowerCase()}/>
                       </TableCell>

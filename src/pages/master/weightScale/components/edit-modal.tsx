@@ -14,7 +14,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 
-import { cn } from '@/lib/utils'
+import { cn, formatCurrency } from '@/lib/utils'
 import { format } from 'date-fns'
 import {
   Form,
@@ -85,6 +85,7 @@ interface EditModalProps {
 const initItemValue = {
   id: 0,
   selectedItem: '',
+  selectedItemCode: '',
   itemMasterId: 0,
   selectedVenderType: '',
   venderTypeId: 0,
@@ -476,8 +477,9 @@ export const EditModal: React.FC<EditModalProps> = ({
                             <TableHead className='w-[10rem]'>
                               Vender Type
                             </TableHead>
+                            <TableHead>Item Code</TableHead>
                             <TableHead>Item Name</TableHead>
-                            <TableHead>Price</TableHead>
+                            <TableHead>Price(Baht)</TableHead>
 
                             <TableHead>Action</TableHead>
                           </TableRow>
@@ -489,9 +491,12 @@ export const EditModal: React.FC<EditModalProps> = ({
                                 {item.venderType?.typeName}
                               </TableCell>
                               <TableCell className='text-left'>
+                                {item.itemMaster?.code}
+                              </TableCell>
+                              <TableCell className='text-left'>
                                 {item.itemMaster?.name}
                               </TableCell>
-                              <TableCell>{item.price}</TableCell>
+                              <TableCell>{formatCurrency(item.price)}</TableCell>
 
                               <TableCell
                                 className={`${type === 'approve' || type === 'view' ? 'hidden' : 'w-[8rem] text-white hover:bg-primary'}`}

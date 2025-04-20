@@ -83,7 +83,13 @@ const initialValue = {
     id : 0,
     fileName : "",
     path: "",
-}]
+}],
+  accountCode1: '',
+  accountCode2: '',
+  accountCode3: '',
+  accountCode4: '',
+  accountCode5: '',
+
 }
 
 

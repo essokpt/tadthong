@@ -57,6 +57,7 @@ import { getItemBomItem } from '@/services/itemApi'
 import { ItemType } from '../../item/components/type'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Check, ChevronsUpDown } from 'lucide-react'
+import InputCurrency from '@/components/custom/inputCurrency'
 
 interface EditModalProps {
   isOpen: boolean
@@ -112,16 +113,15 @@ export const CreateModal: React.FC<EditModalProps> = ({
     // const itemmasterid: any = itemMaster.find(
     //   (item) => item.code == data.selectedItem
     // )
-   // data.itemMasterId = itemmasterid.id
-   // data.itemMasterCode = itemmasterid.code
-   // data.itemMasterName = itemmasterid.name
+    // data.itemMasterId = itemmasterid.id
+    // data.itemMasterCode = itemmasterid.code
+    // data.itemMasterName = itemmasterid.name
     // data.outEffectiveDate = format(data.OutDate, 'yyyy-MM-dd')
 
     console.log('createBom', data)
     createData(data)
     form.reset()
     onClose()
-    
   }
   // const handleSelectItem = (e:any) =>{
   //   console.log('handleSelectItem',e);
@@ -134,17 +134,17 @@ export const CreateModal: React.FC<EditModalProps> = ({
   //     form.setValue('itemMasterName', selectItem.name)
 
   //   }
-    
+
   // }
   // function checkValue(arr:any, val:any) {
-  //   const result = arr.find((arrVal:any, index:any) => { 
-  //    if(arrVal.name === val) return index+1 
+  //   const result = arr.find((arrVal:any, index:any) => {
+  //    if(arrVal.name === val) return index+1
   //   }
   //   );
   //   console.log('checkValue',val);
-    
+
   //   if(result){
-  //     return result 
+  //     return result
   //   }else{
   //     return null
   //   }
@@ -171,11 +171,11 @@ export const CreateModal: React.FC<EditModalProps> = ({
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)}>
                 <div className='grid grid-cols-2 gap-2 '>
-                <FormField
+                  <FormField
                     control={form.control}
                     name='selectedItem'
                     render={({ field }) => (
-                      <FormItem className='grid space-y-2 mt-1.5'>
+                      <FormItem className='mt-1.5 grid space-y-2'>
                         <FormLabel>Item Master</FormLabel>
                         <Popover>
                           <PopoverTrigger asChild>
@@ -189,9 +189,9 @@ export const CreateModal: React.FC<EditModalProps> = ({
                                 )}
                               >
                                 {field.value
-                                   ? itemMaster.find(
-                                    (item) => item.name === field.value
-                                  )?.name                                    
+                                  ? itemMaster.find(
+                                      (item) => item.name === field.value
+                                    )?.name
                                   : 'Select Item master'}
                                 <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                               </Button>
@@ -205,20 +205,26 @@ export const CreateModal: React.FC<EditModalProps> = ({
                                   No Item master found.
                                 </CommandEmpty>
                                 <CommandGroup>
-                                  {itemMaster.map((item,index) => (
+                                  {itemMaster.map((item, index) => (
                                     <CommandItem
                                       value={item.name}
                                       key={item.id}
                                       onSelect={() => {
-                                        form.setValue(
-                                          'selectedItem',
-                                          item.name
-                                        )
+                                        form.setValue('selectedItem', item.name)
                                         form.setValue('id', parseInt(item.id))
                                         form.setValue('selectedItem', item.name)
-                                        form.setValue('itemMasterId', parseInt(item.id))
-                                        form.setValue('itemMasterCode', item.code)
-                                        form.setValue('itemMasterName', item.name)
+                                        form.setValue(
+                                          'itemMasterId',
+                                          parseInt(item.id)
+                                        )
+                                        form.setValue(
+                                          'itemMasterCode',
+                                          item.code
+                                        )
+                                        form.setValue(
+                                          'itemMasterName',
+                                          item.name
+                                        )
                                       }}
                                     >
                                       <Check
@@ -229,7 +235,7 @@ export const CreateModal: React.FC<EditModalProps> = ({
                                             : 'opacity-0'
                                         )}
                                       />
-                                      {index+1}-{item.name}
+                                      {index + 1}-{item.name}
                                     </CommandItem>
                                   ))}
                                 </CommandGroup>
@@ -271,7 +277,13 @@ export const CreateModal: React.FC<EditModalProps> = ({
                       </FormItem>
                     )}
                   /> */}
-                  <FormField
+                  <InputCurrency
+                    value={0}
+                    label='Quantity'
+                    name='quantity'
+                    placeholder={'input quantity'}
+                  />
+                  {/* <FormField
                     control={form.control}
                     name='quantity'
                     render={({ field }) => (
@@ -289,7 +301,7 @@ export const CreateModal: React.FC<EditModalProps> = ({
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
+                  /> */}
                   <FormField
                     control={form.control}
                     name='scrap'

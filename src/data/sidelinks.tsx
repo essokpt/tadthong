@@ -82,6 +82,27 @@ export const sidelinks: SideLink[] = [
         icon: <IconReportAnalytics size={22} />,
         role: 'report',
       },
+      {
+        title: 'Weight Scale Report',
+        label: '',
+        href: '/weightScale-report',
+        icon: <IconServer2 size={22} />,
+        role: 'report',
+      },
+      {
+        title: 'Purchase Request Report',
+        label: '',
+        href: '/purchaseRequest-report',
+        icon: <IconServer2 size={22} />,
+        role: 'report',
+      },
+      {
+        title: 'Sale Order Report',
+        label: '',
+        href: '/saleOrder-report',
+        icon: <IconServer2 size={22} />,
+        role: 'report',
+      },
       
     ],
   },

@@ -663,7 +663,7 @@ export const CreateModal: React.FC<EditModalProps> = ({
                         {/* <FormLabel>Customer Queue No.</FormLabel> */}
                         <FormLabel>เลขใบชั่งลูกค้า</FormLabel>
                         <FormControl>
-                          <Input {...field} type='number' />
+                          <Input {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

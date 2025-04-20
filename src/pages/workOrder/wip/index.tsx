@@ -22,7 +22,10 @@ import { ToolBar } from './toolbar'
 import { Loading } from '@/components/custom/loading'
 import { format } from 'date-fns'
 import { PageHeader } from '@/components/layouts/header'
-import { createInventory, createInventoryHistory } from '@/services/inventoryApi'
+import {
+  createInventory,
+  createInventoryHistory,
+} from '@/services/inventoryApi'
 
 interface ChangeEvent<T = Element> extends SyntheticEvent<T> {
   target: EventTarget & T
@@ -54,30 +57,29 @@ export default function WIP() {
       console.log('updateItem:', res.data)
       //add to stock onhand
       const stock = {
-        itemMasterId : res.data.item.id,
-        locationId : res.data.item.locationId,
-        warehouseId : res.data.item.location.warehouseId,
-        branchesId : localStorage.getItem('branchId'),
-        receiveQuantity : res.data.newProductionValue,
-        unit : 'pcs',
+        itemMasterId: res.data.item.id,
+        locationId: res.data.item.locationId,
+        warehouseId: res.data.item.location.warehouseId,
+        branchesId: localStorage.getItem('branchId'),
+        receiveQuantity: res.data.newProductionValue,
+        unit: 'pcs',
       }
       console.log('add stock:', [stock])
 
       await createInventory([stock])
-      
+
       //save stock history
       const history = {
-      
-        StockType : 'WIP',
-        Ref : res.data.item.code,
-        StockBy : localStorage.getItem('user'),
-        ReceiveQuantity : res.data.newProductionValue,
-        Unit : 'pcs',
-        Status : 'WIP',
-        ItemMasterId : res.data.item.id,
-        LocationId : res.data.item.locationId,
-        warehouseId : res.data.item.location.warehouseId,
-        branchesId : localStorage.getItem('branchId'),
+        StockType: 'WIP',
+        Ref: res.data.item.code,
+        StockBy: localStorage.getItem('user'),
+        ReceiveQuantity: res.data.newProductionValue,
+        Unit: 'pcs',
+        Status: 'WIP',
+        ItemMasterId: res.data.item.id,
+        LocationId: res.data.item.locationId,
+        warehouseId: res.data.item.location.warehouseId,
+        branchesId: localStorage.getItem('branchId'),
       }
 
       await createInventoryHistory([history])
@@ -85,16 +87,16 @@ export default function WIP() {
     }
   }
 
-  const handleChangeMonth = (e:any) => {
-    console.log("handleChangeMonth", e);
+  const handleChangeMonth = (e: any) => {
+    console.log('handleChangeMonth', e)
     setSelectedMonth(parseInt(e))
-    getData(parseInt(e), selectedYear);
+    getData(parseInt(e), selectedYear)
   }
 
-  const handleChangeYear = (e:any) => {
-    console.log("handleChangeYear", e);
+  const handleChangeYear = (e: any) => {
+    console.log('handleChangeYear', e)
     setSelectedYear(parseInt(e))
-    getData(selectedMonth,parseInt(e));
+    getData(selectedMonth, parseInt(e))
   }
 
   function handleChangeItemValue(e: ChangeEvent<HTMLInputElement>) {
@@ -132,7 +134,10 @@ export default function WIP() {
     let indexValue = wipValue.findIndex((x: any) => x.date == item)
     if (findValue) {
       return (
-        <TableCell className='items-center text-center w-[6rem]' key={findValue.id}>
+        <TableCell
+          className='w-[6rem] items-center text-center hover:bg-none'
+          key={findValue.id}
+        >
           {level != 4 ? (
             findValue.value
           ) : (
@@ -153,49 +158,49 @@ export default function WIP() {
                 className='rounded-full'
                 onClick={() => updateItem(findValue)}
               >
-                
-                <IconDeviceFloppy size={20} className='text-cyan-400'/>
+                <IconDeviceFloppy size={20} className='text-cyan-400' />
               </Button>
             </div>
           )}
         </TableCell>
       )
     } else {
-      return <TableCell className='w-[13rem] text-right'></TableCell>
+      return (
+        <TableCell className='w-[13rem] text-right dark:hover:bg-none'></TableCell>
+      )
     }
   }
 
   useEffect(() => {
     getData(currentMonth, currentYear)
-    
   }, [refresh])
 
   return (
     <Layout>
       <LayoutBody className='flex flex-col' fixedHeight>
-       
         <PageHeader
           label='WIP'
           icon={<IconReportAnalytics size={45} className='mt-2 ' />}
         />
-        <ToolBar 
-          queryData={(e) => queryData(e)} 
-          filterMonth={(e) => handleChangeMonth(e)} 
+        <ToolBar
+          queryData={(e) => queryData(e)}
+          filterMonth={(e) => handleChangeMonth(e)}
           filterYear={(e) => handleChangeYear(e)}
-          link='' 
+          link=''
         />
 
         <div className='-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-x-12 lg:space-y-0'>
-          {/* <FullCalendarDemo /> */}
-          {/* <FullCalendarDemo2 /> */}
           <Table className='w-[210rem]'>
             <TableHeader>
               <TableRow>
                 <TableHead rowSpan={2} className='w-[30rem]'>
                   สินค้า WIP{' '}
                 </TableHead>
-                <TableHead rowSpan={2} className='w-[15rem]'> รายการ </TableHead>
-                
+                <TableHead rowSpan={2} className='w-[15rem]'>
+                  {' '}
+                  รายการ{' '}
+                </TableHead>
+
                 <TableHead
                   colSpan={dateOfMonth.length - 2}
                   className='text-right'
@@ -209,9 +214,7 @@ export default function WIP() {
                   <TableHead key={i}>{i + 1}</TableHead>
                 ))} */}
                 {dateOfMonth.map((value, index) => (
-                  <TableHead key={index}>
-                    {format(value, 'dd')}
-                  </TableHead>
+                  <TableHead key={index}>{format(value, 'dd')}</TableHead>
                 ))}
               </TableRow>
             </TableHeader>
@@ -220,44 +223,23 @@ export default function WIP() {
                 data?.map((wip, index) => (
                   <React.Fragment key={index}>
                     {wip.wips.map((item, itemIndex) => (
-                      <TableRow key={itemIndex} >
+                      <TableRow
+                        key={index}
+                        className={`${index% 2 === 0 ? 'hover:bg-slate-500 bg-slate-500 text-white' : 'dark:hover:bg-none'}`}
+                      >
                         {itemIndex === 0 && (
                           <TableCell rowSpan={wip.wips.length}>
                             {wip.code}-{wip.name}
                           </TableCell>
                         )}
-                        <TableCell>{item.name}</TableCell>
+                        <TableCell
+                          // className={`${itemIndex % 2 === 0 ? 'bg-zinc-300 hover:bg-none' : 'hover:bg-none'}`}
+                        >
+                          {item.name}
+                        </TableCell>
                         {dateOfMonth.map((value) =>
                           compareDate(value, item.wipValues, item.level, index)
                         )}
-                        {/* {item.wipValues.map((value, valueIndex) => (
-                          <TableCell key={value.id}>
-                            { item.level != 4 ? (
-                                 value.date
-                            ) : (
-                              <div className='item-center'>
-                                <Input
-                                 disabled={parseInt(value.value) > 0}
-                                  className='w-[70px]'
-                                  type='number'
-                                  id={index.toString()}
-                                  name={valueIndex.toString()}
-                                  defaultValue={value.value}
-                                  onChange={handleChangeItemValue}
-                                />
-                                <Button
-                                  disabled={parseInt(value.value) > 0}
-                                  size='icon'
-                                  variant='ghost'
-                                  className='rounded-full'
-                                  onClick={() => updateItem(value)}
-                                >
-                                  <IconRefresh size={20} />
-                                </Button>
-                              </div>
-                              )} 
-                          </TableCell>
-                        ))} */}
                       </TableRow>
                     ))}
                   </React.Fragment>

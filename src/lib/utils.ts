@@ -5,6 +5,25 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+export const toCurrency = (value: number) =>
+  new Intl.NumberFormat("th-TH", {
+    currency: "THA",
+    style: "currency",
+    currencyDisplay: "code",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value)
+  .replace("THA", "")
+  .trim()
+
+export const formatCurrency = (amount: number, ): string => {
+  // return new Intl.NumberFormat(undefined, {
+  //   style: 'decimal',
+  //   currency: currency,
+  // }).format(amount);
+  return new Intl.NumberFormat("en-EN").format(amount);
+};
+
 export function isPermission(module:any, action:string){ 
   const acl:any = localStorage.getItem('accessPermissions')
   const aclPermission = JSON.parse(acl)

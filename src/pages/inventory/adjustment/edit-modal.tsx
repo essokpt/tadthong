@@ -47,6 +47,7 @@ import { z } from 'zod'
 import { IconChecklist, IconInfoCircle } from '@tabler/icons-react'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
+import { toCurrency } from '@/lib/utils'
 // import { cn } from '@/lib/utils'
 // import { Button } from '@/components/ui/button'
 // import { ChevronsUpDown } from 'lucide-react'
@@ -349,7 +350,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                               <TableCell>
                                 {item.stockOnHand?.itemMaster?.name}
                               </TableCell>
-                              <TableCell>{item.quantity}</TableCell>
+                              <TableCell>{toCurrency(item.quantity)}</TableCell>
                               <TableCell>
                                 <Badge variant={'destructive'}>
                                   {item.flag}

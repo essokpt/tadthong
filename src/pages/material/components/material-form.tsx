@@ -5,6 +5,15 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/custom/button'
 import { cn } from '@/lib/utils'
 import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import {
   Table,
   TableBody,
   TableCaption,
@@ -27,6 +36,7 @@ import { LocationType } from '@/pages/location/components/type'
 import { IconTrash } from '@tabler/icons-react'
 import { PageHeader } from '@/components/layouts/header'
 import { IconPencilPlus } from '@tabler/icons-react'
+import { getWeightScaleVenderItems } from '@/services/weightScaleApi'
 
 interface SignUpFormProps extends HTMLAttributes<HTMLDivElement> {}
 
@@ -34,18 +44,72 @@ interface ChangeEvent<T = Element> extends SyntheticEvent<T> {
   target: EventTarget & T
 }
 
+interface WeightScalePriceItems {
+  id: number
+  price: number
+  itemMaster: {
+    id: number
+    code: string
+    name: string
+  }
+  venderType: {
+    id: number
+    typeName: string
+    description: string
+  }
+}
+
 export function MaterialForm({ className, ...props }: SignUpFormProps) {
   const [material, setMaterial] = useState<MaterilalType[]>([])
+  const [weitghtScalePrice, setWeitghtScalePrice] = useState<
+    WeightScalePriceItems[]
+  >([])
+
   const [locations, setLocation] = useState<LocationType[]>([])
   const [selectLocation, setSelectLocation] = useState('')
   const [fileName, setFilename] = useState('')
-
+  const [alertMessage, setAlertMessage] = useState('')
+  const [isImport, setIsImport] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+
   const navigate = useNavigate()
   const { handleSubmit, register } = useForm()
 
-  const handleImport = (event: ChangeEvent<HTMLInputElement>) => {
-    const files: any = event.target.files
+  const checkProductCode = (code: string, price: number) => {
+    let isCode = 500
+
+    for (let index = 0; index < weitghtScalePrice.length; index++) {
+      console.log(
+        'check product code:',
+        weitghtScalePrice[index].itemMaster.code,
+        code
+      )
+      if (weitghtScalePrice[index].itemMaster.code === code) {
+        console.log(
+          'existing product code',
+          weitghtScalePrice[index].itemMaster.code
+        )
+
+        if (weitghtScalePrice[index].price == price) {
+          console.log(' match', code, price)
+        } else {
+          console.log('price not match', weitghtScalePrice[index].price, price)
+          return isCode
+        }
+        isCode = 200
+        break
+      } else {
+        console.log('no product code:', code)
+        return isCode
+      }
+    }
+    return isCode
+  }
+
+  const handleImport = (e: ChangeEvent<HTMLInputElement>) => {
+    const files: any = e.target.files
+    
+
     if (files.length) {
       const file = files[0]
       console.log('file:', file)
@@ -61,45 +125,60 @@ export function MaterialForm({ className, ...props }: SignUpFormProps) {
           const newArray = []
 
           for (let index = 0; index < rows.length; index++) {
-            let renamedObject: any = Object.assign(
-              {},
-              {
-                importId: rows[index][0],
-                queueNo: rows[index][1],
-                cardNo: rows[index][2],
-                carNo: rows[index][3],
-                dateIn: rows[index][4],
-                timeIn: rows[index][5],
-                weightIn: rows[index][6],
-                dateOut: rows[index][7],
-                timeOut: rows[index][8],
-                weightOut: rows[index][9],
-                typeCode: rows[index][10],
-                customerCode: rows[index][11],
-                productCode: rows[index][12],
-                col1: rows[index][13],
-                col2: rows[index][14],
-                col3: rows[index][15],
-                remark: rows[index][16],
-                priceReceipt: rows[index][17],
-                col4: rows[index][18],
-                col5: rows[index][19],
-                col6: rows[index][20],
-                col7: rows[index][21],
-                col8: rows[index][22],
-                col9: rows[index][23],
-                col10: rows[index][24],
-                col11: rows[index][25],
-                col12: rows[index][26],
-                col13: rows[index][27],
-              }
+            // console.log('product code:', rows[index][12])
+            const isProductCode: any = checkProductCode(
+              rows[index][12],
+              rows[index][17]
             )
+            if (isProductCode == 200) {
+              let renamedObject: any = Object.assign(
+                {},
+                {
+                  importId: rows[index][0],
+                  queueNo: rows[index][1],
+                  cardNo: rows[index][2],
+                  carNo: rows[index][3],
+                  dateIn: rows[index][4],
+                  timeIn: rows[index][5],
+                  weightIn: rows[index][6],
+                  dateOut: rows[index][7],
+                  timeOut: rows[index][8],
+                  weightOut: rows[index][9],
+                  typeCode: rows[index][10],
+                  customerCode: rows[index][11],
+                  productCode: rows[index][12],
+                  col1: rows[index][13],
+                  col2: rows[index][14],
+                  col3: rows[index][15],
+                  remark: rows[index][16],
+                  priceReceipt: rows[index][17],
+                  col4: rows[index][18],
+                  col5: rows[index][19],
+                  col6: rows[index][20],
+                  col7: rows[index][21],
+                  col8: rows[index][22],
+                  col9: rows[index][23],
+                  col10: rows[index][24],
+                  col11: rows[index][25],
+                  col12: rows[index][26],
+                  col13: rows[index][27],
+                }
+              )
 
-            newArray.push(renamedObject)
-            console.log('newArray:', newArray)
+              newArray.push(renamedObject)
+              console.log('newArray:', newArray)
+            } else {
+              console.log('product code or price not match, not import data')
+              setIsImport(true)
+              setAlertMessage("Product code or price not match, not import data Plesae try again.")
+              setMaterial([])
+              setFilename('')
+              e.target.value = ''
+              break
+            }
           }
+
           setMaterial(newArray)
-          //  console.log('s:', newArray)
         }
       }
       console.log('material:', material)
@@ -109,7 +188,6 @@ export function MaterialForm({ className, ...props }: SignUpFormProps) {
     console.log('no read file')
   }
 
- 
   function handleChangeRole(e: ChangeEvent<HTMLSelectElement>) {
     setSelectLocation(e.target.value)
   }
@@ -120,47 +198,46 @@ export function MaterialForm({ className, ...props }: SignUpFormProps) {
     const branchid: any = localStorage.getItem('branchId')
     let today = new Date()
     let importCode = format(today, 'yyyy-MM-dd')
-    let genCode = importCode.split("-")
-    const locationID:any = locations.find(item => item.name == selectLocation)
+    let genCode = importCode.split('-')
+    const locationID: any = locations.find(
+      (item) => item.name == selectLocation
+    )
 
     data.code = `IMPORT-${genCode[0]}${genCode[1]}${genCode[2]}-`
     data.importDate = format(today, 'yyyy-MM-dd')
     data.userId = parseInt(userid)
     data.branchId = parseInt(branchid)
-   // data.materials = material
+    // data.materials = material
     data.approveDate = ''
     data.locationId = locationID.id
 
     data.stockIn = selectLocation
     data.fileName = fileName
-  
 
-    const res:any = await createMaterial(data)
+    const res: any = await createMaterial(data)
     if (res.data.id) {
       data.id = res.data.id
-      // console.log('res data', res)
-      // console.log('material data', material)
+
       const response: any = await createMaterialItem(res.data.id, material)
       if (response.status == 200) {
-        console.log("createMaterialItem",response.data)
+        console.log('createMaterialItem', response.data)
       }
-        setTimeout(() => {
-          setIsLoading(false)
-          navigate('/material', { replace: true })
-        }, 1000)
-    //}
-  }
-   
+      setTimeout(() => {
+        setIsLoading(false)
+        navigate('/material', { replace: true })
+      }, 1000)
+      //}
+    }
   }
 
   useEffect(() => {
     getLocation().then((data) => setLocation(data))
+    getWeightScaleVenderItems().then((data) => setWeitghtScalePrice(data))
   }, [])
 
   return (
     <Layout>
       <LayoutBody className='flex flex-col' fixedHeight>
-       
         <PageHeader
           label='Import Weight Scale Data'
           icon={<IconPencilPlus size={45} className='mt-2 ' />}
@@ -178,6 +255,8 @@ export function MaterialForm({ className, ...props }: SignUpFormProps) {
                 </Label>
 
                 <Input
+                 // ref={inputFileRef}
+                 // value={''}
                   id='material'
                   type='file'
                   name='file'
@@ -248,11 +327,7 @@ export function MaterialForm({ className, ...props }: SignUpFormProps) {
                 >
                   Remark
                 </Label>
-                <Input
-                  className='text-[0.8rem]'
-                  {...register('remark')}
-                  
-                />
+                <Input className='text-[0.8rem]' {...register('remark')} />
               </div>
 
               <br />
@@ -263,20 +338,30 @@ export function MaterialForm({ className, ...props }: SignUpFormProps) {
             <div className='grid grid-cols-1 gap-2 '>
               <div className='grid'>
                 <Label>Material Import Information.</Label>
-                <Table className='w-[160rem] mt-2'>
+                <Table className='mt-2 w-[160rem]'>
                   <TableCaption>A list of your recent items.</TableCaption>
                   <TableHeader>
-                  <TableRow>
+                    <TableRow>
                       <TableHead>Import ID (Ident)</TableHead>
-                      <TableHead className='w-[6rem]'>เลขที่ชั่งเข้า (ticket1)</TableHead>
-                      <TableHead className='w-[6rem]'>เลขที่ชั่งออก (ticket2)</TableHead>
-                      <TableHead className='w-[6rem]'>ทะเบียนรถ (truck)</TableHead>
+                      <TableHead className='w-[6rem]'>
+                        เลขที่ชั่งเข้า (ticket1)
+                      </TableHead>
+                      <TableHead className='w-[6rem]'>
+                        เลขที่ชั่งออก (ticket2)
+                      </TableHead>
+                      <TableHead className='w-[6rem]'>
+                        ทะเบียนรถ (truck)
+                      </TableHead>
                       <TableHead>วันชั่งเข้า (datein)</TableHead>
                       <TableHead>เวลาชั่งเข้า (timein)</TableHead>
-                      <TableHead className='w-[6rem]'>น้ำหนักชั่งเข้า (w1)</TableHead>
+                      <TableHead className='w-[6rem]'>
+                        น้ำหนักชั่งเข้า (w1)
+                      </TableHead>
                       <TableHead>วันชั่งออก (dateout)</TableHead>
                       <TableHead>เวลาชั่งออก (timeout)</TableHead>
-                      <TableHead className='w-[6rem]'>น้ำหนักชั่งออก (w2)</TableHead>
+                      <TableHead className='w-[6rem]'>
+                        น้ำหนักชั่งออก (w2)
+                      </TableHead>
                       <TableHead>ประเภท (code1)</TableHead>
                       <TableHead>บริษัท (code2)</TableHead>
                       <TableHead>สินค้า (code3)</TableHead>
@@ -285,12 +370,20 @@ export function MaterialForm({ className, ...props }: SignUpFormProps) {
                       <TableHead>สิ่งเจือปน% (remark2)</TableHead>
                       <TableHead>หมายเหตุ (remark3)</TableHead>
                       <TableHead>ราคา (price)</TableHead>
-                      <TableHead className='w-[6rem]'>หักความชื้น (adj_w1)</TableHead>
-                      <TableHead className='w-[6rem]'>หักสิ่งเจือปน (adj_w2)</TableHead>
+                      <TableHead className='w-[6rem]'>
+                        หักความชื้น (adj_w1)
+                      </TableHead>
+                      <TableHead className='w-[6rem]'>
+                        หักสิ่งเจือปน (adj_w2)
+                      </TableHead>
                       <TableHead>หักอื่นๆ (adj_w3)</TableHead>
-                      <TableHead className='w-[6rem]'>หักเงินค่าชั่ง (adj_m1)</TableHead>
-                      <TableHead>หักค่าลง  (adj_m2)</TableHead>
-                      <TableHead className='w-[6rem]'>หักเงินอื่นๆ  (adj_m3)</TableHead>
+                      <TableHead className='w-[6rem]'>
+                        หักเงินค่าชั่ง (adj_m1)
+                      </TableHead>
+                      <TableHead>หักค่าลง (adj_m2)</TableHead>
+                      <TableHead className='w-[6rem]'>
+                        หักเงินอื่นๆ (adj_m3)
+                      </TableHead>
                       <TableHead>Print 1 (print1)</TableHead>
                       <TableHead>Print 2 (print2)</TableHead>
                       <TableHead>CheckSum (chksum)</TableHead>
@@ -303,8 +396,7 @@ export function MaterialForm({ className, ...props }: SignUpFormProps) {
                         <TableCell>{item.importId}</TableCell>
                         <TableCell>{item.queueNo}</TableCell>
                         <TableCell>{item.cardNo}</TableCell>
-                        <TableCell > {item.carNo}
-                        </TableCell>
+                        <TableCell> {item.carNo}</TableCell>
                         <TableCell>{item.dateIn}</TableCell>
                         <TableCell>{item.timeIn}</TableCell>
 
@@ -336,11 +428,13 @@ export function MaterialForm({ className, ...props }: SignUpFormProps) {
                         <TableCell>
                           <IconTrash
                             size={20}
-                            onClick={() =>  setMaterial(
-                              material.filter(a => 
-                                a.queueNo !== item.queueNo
+                            onClick={() =>
+                              setMaterial(
+                                material.filter(
+                                  (a) => a.queueNo !== item.queueNo
                                 )
-                            )}
+                              )
+                            }
                           />
                         </TableCell>
                       </TableRow>
@@ -350,13 +444,33 @@ export function MaterialForm({ className, ...props }: SignUpFormProps) {
                 </Table>
               </div>
               <div className='mt-5 grid'>
-                <Button className='float-end mt-2 w-full' loading={isLoading} variant='button'>
+                <Button
+                  className='float-end mt-2 w-full'
+                  loading={isLoading}
+                  variant='button'
+                >
                   Create
                 </Button>
               </div>
             </div>
           </form>
         </div>
+
+        <AlertDialog open={isImport} onOpenChange={() => setIsImport(!isImport)}>
+        
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Warning?</AlertDialogTitle>
+              <AlertDialogDescription>
+                {alertMessage}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Close</AlertDialogCancel>
+              {/* <AlertDialogAction>Continue</AlertDialogAction> */}
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </LayoutBody>
     </Layout>
   )

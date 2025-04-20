@@ -58,7 +58,7 @@ import {
   updatePurchaseOrderItemById,
 } from '@/services/purchaseOrderApi'
 import FileDrag from '@/components/custom/fileDrag'
-import { cn, downloadFileData } from '@/lib/utils'
+import { cn, downloadFileData, toCurrency } from '@/lib/utils'
 import { AlertModal } from '@/components/custom/alert-modal'
 import { ApiContext } from '@/components/layouts/api-context'
 import { ApiType } from 'types/api'
@@ -595,13 +595,13 @@ export const EditModal: React.FC<EditModalProps> = ({
                             </TableCell>
                             <TableCell>{item.itemMaster?.name}</TableCell>
                             <TableCell>{item.specification}</TableCell>
-                            <TableCell>{item.quantity}</TableCell>
-                            <TableCell>{item.price}</TableCell>
-                            <TableCell>{item.discountPercent}</TableCell>
-                            <TableCell>{item.discountUnit}</TableCell>
-                            <TableCell>{item.discountTotal}</TableCell>
-                            <TableCell>{item.amount}</TableCell>
-                            <TableCell>{item.vat}</TableCell>
+                            <TableCell>{toCurrency(item.quantity)}</TableCell>
+                            <TableCell>{toCurrency(item.price)}</TableCell>
+                            <TableCell>{toCurrency(item.discountPercent)}</TableCell>
+                            <TableCell>{toCurrency(item.discountUnit)}</TableCell>
+                            <TableCell>{toCurrency(item.discountTotal)}</TableCell>
+                            <TableCell>{toCurrency(item.amount)}</TableCell>
+                            <TableCell>{toCurrency(item.vat)}</TableCell>
                             <TableCell>{item.remark}</TableCell>
                             <TableCell>
                             <div className='flex items-center gap-3'>

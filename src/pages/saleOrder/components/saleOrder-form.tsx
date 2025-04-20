@@ -138,7 +138,7 @@ const formSchema = z.object({
   carRegistration: z.string(),
   driverName: z.string(),
   userId: z.number(),
-  // vat: z.number(),
+  workorderNo : z.string(),
   // amount : z.number(),
   selectLocation: z.string(),
   selectCustomer: z.string(),
@@ -173,7 +173,7 @@ export function SaleOrderForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       cause: '',
-      //selectLocation: '1',
+      workorderNo : '',
       code: 'SO' + newCode[0] + newCode[1] + newCode[2],
       createBy: user,
       userId: parseInt(userid),
@@ -582,7 +582,20 @@ export function SaleOrderForm() {
                         </FormItem>
                       )}
                     />
+                    <FormField
+                      control={form.control}
+                      name='workorderNo'
+                      render={({ field }) => (
+                        <FormItem className='space-y-1'>
+                          <FormLabel>Work Order No</FormLabel>
+                          <FormControl>
+                            <Input {...field}  />
+                          </FormControl>
 
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                     <FormField
                       control={form.control}
                       name='status'
@@ -639,6 +652,8 @@ export function SaleOrderForm() {
                       <TableCaption>A list of your recent items.</TableCaption>
                       <TableHeader>
                         <TableRow>
+                        <TableHead className='items-center'>Action</TableHead>
+
                           <TableHead>รหัสสินค้า</TableHead>
                           <TableHead>สินค้า</TableHead>
                           <TableHead>จำนวน</TableHead>
@@ -660,34 +675,33 @@ export function SaleOrderForm() {
                           <TableHead>ความชื้นต้นทาง</TableHead>
                           <TableHead>ความชื้นลูกค้า</TableHead>
                           <TableHead>เลขใบชั่งลูกค้า</TableHead>
-                          <TableHead className='items-center'>Action</TableHead>
-                          {/* <TableHead>Item Code</TableHead>
-                          <TableHead>Item Name</TableHead>
-                          <TableHead>Quantity</TableHead>
-                          <TableHead>Humidity</TableHead>
-                          <TableHead>Adulteration</TableHead>
-                          <TableHead>Other</TableHead>
-
-                          <TableHead>Unit Price</TableHead>
-                          <TableHead>Weighing Money</TableHead>
-                          <TableHead>Ship Down</TableHead>
-                          <TableHead>Cash Other</TableHead>
-
-                          <TableHead>Amount</TableHead>
-                          <TableHead>Customer Price</TableHead>
-                          <TableHead>Customer Weight</TableHead>
-                          <TableHead>Different Price</TableHead>
-                          <TableHead>Different Quantity</TableHead>
-                          <TableHead>Customer Amount</TableHead>
-                          <TableHead>SourceHumidity</TableHead>
-                          <TableHead>Customer Humidity</TableHead>
-                          <TableHead>Customer Queue No.</TableHead>
-                          <TableHead className='items-center'>Action</TableHead> */}
+                          
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {items?.map((item) => (
                           <TableRow key={item.id}>
+                            <TableCell>
+                              <Button
+                                loading={false}
+                                size='icon'
+                                variant='ghost'
+                                className='rounded-full'
+                                onClick={() => editItem(item)}
+                              >
+                                <IconEdit color='blue' size={20} />
+                              </Button>
+
+                              <Button
+                                size='icon'
+                                variant='ghost'
+                                color='red'
+                                className='rounded-full text-red-600'
+                                onClick={() => deleteItem(item)}
+                              >
+                                <IconTrash size={20} />
+                              </Button>
+                            </TableCell>
                             <TableCell className='w-[8rem] font-medium'>
                               {item.itemMaster?.code}
                             </TableCell>
@@ -717,26 +731,7 @@ export function SaleOrderForm() {
                             <TableCell>
                               {item.destinationWeighingScale}
                             </TableCell>
-                            <TableCell>
-                              <Button
-                                loading={false}
-                                size='icon'
-                                variant='ghost'
-                                className='rounded-full'
-                                onClick={() => editItem(item)}
-                              >
-                                <IconEdit size={20} />
-                              </Button>
-
-                              <Button
-                                size='icon'
-                                variant='ghost'
-                                className='rounded-full'
-                                onClick={() => deleteItem(item)}
-                              >
-                                <IconTrash size={20} />
-                              </Button>
-                            </TableCell>
+                            
                           </TableRow>
                         ))}
                       </TableBody>

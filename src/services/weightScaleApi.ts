@@ -24,6 +24,16 @@ export async function getWeightScaleApprove(){
   }
 }
 
+export async function getWeightScaleVenderItems(){
+  try {
+    const response = await api.get(`${endpoint}/VenderItems`);  
+    const res = await response.data
+    return res
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 
 export async function searchWeightScale(str:any){
   try {

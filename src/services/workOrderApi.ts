@@ -111,6 +111,7 @@ export async function createWorkOrder(data:any) {
    export async function updateProduction(data:any) {
     // console.error('login',data);
      try {
+      //data.remark =  "Testing"
        const response = await api.put(`${endpoint}/UpdateProduction`, data);
        console.log('updateProduction',response.status);
        return response

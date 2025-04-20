@@ -29,7 +29,8 @@ export const schema = z.object({
         firstName : z.string()
     }),
     createAt: z.string(),
-    remark: z.string(),   
+    remark: z.string(), 
+    workorderNo : z.string(),  
     status: z.string(),
     saleOrderItems: z.array(z.object({
         id: z.number(),

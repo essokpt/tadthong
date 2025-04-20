@@ -46,7 +46,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { WorkOrder } from '../components/schema'
 import { getLocation } from '@/services/locationApi'
 import { LocationType } from '@/pages/location/components/type'
-import { updateProduction, updateWorkOrderItems } from '@/services/workOrderApi'
+import { updateWorkOrderItems } from '@/services/workOrderApi'
 import { IconInfoCircle, IconRefresh } from '@tabler/icons-react'
 import { UpdateProductionWip } from '@/services/itemApi'
 import { format } from 'date-fns'
@@ -92,6 +92,7 @@ const formSchema = z.object({
     // stockingUom: z.string(),
   }),
   received: z.number(),
+  receiveRequest: z.number(),
   balance: z.number(),
 })
 
@@ -115,52 +116,43 @@ export const EditModal: React.FC<EditModalProps> = ({
       (item) => item.id == e.target.id
     )
     if (findIndex != -1) {
-      data.workOrderUsages[findIndex].pickingRequest = parseInt(e.target.value)
+      data.workOrderUsages[findIndex].pickingRequest = parseFloat(e.target.value)
       //updateItem(findIndex)
     }
 
     console.log('handleChangeQuantity value', data)
   }
 
-  //function handleChangeLocation(e: ChangeEvent<HTMLSelectElement>) {
-  //setValue('locationId', parseInt(e.target.value))
-  //data.locationId = parseInt(e.target.value)
-  //console.log('handleChangeLocation value', data)
-  // const findIndex: any = data.purchaseRequestItems.findIndex(
-  //   (item) => item.id == e.target.id
-  // )
-  // if (findIndex != -1) {
-  //   data.purchaseRequestItems[findIndex].price = parseInt(e.target.value)
-  //   updateItem(findIndex)
-  // }
-  //}
-
   async function updateData(payload: z.infer<typeof formSchema>) {
     setOnloading(true)
     console.log('updateData:', payload)
+  //const receiveValue = payload.receiveRequest
+    payload.received =  payload.receiveRequest
+   // data.received = pareInt(data.received + receiveValue)
     const userid: any = localStorage.getItem('userId')
-    const res: any = await updateProduction(payload)
+    //const res: any = await updateProduction(payload)
 
-    if (res.status == 200) {
+    const res:any = await updateItem(payload.receiveRequest)
+    if(res){    
       // stock
       const stock = {
         itemMasterId: payload.itemMasterId,
         LocationId: payload.locationId,
         warehouseId: data.location.warehouseId,
         branchesId: localStorage.getItem('branchId'),
-        receiveQuantity: payload.received,
+        receiveQuantity: payload.receiveRequest,
         unit: 'pcs',
       }
-      console.log('add stock:', [stock])
+      // console.log('add stock:', [stock])
 
-      await createInventory([stock])
+       await createInventory([stock])
 
       // save history
       const history = {
         StockType: 'Production-Receipt',
         Ref: payload.code,
         StockBy: localStorage.getItem('user'),
-        ReceiveQuantity: payload.received,
+        ReceiveQuantity: payload.receiveRequest,
         Unit: 'pcs',
         Status: 'Production Receipt',
         ItemMasterId: payload.itemMasterId,
@@ -170,32 +162,35 @@ export const EditModal: React.FC<EditModalProps> = ({
         userId: parseInt(userid),
       }
 
-      console.log('createInventoryHistory:', history)
-      await createInventoryHistory([history])
-      setTimeout(() => {
-        setOnloading(false)
-        onClose()
-      }, 1000)
+      // console.log('createInventoryHistory:', history)
+       await createInventoryHistory([history])
+
     }
+    //}
+    setTimeout(() => {
+      setOnloading(false)
+      onClose()
+    }, 1500)
   }
 
-  async function updateItem() {
+  async function updateItem(receiveValue:any) {
     // setOnloading(true)
-    console.log('updateData:', data)
-
-    const res: any = await updateWorkOrderItems(data)
+    const value = parseInt(receiveValue)
+   if(value > 0){
+    data.received = data.received + value
+    data.balance = data.quantity - data.received
+   }
+    console.log('updateItem:', data)
+   const res: any = await updateWorkOrderItems(data)
 
     if (res.status == 200) {
       const response: any = await UpdateProductionWip(data.workOrderUsages)
       console.log('UpdateProductionWip:', response)
 
-      setOnloading(false)
-      onClose()
+     return true
     }
 
-    setTimeout(() => {
-      setOnloading(false)
-    }, 1000)
+   
   }
 
   useEffect(() => {
@@ -222,7 +217,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(updateData)}>
                     <div className='grid gap-4'>
-                      <div className='mb-3  grid items-start gap-2 space-x-3 space-y-0 rounded-md border p-4 shadow'>
+                      <div className='mb-3  grid-cols-2 items-start gap-2 space-x-3 space-y-0 rounded-md border p-4 shadow'>
                         <div className='mb-2  flex items-center'>
                           <IconInfoCircle />
                           <Label htmlFor='terms' className='ml-3 text-lg'>
@@ -304,33 +299,34 @@ export const EditModal: React.FC<EditModalProps> = ({
                             />
                           </div>
 
-                          {/* <FormField
-                            control={form.control}
-                            name='balance'
-                            render={({ field }) => (
-                              <FormItem className='space-y-1 '>
-                                <FormLabel>Balance</FormLabel>
-                                <FormControl>
-                                  <Input type='number' {...field} readOnly />
-                                </FormControl>
+                          <div className='grid'>
+                            <Label
+                              className='py-1 text-[0.8rem]'
+                              htmlFor='received'
+                            >
+                              Received
+                            </Label>
+                            <Input
+                              readOnly
+                              className='text-[0.8rem]'
+                              defaultValue={data.received}
+                            />
+                          </div>
 
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          /> */}
-
+                        
                           <FormField
                             control={form.control}
-                            name='received'
-                            render={({ field }) => (
+                            name='receiveRequest'
+                            render={({field}) => (
                               <FormItem className='space-y-1'>
                                 <FormLabel>Receipt Request</FormLabel>
                                 <FormControl>
                                   <Input
-                                    type='number'
+                                    type='float'
                                     {...field}
                                     disabled={data.balance == 0}
-                                    min={1}
+                                    defaultValue={0}
+                                    min={0}
                                     max={data.balance}
                                   />
                                 </FormControl>
@@ -412,7 +408,8 @@ export const EditModal: React.FC<EditModalProps> = ({
                             )}
                           />
                         </div>
-                        <div className='grid'>
+                      
+                        {/* <div className='grid'>
                           <Button
                             loading={onloading}
                             type='submit'
@@ -422,7 +419,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                           >
                             Save
                           </Button>
-                        </div>
+                        </div> */}
                       </div>
                     </div>
 
@@ -469,7 +466,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                                 <Input
                                   disabled={item.pickingBalance == 0}
                                   className='w-[100px]'
-                                  type='number'
+                                  type='float'
                                   min={1}
                                   max={item.pickingBalance}
                                   id={item.id}
@@ -503,7 +500,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                             <TableCell colSpan={10} className='text-right'>
                               <Button
                                 loading={onloading}
-                                onClick={updateItem}
+                                // onClick={updateItem}
                                 variant='button'
                               >
                                 <IconRefresh size={20} className='mr-2' />

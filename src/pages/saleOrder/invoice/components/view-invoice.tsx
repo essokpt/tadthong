@@ -21,6 +21,7 @@ import { PageHeader } from '@/components/layouts/header'
 import { IconChecklist, IconEye, IconInfoCircle } from '@tabler/icons-react'
 import { EditModal } from '../../components/edit-modal'
 import { SaleOrder } from '../../components/schema'
+import { toCurrency } from '@/lib/utils'
 
 const initialValue = {
   id: 0,
@@ -97,6 +98,7 @@ const initialSaleOrderValue = {
   createBy: '',
   code: '',
   poNumber: '',
+  workorderNo: '',
   cause: '',
   carRegistration: '',
   driverName: '',
@@ -322,13 +324,13 @@ export const ViewInvoice = () => {
                     className='py-1 text-[0.8rem] text-muted-foreground'
                     htmlFor='total'
                   >
-                    Total
+                    Total(Baht)
                   </Label>
                   <Input
                     readOnly
                     className='text-[0.8rem]'
                     // {...register('total')}
-                    defaultValue={data.total}
+                    defaultValue={toCurrency(data.total)}
                   />
                 </div>
                 <div className='grid '>
@@ -336,13 +338,13 @@ export const ViewInvoice = () => {
                     className='py-1 text-[0.8rem] text-muted-foreground'
                     htmlFor='vat'
                   >
-                    Vat
+                    Vat(Baht)
                   </Label>
                   <Input
                     readOnly
                     className='text-[0.8rem]'
                     // {...register('vat')}
-                    defaultValue={data.vat}
+                    defaultValue={toCurrency(data.vat)}
                   />
                 </div>
                 <div className='grid '>
@@ -350,12 +352,12 @@ export const ViewInvoice = () => {
                     className='py-1 text-[0.8rem] text-muted-foreground'
                     htmlFor='amount'
                   >
-                    Amount
+                    Amount(Baht)
                   </Label>
                   <Input
                     readOnly
                     className='text-[0.8rem]'
-                    defaultValue={data.amount}
+                    defaultValue={toCurrency(data.amount)}
                   />
                 </div>
                 <div className='grid '>

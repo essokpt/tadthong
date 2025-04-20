@@ -38,6 +38,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { cn } from '@/lib/utils'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { PurchaseOrderItemType } from './type'
+import InputCurrency from '@/components/custom/inputCurrency'
 
 interface EditModalProps {
   isOpen: boolean
@@ -49,7 +50,7 @@ interface EditModalProps {
 
 const formSchema = z.object({
   id: z.number(),
-  purchaseOrderId : z.number(),
+  purchaseOrderId: z.number(),
   itemName: z.string().min(1),
   itemMasterId: z.string(),
   quantity: z.number().min(1),
@@ -57,11 +58,10 @@ const formSchema = z.object({
   discountPercent: z.number(),
   discountUnit: z.number(),
   //discountTotal: z.number(),
- // vat: z.number(),
+  // vat: z.number(),
   remark: z.string(),
   price: z.number().min(1),
- // amount: z.number(),
-  
+  // amount: z.number(),
 })
 
 export const ItemModal: React.FC<EditModalProps> = ({
@@ -188,7 +188,13 @@ export const ItemModal: React.FC<EditModalProps> = ({
                     )}
                   />
 
-                  <FormField
+                  <InputCurrency
+                    value={0}
+                    label='Quantity'
+                    name='quantity'
+                    placeholder={'input quantity'}
+                  />
+                  {/* <FormField
                     control={form.control}
                     name='quantity'
                     render={({ field }) => (
@@ -206,26 +212,13 @@ export const ItemModal: React.FC<EditModalProps> = ({
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
+                  /> */}
 
-                  <FormField
-                    control={form.control}
+                  <InputCurrency
+                    value={0}
+                    label='Unit Price(Baht)'
                     name='price'
-                    render={({ field }) => (
-                      <FormItem className='space-y-1'>
-                        <FormLabel>Unit Price</FormLabel>
-                        <FormControl>
-                          <Input
-                            type='number'
-                            {...field}
-                            onChange={(event) =>
-                              field.onChange(parseFloat(event.target.value))
-                            }
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                    placeholder={'input price'}
                   />
 
                   <FormField
@@ -248,24 +241,11 @@ export const ItemModal: React.FC<EditModalProps> = ({
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
+                  <InputCurrency
+                    value={0}
+                    label='Discount Unit'
                     name='discountUnit'
-                    render={({ field }) => (
-                      <FormItem className='space-y-1'>
-                        <FormLabel>Discount Unit</FormLabel>
-                        <FormControl>
-                          <Input
-                            type='number'
-                            {...field}
-                            onChange={(event) =>
-                              field.onChange(parseFloat(event.target.value))
-                            }
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                    placeholder={'input discountUnit'}
                   />
 
                   <FormField

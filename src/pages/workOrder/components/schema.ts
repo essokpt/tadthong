@@ -29,6 +29,7 @@ export const customerSchema = z.object({
         stockingUom: z.string()      
     }),
     received: z.number(),
+    receiveRequest: z.number(),
     balance: z.number(),
     remark: z.string(),   
     status: z.string(),

@@ -2,7 +2,6 @@
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/custom/button'
 import { useForm } from 'react-hook-form'
-import { Input } from '@/components/ui/input'
 import { z } from 'zod'
 import { cn } from '@/lib/utils'
 import {
@@ -41,6 +40,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { gethWeightScaleVenderType } from '@/services/weightScaleApi'
 import { VenderType, weightScaleItem } from './type'
+import InputCurrency from '@/components/custom/inputCurrency'
 
 interface EditModalProps {
   isOpen: boolean
@@ -53,6 +53,7 @@ interface EditModalProps {
 const formSchema = z.object({
   id: z.number(),
   selectedItem: z.string(),
+  selectedItemCode: z.string(),
   itemMasterId: z.number(),
   selectedVenderType: z.string(),
   venderTypeId: z.number(),
@@ -85,32 +86,7 @@ export const CreateModal: React.FC<EditModalProps> = ({
     //onClose()
     
   }
-  // const handleSelectItem = (e:any) =>{
-  //   console.log('handleSelectItem',e);
-  //   const selectItem = itemMaster.find(x => x.code == e)
-  //   if(selectItem){
-  //     form.setValue('id', parseInt(selectItem.id))
-  //     form.setValue('selectedItem', selectItem.name)
-  //     form.setValue('itemMasterId', parseInt(selectItem.id))
-  //     form.setValue('itemMasterCode', selectItem.code)
-  //     form.setValue('itemMasterName', selectItem.name)
-
-  //   }
-    
-  // }
-  // function checkValue(arr:any, val:any) {
-  //   const result = arr.find((arrVal:any, index:any) => { 
-  //    if(arrVal.name === val) return index+1 
-  //   }
-  //   );
-  //   console.log('checkValue',val);
-    
-  //   if(result){
-  //     return result 
-  //   }else{
-  //     return null
-  //   }
-  // }
+ 
 
   useEffect(() => {
     setIsMounted(true)
@@ -179,6 +155,7 @@ export const CreateModal: React.FC<EditModalProps> = ({
                                         )
                                         // form.setValue('id', parseInt(item.id))
                                         form.setValue('selectedItem', item.name)
+                                        form.setValue('selectedItemCode', item.code)
                                         form.setValue('itemMasterId', parseInt(item.id))
                                         //form.setValue('itemMasterName', item.name)
                                       }}
@@ -272,37 +249,15 @@ export const CreateModal: React.FC<EditModalProps> = ({
                       </FormItem>
                     )}
                   />
+
+                      <InputCurrency 
+                       value={0}
+                       label="Price(Baht)"
+                       name="price"
+                       placeholder={'input price'}
+                      />
+                 
                   {/* <FormField
-                    control={form.control}
-                    name='selectedItem'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Item </FormLabel>
-                        <Select
-                          onValueChange={(event) => handleSelectItem(event)}
-                        
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder='Select a item master' />
-                            </SelectTrigger>
-                          </FormControl>
-
-                          <SelectContent>
-                            {itemMaster?.map((item) => (
-                              <SelectItem key={item.id} value={item.code}>
-                                {item.code}-{item.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  /> */}
-                  <FormField
                     control={form.control}
                     name='price'
                     render={({ field }) => (
@@ -320,7 +275,7 @@ export const CreateModal: React.FC<EditModalProps> = ({
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
+                  /> */}
                   
                 
                 </div>

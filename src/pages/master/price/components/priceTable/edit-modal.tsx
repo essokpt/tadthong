@@ -1,5 +1,5 @@
 'use client'
-import { useContext, useEffect, useState } from 'react'
+import { ChangeEvent, useContext, useEffect, useState } from 'react'
 import { Button } from '@/components/custom/button'
 import { useForm } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
@@ -19,6 +19,7 @@ import { PriceList } from './schema'
 import { ApiContext } from '@/components/layouts/api-context'
 import { ApiType } from 'types/api'
 import { updatePrice } from '@/services/priceApi'
+import { toCurrency } from '@/lib/utils'
 
 interface EditModalProps {
   isOpen: boolean
@@ -32,19 +33,26 @@ export const EditModal: React.FC<EditModalProps> = ({
   data,
 }) => {
   const [isMounted, setIsMounted] = useState(false)
-  const { handleSubmit, register } = useForm()
+  const { handleSubmit, register, setValue } = useForm()
   const [onloading, setOnloading] = useState(false)
   const { setRefresh } = useContext(ApiContext) as ApiType
+
+  const handleChangeInput = (e: ChangeEvent<HTMLInputElement>) => {
+    console.log('handleChangeInput', e.target.id, e.target.value)
+    const numericValue = Number(e.target.value.replace(/\D/g, '')) / 100
+    const current = numericValue ? toCurrency(numericValue) : ''
+
+    setValue(e.target.id, current)
+  }
 
   async function updateData(data: any) {
     setOnloading(true)
 
-    console.log('updateData',data);
+    console.log('updateData', data)
     const res: any = await updatePrice(data)
 
     if (res.status == 200) {
       console.log('update item price sucess')
-     
     }
 
     setTimeout(() => {
@@ -52,8 +60,6 @@ export const EditModal: React.FC<EditModalProps> = ({
       onClose()
       setRefresh(true)
     }, 1500)
-    
-   
   }
 
   useEffect(() => {
@@ -80,12 +86,12 @@ export const EditModal: React.FC<EditModalProps> = ({
                   {...register('id')}
                   defaultValue={data.id}
                 />
-                 <Input
+                <Input
                   className='hidden'
                   {...register('customersId')}
                   defaultValue={data.customersId}
                 />
-                 <Input
+                <Input
                   className='hidden'
                   {...register('itemMasterId')}
                   defaultValue={data.itemMasterId}
@@ -99,9 +105,8 @@ export const EditModal: React.FC<EditModalProps> = ({
                     Customer
                   </Label>
                   <Input
-                   readOnly
+                    readOnly
                     className='text-[0.8rem]'
-                 
                     defaultValue={data.customers?.companyName}
                   />
                 </div>
@@ -110,15 +115,16 @@ export const EditModal: React.FC<EditModalProps> = ({
                     className='py-1 text-[0.8rem] text-muted-foreground'
                     htmlFor='description'
                   >
-                    Price
+                    Price(Baht)
                   </Label>
                   <Input
+                    id='price'
                     className='text-[0.8rem]'
                     {...register('price')}
                     defaultValue={data.price}
+                    onChange={handleChangeInput}
                   />
                 </div>
-                
 
                 <DialogFooter>
                   <Button loading={onloading} type='submit' variant='button'>

@@ -35,6 +35,7 @@ import {
 import { Label } from '@/components/ui/label'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { toCurrency } from '@/lib/utils'
 
 interface EditModalProps {
   isOpen: boolean
@@ -392,7 +393,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                               <TableCell>
                                 {data.locationDestination.name}
                               </TableCell>
-                              <TableCell>{item.quantity}</TableCell>
+                              <TableCell>{toCurrency(item.quantity)}</TableCell>
                               <TableCell>{item.remark}</TableCell>
                             </TableRow>
                           ))}

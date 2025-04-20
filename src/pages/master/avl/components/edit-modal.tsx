@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { ChangeEvent, useEffect, useState } from 'react'
 import { Button } from '@/components/custom/button'
 import { useForm } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
@@ -25,6 +25,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Avl } from './schema'
 import { PriceDataTable } from '../priceTable/priceDataTable'
 import { columns } from '../priceTable/columns'
+import { toCurrency } from '@/lib/utils'
 
 interface EditModalProps {
   isOpen: boolean
@@ -46,7 +47,7 @@ export const EditModal: React.FC<EditModalProps> = ({
   const [onLoading, setOnLoading] = useState(false)
 
   const [alert, setAlert] = useState('')
-  const { handleSubmit, register } = useForm()
+  const { handleSubmit, register, setValue } = useForm()
   const [venders, setVender] = useState<VenderType[]>([])
 
   // const form = useForm<z.infer<typeof formSchema>>({
@@ -55,6 +56,13 @@ export const EditModal: React.FC<EditModalProps> = ({
   //     selectVender: '',
   //   },
   // })
+    const handleChangePrice = (e: ChangeEvent<HTMLInputElement>) => {
+      console.log('handleChangeInput', e.target.id, e.target.value)
+      const numericValue = Number(e.target.value.replace(/\D/g, '')) / 100
+      const current = numericValue ? toCurrency(numericValue) : ''
+  
+      setValue(e.target.id, current)
+    }
 
   async function updateData(data: any) {
     data.itemMasterId = editdata.id
@@ -231,13 +239,14 @@ export const EditModal: React.FC<EditModalProps> = ({
                               className='py-1 text-[0.8rem] text-muted-foreground'
                               htmlFor='address'
                             >
-                              Cost
+                              Cost(Baht)
                             </Label>
                             <Input
+                            id='cost'
                               className='w-[100px]'
                               type='float'
                               {...register('cost')}
-                              // onChange={handleChangePrice}
+                              onChange={handleChangePrice}
                             />
                           </div>
                           <div className='grid'>

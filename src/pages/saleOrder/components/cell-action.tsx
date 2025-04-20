@@ -14,7 +14,7 @@ import { EditModal } from './edit-modal'
 import { deleteSaleOrder } from '@/services/saleOrderApi'
 import { ApiContext } from '@/components/layouts/api-context'
 import { ApiType } from 'types/api'
-import { IconSettingsDown } from '@tabler/icons-react'
+import { IconEye, IconSettingsDown } from '@tabler/icons-react'
 import usePermission from '@/hooks/use-permission'
 
 interface DataTableRowActionsProps {
@@ -49,6 +49,7 @@ const initialValue = {
     },
     createAt: '',
     remark: '',   
+    workorderNo: '',
     status: '',
     saleOrderItems: [{
       id: 0,
@@ -162,7 +163,7 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
               updateAction(row)
             }}
           >
-            <Edit className='mr-2 h-4 w-4' /> View
+            <IconEye className='mr-2 h-4 w-4 text-primary' /> View
           </DropdownMenuItem>
           <DropdownMenuItem
             disabled={

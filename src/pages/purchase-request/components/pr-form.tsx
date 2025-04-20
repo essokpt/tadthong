@@ -61,7 +61,7 @@ import { getLocation } from '@/services/locationApi'
 import { LocationType } from '@/pages/location/components/type'
 import FileDrag from '@/components/custom/fileDrag'
 import { PageHeader } from '@/components/layouts/header'
-import { cn } from '@/lib/utils'
+import { cn, toCurrency } from '@/lib/utils'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
@@ -293,332 +293,324 @@ export function PRForm() {
             <TabsTrigger value='materiallist'>Item List</TabsTrigger>
           </TabsList>
           <TabsContent value='general'> */}
-            <Card>
-              <CardContent className='space-y-2'>
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)}>
-                    <div className='grid gap-4'>
-                      <div className='mb-3  grid grid-cols-2 items-start gap-2 space-x-3 space-y-0 rounded-md border p-4 shadow'>
-                        <div className='col-span-2 mb-2  flex items-center'>
-                          <IconInfoCircle />
-                          <Label htmlFor='terms' className='ml-3 text-lg'>
-                            General Information.
-                          </Label>
-                        </div>
-                        <FormField
-                          control={form.control}
-                          name='requirmentDate'
-                          render={({ field }) => (
-                            <FormItem className='space-y-1'>
-                              <FormLabel>Date</FormLabel>
-                              <FormControl>
-                                <Input {...field} readOnly />
-                              </FormControl>
-
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name='selectLocation'
-                          render={({ field }) => (
-                            <FormItem className='grid space-y-1.5 py-2'>
-                              <FormLabel>Location</FormLabel>
-                              <Popover>
-                                <PopoverTrigger asChild>
-                                  <FormControl>
-                                    <Button
-                                      variant='outline'
-                                      role='combobox'
-                                      className={cn(
-                                        'justify-between',
-                                        !field.value && 'text-muted-foreground'
-                                      )}
-                                    >
-                                      {field.value
-                                        ? locations.find(
-                                            (item) => item.name === field.value
-                                          )?.name
-                                        : 'Select location'}
-                                      <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                                    </Button>
-                                  </FormControl>
-                                </PopoverTrigger>
-                                <PopoverContent className='w-[200px] p-0'>
-                                  <Command>
-                                    <CommandInput placeholder='Search location...' />
-                                    <CommandList>
-                                      <CommandEmpty>
-                                        No location found.
-                                      </CommandEmpty>
-                                      <CommandGroup>
-                                        {locations.map((item) => (
-                                          <CommandItem
-                                            value={item.name}
-                                            key={item.id}
-                                            onSelect={() => {
-                                              form.setValue(
-                                                'selectLocation',
-                                                item.name
-                                              )
-                                            }}
-                                          >
-                                            <Check
-                                              className={cn(
-                                                'mr-2 h-4 w-4',
-                                                item.name === field.value
-                                                  ? 'opacity-100'
-                                                  : 'opacity-0'
-                                              )}
-                                            />
-                                            {item.name}
-                                          </CommandItem>
-                                        ))}
-                                      </CommandGroup>
-                                    </CommandList>
-                                  </Command>
-                                </PopoverContent>
-                              </Popover>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name='userName'
-                          render={({ field }) => (
-                            <FormItem className='space-y-1'>
-                              <FormLabel>Request By</FormLabel>
-                              <FormControl>
-                                <Input {...field} readOnly />
-                              </FormControl>
-
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name='code'
-                          render={({ field }) => (
-                            <FormItem className='space-y-1'>
-                              <FormLabel>Code</FormLabel>
-                              <FormControl>
-                                <Input {...field} readOnly />
-                              </FormControl>
-
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name='department'
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Department</FormLabel>
-                              <FormControl>
-                                <Input {...field} />
-                              </FormControl>
-
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name='status'
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Status</FormLabel>
-                              <FormControl>
-                                <Input {...field} readOnly />
-                              </FormControl>
-
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name='reason'
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Reason for request</FormLabel>
-                              <FormControl>
-                                <Textarea className='resize-none' {...field} />
-                              </FormControl>
-
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name='cause'
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Cause</FormLabel>
-                              <FormControl>
-                                <Textarea className='resize-none' {...field} />
-                              </FormControl>
-
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name='remark'
-                          render={({ field }) => (
-                            <FormItem className='col-span-2'>
-                              <FormLabel>Remark</FormLabel>
-                              <FormControl>
-                                <Input {...field} />
-                              </FormControl>
-
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-
-                      <div className='mb-3  grid grid-cols-1 items-start gap-2 space-x-3 space-y-0 rounded-md border p-4 shadow'>
-                        <div className='mb-2  flex items-center'>
-                          <IconChecklist />
-                          <Label htmlFor='terms' className='ml-3 text-lg'>
-                            Items List.
-                          </Label>
-                        </div>
-                        <Table className='w-[80rem]'>
-                          <TableCaption>
-                            A list of your recent items.
-                          </TableCaption>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>Item Code</TableHead>
-                              <TableHead className='w-[8rem]'>Item Name</TableHead>
-                              <TableHead>Vender Code</TableHead>
-                              <TableHead className='w-[8rem]'>Vender Name</TableHead>
-                              <TableHead>Specifications</TableHead>
-                              <TableHead>Quantity</TableHead>
-                              <TableHead>Unit Price</TableHead>
-                              <TableHead>Total</TableHead>
-                              <TableHead>Vat</TableHead>
-                              <TableHead>Amount</TableHead>
-                              <TableHead>Remark</TableHead>
-                              <TableHead>Action</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {items.map((item) => (
-                              <TableRow key={item.code}>
-                                <TableCell className='font-medium'>
-                                  {item.code}
-                                </TableCell>
-                                <TableCell>{item.itemName}</TableCell>
-                                <TableCell>{item.venderCode}</TableCell>
-                                <TableCell>{item.venderName}</TableCell>
-                                <TableCell>{item.specification}</TableCell>
-                                <TableCell>{item.quantity}</TableCell>
-                                <TableCell>{item.price?.toFixed(2)}</TableCell>
-                                <TableCell>{item.total?.toFixed(2)}</TableCell>
-                                <TableCell>
-                                  {item.includeVat?.toFixed(2)}
-                                </TableCell>
-                                <TableCell>{item.amount?.toFixed(2)}</TableCell>
-                                <TableCell>{item.remark}</TableCell>
-                                <TableCell>
-                                  <Button
-                                    size='icon'
-                                    variant='ghost'
-                                    className='rounded-full'
-                                    onClick={() => updateData(item)}
-                                  >
-                                    <IconEdit size={20} />
-                                  </Button>
-
-                                  <Button
-                                    size='icon'
-                                    variant='ghost'
-                                    className='rounded-full'
-                                    onClick={() =>
-                                      setItem(
-                                        items.filter((a) => a.id !== item.id)
-                                      )
-                                    }
-                                  >
-                                    <IconTrash size={20} />
-                                  </Button>
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                          <TableFooter>
-                            <TableRow>
-                              <TableCell>
-                              <Badge
-                                  className='text-white hover:bg-primary w-[7rem] h-7'
-                                  variant={'default'}
-                                  onClick={addNewItem}
-                                >
-                                   <IconPlus size={20} className='mr-2 h-4 w-4' />
-                                   Add Item
-                                </Badge>
-                               
-                              </TableCell>
-                            </TableRow>
-
-                            <TableRow>
-                              <TableCell colSpan={6} className='text-right'>
-                                {sumQty}
-                              </TableCell>
-                              <TableCell></TableCell>
-                              <TableCell>{sumTotal}</TableCell>
-                              <TableCell></TableCell>
-                              <TableCell>{sumVat.toFixed(2)}</TableCell>
-                              <TableCell colSpan={2} className='text-center'>
-                                {grandTotal.toFixed(2)}
-                              </TableCell>
-                            </TableRow>
-                          </TableFooter>
-                        </Table>
-                      </div>
-
-                      <div className='mb-3  grid grid-cols-1 items-start gap-2 space-x-3 space-y-0 rounded-md border p-4 shadow'>
-                        <div className='mb-2  flex items-center'>
-                          <IconFile />
-                          <Label htmlFor='terms' className='ml-3 text-lg'>
-                            File Attach.
-                          </Label>
-                        </div>
-                        <FileDrag uploadData={(e) => addFile(e)} />
-                      </div>
-
-                      <div className='grid'>
-                        <Button
-                          loading={isLoading}
-                          type='submit'
-                          variant='button'
-                          size='sm'
-                          className='float-end mt-8 h-8 gap-3'
-                        >
-                          <IconDeviceFloppy size={20} />
-                          Save
-                        </Button>
-                      </div>
+        <Card>
+          <CardContent className='space-y-2'>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)}>
+                <div className='grid gap-4'>
+                  <div className='mb-3  grid grid-cols-2 items-start gap-2 space-x-3 space-y-0 rounded-md border p-4 shadow'>
+                    <div className='col-span-2 mb-2  flex items-center'>
+                      <IconInfoCircle />
+                      <Label htmlFor='terms' className='ml-3 text-lg'>
+                        General Information.
+                      </Label>
                     </div>
-                  </form>
-                </Form>
-              </CardContent>
-            </Card>
-        
+                    <FormField
+                      control={form.control}
+                      name='requirmentDate'
+                      render={({ field }) => (
+                        <FormItem className='space-y-1'>
+                          <FormLabel>Date</FormLabel>
+                          <FormControl>
+                            <Input {...field} readOnly />
+                          </FormControl>
+
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name='selectLocation'
+                      render={({ field }) => (
+                        <FormItem className='grid space-y-1.5 py-2'>
+                          <FormLabel>Location</FormLabel>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant='outline'
+                                  role='combobox'
+                                  className={cn(
+                                    'justify-between',
+                                    !field.value && 'text-muted-foreground'
+                                  )}
+                                >
+                                  {field.value
+                                    ? locations.find(
+                                        (item) => item.name === field.value
+                                      )?.name
+                                    : 'Select location'}
+                                  <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className='w-[200px] p-0'>
+                              <Command>
+                                <CommandInput placeholder='Search location...' />
+                                <CommandList>
+                                  <CommandEmpty>
+                                    No location found.
+                                  </CommandEmpty>
+                                  <CommandGroup>
+                                    {locations.map((item) => (
+                                      <CommandItem
+                                        value={item.name}
+                                        key={item.id}
+                                        onSelect={() => {
+                                          form.setValue(
+                                            'selectLocation',
+                                            item.name
+                                          )
+                                        }}
+                                      >
+                                        <Check
+                                          className={cn(
+                                            'mr-2 h-4 w-4',
+                                            item.name === field.value
+                                              ? 'opacity-100'
+                                              : 'opacity-0'
+                                          )}
+                                        />
+                                        {item.name}
+                                      </CommandItem>
+                                    ))}
+                                  </CommandGroup>
+                                </CommandList>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name='userName'
+                      render={({ field }) => (
+                        <FormItem className='space-y-1'>
+                          <FormLabel>Request By</FormLabel>
+                          <FormControl>
+                            <Input {...field} readOnly />
+                          </FormControl>
+
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name='code'
+                      render={({ field }) => (
+                        <FormItem className='space-y-1'>
+                          <FormLabel>Code</FormLabel>
+                          <FormControl>
+                            <Input {...field} readOnly />
+                          </FormControl>
+
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name='department'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Department</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name='status'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Status</FormLabel>
+                          <FormControl>
+                            <Input {...field} readOnly />
+                          </FormControl>
+
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name='reason'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Reason for request</FormLabel>
+                          <FormControl>
+                            <Textarea className='resize-none' {...field} />
+                          </FormControl>
+
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name='cause'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Cause</FormLabel>
+                          <FormControl>
+                            <Textarea className='resize-none' {...field} />
+                          </FormControl>
+
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name='remark'
+                      render={({ field }) => (
+                        <FormItem className='col-span-2'>
+                          <FormLabel>Remark</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <div className='mb-3  grid grid-cols-1 items-start gap-2 space-x-3 space-y-0 rounded-md border p-4 shadow'>
+                    <div className='mb-2  flex items-center'>
+                      <IconChecklist />
+                      <Label htmlFor='terms' className='ml-3 text-lg'>
+                        Items List.
+                      </Label>
+                    </div>
+                    <Table className='w-[80rem]'>
+                      <TableCaption>A list of your recent items.</TableCaption>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Item Code</TableHead>
+                          <TableHead className='w-[8rem]'>Item Name</TableHead>
+                          <TableHead>Vender Code</TableHead>
+                          <TableHead className='w-[8rem]'>
+                            Vender Name
+                          </TableHead>
+                          <TableHead>Specifications</TableHead>
+                          <TableHead>Quantity</TableHead>
+                          <TableHead>Unit Price</TableHead>
+                          <TableHead>Total</TableHead>
+                          <TableHead>Vat</TableHead>
+                          <TableHead>Amount</TableHead>
+                          <TableHead>Remark</TableHead>
+                          <TableHead>Action</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {items.map((item) => (
+                          <TableRow key={item.code}>
+                            <TableCell className='font-medium'>
+                              {item.code}
+                            </TableCell>
+                            <TableCell>{item.itemName}</TableCell>
+                            <TableCell>{item.venderCode}</TableCell>
+                            <TableCell>{item.venderName}</TableCell>
+                            <TableCell>{item.specification}</TableCell>
+                            <TableCell>{toCurrency(item.quantity)}</TableCell>
+                            <TableCell>{toCurrency(item.price)}</TableCell>
+                            <TableCell>{toCurrency(item.total)}</TableCell>
+                            <TableCell>{toCurrency(item.includeVat)}</TableCell>
+                            <TableCell>{toCurrency(item.amount)}</TableCell>
+                            <TableCell>{item.remark}</TableCell>
+                            <TableCell>
+                              <Badge
+                                className='text-white hover:bg-primary mr-2'
+                                variant={'default'}
+                                onClick={() => updateData(item)}
+                              >
+                                <IconEdit size={20} />
+                              </Badge>
+                              <Badge
+                                className='text-white hover:bg-primary'
+                                variant={'destructive'}
+                                onClick={() =>
+                                  setItem(items.filter((a) => a.id !== item.id))
+                                }                              >
+                                <IconTrash size={20} />
+                              </Badge>
+
+                              
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                      <TableFooter>
+                        <TableRow>
+                          <TableCell>
+                            <Badge
+                              className='h-7 w-[7rem] text-white hover:bg-primary'
+                              variant={'default'}
+                              onClick={addNewItem}
+                            >
+                              <IconPlus size={20} className='mr-2 h-4 w-4' />
+                              Add Item
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+
+                        <TableRow>
+                          <TableCell colSpan={6} className='text-right'>
+                            {toCurrency(sumQty)}
+                          </TableCell>
+                          <TableCell></TableCell>
+                          <TableCell>{toCurrency(sumTotal)}</TableCell>
+                          <TableCell></TableCell>
+                          <TableCell>{toCurrency(sumVat)}</TableCell>
+                          <TableCell colSpan={2} className='text-center'>
+                            {toCurrency(grandTotal)}
+                          </TableCell>
+                        </TableRow>
+                      </TableFooter>
+                    </Table>
+                  </div>
+
+                  <div className='mb-3  grid grid-cols-1 items-start gap-2 space-x-3 space-y-0 rounded-md border p-4 shadow'>
+                    <div className='mb-2  flex items-center'>
+                      <IconFile />
+                      <Label htmlFor='terms' className='ml-3 text-lg'>
+                        File Attach.
+                      </Label>
+                    </div>
+                    <FileDrag uploadData={(e) => addFile(e)} />
+                  </div>
+
+                  <div className='grid'>
+                    <Button
+                      loading={isLoading}
+                      type='submit'
+                      variant='button'
+                      size='sm'
+                      className='float-end mt-8 h-8 gap-3'
+                    >
+                      <IconDeviceFloppy size={20} />
+                      Save
+                    </Button>
+                  </div>
+                </div>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
 
         <CreateModal
           isOpen={openModal}

@@ -31,6 +31,7 @@ import { approvePurchaseRequest } from '@/services/purchaseRequestApi'
 import { ApiContext } from '@/components/layouts/api-context'
 import { ApiType } from 'types/api'
 import { IconCheck, IconChecklist, IconEye, IconFile, IconInfoCircle } from '@tabler/icons-react'
+import { toCurrency } from '@/lib/utils'
 
 interface EditModalProps {
   isOpen: boolean
@@ -365,12 +366,12 @@ export const EditModal: React.FC<EditModalProps> = ({
                               <TableCell>{item.vender?.companyName}</TableCell>
                               <TableCell>{item.specification}</TableCell>
 
-                              <TableCell>{item.quantity}</TableCell>
-                              <TableCell>{item.price?.toFixed(2)}</TableCell>
-                              <TableCell>{item.total?.toFixed(2)}</TableCell>
-                              <TableCell>{item.amount?.toFixed(2)}</TableCell>
+                              <TableCell>{toCurrency(item.quantity)}</TableCell>
+                              <TableCell>{toCurrency(item.price)}</TableCell>
+                              <TableCell>{toCurrency(item.total)}</TableCell>
+                              <TableCell>{toCurrency(item.amount)}</TableCell>
                               <TableCell>
-                                {item.includeVat?.toFixed(2)}
+                                {toCurrency(item.includeVat)}
                               </TableCell>
                               <TableCell>{item.remark}</TableCell>
                             </TableRow>

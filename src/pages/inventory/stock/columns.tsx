@@ -1,6 +1,7 @@
 import { ColumnDef } from '@tanstack/react-table'
 import { DataTableColumnHeader } from '@/components/dataTable/data-table-column-header'
 import { StockOnhand} from './schema'
+import { toCurrency } from '@/lib/utils'
 
 export const columns: ColumnDef<StockOnhand>[] = [
   {
@@ -77,7 +78,7 @@ export const columns: ColumnDef<StockOnhand>[] = [
         <div className='flex space-x-2'>
          
           <span className='max-w-32 truncate font-medium sm:max-w-72 md:max-w-[31rem]'>
-          {row.getValue('receiveQuantity')}
+          {toCurrency(row.getValue('receiveQuantity'))}
           </span>
         </div>
       )

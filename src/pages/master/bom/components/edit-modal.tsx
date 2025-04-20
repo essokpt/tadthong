@@ -22,7 +22,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 
-import { cn } from '@/lib/utils'
+import { cn, toCurrency } from '@/lib/utils'
 import { format } from 'date-fns'
 import {
   Form,
@@ -256,7 +256,9 @@ export const EditModal: React.FC<EditModalProps> = ({
     const changeItem: any = data.bomItems.findIndex(
       (item) => item.id == e.target.id
     )
-    data.bomItems[changeItem].quantity = parseFloat(e.target.value)
+      // const numericValue = Number(e.target.value.replace(/\D/g, "")) / 100;
+      //   const current = numericValue ? toCurrency(numericValue) : "";
+    data.bomItems[changeItem].quantity =  parseFloat(e.target.value)
     //console.log('handleChangePrice id', id)
     console.log('handleChangeQuantity value', data.bomItems[changeItem])
   }
@@ -478,7 +480,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                                   className='w-[80px]'
                                   type='float'
                                   id={item.id}
-                                  defaultValue={item.quantity?.toFixed(2)}
+                                  defaultValue={toCurrency(item.quantity)}
                                   onChange={handleChangeQuantity}
                                 />
                               </TableCell>

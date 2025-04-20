@@ -51,7 +51,7 @@ import {
 import { getLocation } from '@/services/locationApi'
 import { LocationType } from '@/pages/location/components/type'
 import FileDrag from '@/components/custom/fileDrag'
-import { downloadFileData } from '@/lib/utils'
+import { downloadFileData, toCurrency } from '@/lib/utils'
 import { AlertModal } from '@/components/custom/alert-modal'
 import { CreateModal } from './create-modal'
 import { Badge } from '@/components/ui/badge'
@@ -517,8 +517,8 @@ export const EditModal: React.FC<EditModalProps> = ({
                             <TableCell>{item.vender?.code}</TableCell>
                             <TableCell>{item.vender?.companyName}</TableCell>
                             <TableCell>{item.specification}</TableCell>
-                            <TableCell>{item.quantity?.toFixed(2)}</TableCell>
-                            <TableCell>{item.price?.toFixed(2)}</TableCell>
+                            <TableCell>{toCurrency(item.quantity)}</TableCell>
+                            <TableCell>{toCurrency(item.price)}</TableCell>
                             {/* <TableCell>
                               <Input
                                 className='w-[100px]'
@@ -539,9 +539,9 @@ export const EditModal: React.FC<EditModalProps> = ({
                                 onChange={handleChangePrice}
                               />
                             </TableCell> */}
-                            <TableCell>{item.total?.toFixed(2)}</TableCell>
-                            <TableCell>{item.includeVat?.toFixed(2)}</TableCell>
-                            <TableCell>{item.amount?.toFixed(2)}</TableCell>
+                            <TableCell>{toCurrency(item.total)}</TableCell>
+                            <TableCell>{toCurrency(item.includeVat)}</TableCell>
+                            <TableCell>{toCurrency(item.amount)}</TableCell>
                             <TableCell>{item.remark}</TableCell>
                             <TableCell className='w-[8rem]'>
                               <div className='flex items-center gap-3'>

@@ -32,6 +32,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import {
   createItem,
   createWip,
+  getAccountCode,
   getItemCategory,
   getItemGroup,
   getItemType,
@@ -54,6 +55,7 @@ import { IconFile, IconPencilPlus } from '@tabler/icons-react'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { Label } from '@/components/ui/label'
 import { IconInfoCircle } from '@tabler/icons-react'
+import InputCurrency from '@/components/custom/inputCurrency'
 
 interface SignUpFormProps extends HTMLAttributes<HTMLDivElement> {}
 
@@ -68,6 +70,12 @@ interface ItemType {
 
 interface ItemGroup {
   id: number
+  name: string
+}
+
+interface AccountCode {
+  id: number
+  code: string
   name: string
 }
 
@@ -102,6 +110,11 @@ const formSchema = z.object({
   material: z.string(),
   specification: z.string(),
   group: z.string(),
+  accountCode1: z.string(),
+  accountCode2: z.string(),
+  accountCode3: z.string(),
+  accountCode4: z.string(),
+  accountCode5: z.string(),
   type: z.string(),
   purchaseLeadTime: z.string(),
   manufacturingLeadTime: z.string(),
@@ -128,9 +141,11 @@ export function ItemForm({ className, ...props }: SignUpFormProps) {
   const [uom, setUom] = useState<Uom[]>([])
   const [itemType, setType] = useState<ItemType[]>([])
   const [itemGroup, setGroup] = useState<ItemGroup[]>([])
+  const [accountCode, setAccountCode] = useState<AccountCode[]>([])
   const [itemCategory, setCategory] = useState<ItemCategory[]>([])
   const [locations, setLocation] = useState<LocationType[]>([])
   const [files, setFiles] = useState<File[]>()
+  //const [balanceValue, setBalanceValue] = useState('');
 
   const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
@@ -157,6 +172,11 @@ export function ItemForm({ className, ...props }: SignUpFormProps) {
       material: '',
       specification: '',
       group: '',
+      accountCode1: '',
+      accountCode2: '',
+      accountCode3: '',
+      accountCode4: '',
+      accountCode5: '',
       purchaseLeadTime: '',
       manufacturingLeadTime: '',
       weight: '',
@@ -227,12 +247,15 @@ export function ItemForm({ className, ...props }: SignUpFormProps) {
     }, 2000)
   }
 
+  
+
   useEffect(() => {
     getUom().then((data) => setUom(data))
     getItemCategory().then((data) => setCategory(data))
     getItemGroup().then((data) => setGroup(data))
     getItemType().then((data) => setType(data))
     getLocation().then((data) => setLocation(data))
+    getAccountCode().then((data) => setAccountCode(data))
   }, [])
 
   return (
@@ -796,6 +819,148 @@ export function ItemForm({ className, ...props }: SignUpFormProps) {
                           </FormItem>
                         )}
                       />
+
+                      <FormField
+                        control={form.control}
+                        name='accountCode1'
+                        render={({ field }) => (
+                          <FormItem className='space-y-1'>
+                            <FormLabel>Account Code-1</FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder='Select Account Code' />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {accountCode.map((item) => (
+                                  <SelectItem key={item.id} value={item.code}>
+                                    {item.code}-{item.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name='accountCode2'
+                        render={({ field }) => (
+                          <FormItem className='space-y-1'>
+                            <FormLabel>Account Code-2</FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder='Select Account Code' />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {accountCode.map((item) => (
+                                  <SelectItem key={item.id} value={item.code}>
+                                    {item.code}-{item.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name='accountCode3'
+                        render={({ field }) => (
+                          <FormItem className='space-y-1'>
+                            <FormLabel>Account Code-3</FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder='Select Account Code' />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {accountCode.map((item) => (
+                                  <SelectItem key={item.id} value={item.code}>
+                                    {item.code}-{item.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name='accountCode4'
+                        render={({ field }) => (
+                          <FormItem className='space-y-1'>
+                            <FormLabel>Account Code-4</FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder='Select Account Code' />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {accountCode.map((item) => (
+                                  <SelectItem key={item.id} value={item.code}>
+                                    {item.code}-{item.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name='accountCode5'
+                        render={({ field }) => (
+                          <FormItem className='space-y-1'>
+                            <FormLabel>Account Code-5</FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder='Select Account Code' />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {accountCode.map((item) => (
+                                  <SelectItem key={item.id} value={item.code}>
+                                    {item.code}-{item.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
                       <FormField
                         control={form.control}
                         name='status'
@@ -1088,7 +1253,7 @@ export function ItemForm({ className, ...props }: SignUpFormProps) {
                         )}
                       />
 
-                      <FormField
+                      {/* <FormField
                         control={form.control}
                         name='standardCost'
                         render={({ field }) => (
@@ -1101,34 +1266,27 @@ export function ItemForm({ className, ...props }: SignUpFormProps) {
                                 onChange={(event) =>
                                   field.onChange(parseFloat(event.target.value))
                                 }
+                            
                               />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
-                      />
-                   
-                  
-                      <FormField
-                        control={form.control}
-                        name='averageCost'
-                        render={({ field }) => (
-                          <FormItem className='space-y-1'>
-                            <FormLabel>Average Cost</FormLabel>
-                            <FormControl>
-                              <Input
-                                type='number'
-                                {...field}
-                                onChange={(event) =>
-                                  field.onChange(parseFloat(event.target.value))
-                                }
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                      /> */}
                       
+                      <InputCurrency 
+                       value={0}
+                       label="Standard Cost(Baht)"
+                       name="standardCost"
+                       placeholder={'input standardCost'}
+                      />
+                  
+                      <InputCurrency 
+                       value={0}
+                       label="Average Cost(Baht)"
+                       name="averageCost"
+                       placeholder={'input averageCost'}
+                      />                 
                       
 
                       <FormField
@@ -1148,12 +1306,12 @@ export function ItemForm({ className, ...props }: SignUpFormProps) {
                           </FormItem>
                         )}
                       />
-
+                     <div className='mt-7'>
                       <FormField
                         control={form.control}
                         name='lotControlFlag'
                         render={({ field }) => (
-                          <FormItem className='mt-4 flex h-[37px] flex-row items-start space-x-3 space-y-0 rounded-md border p-2.5 shadow'>
+                          <FormItem className='flex h-[37px] flex-row items-start space-x-3 space-y-0 rounded-md border p-2.5 shadow'>
                             <FormControl>
                               <Checkbox
                                 checked={field.value}
@@ -1166,7 +1324,7 @@ export function ItemForm({ className, ...props }: SignUpFormProps) {
                           </FormItem>
                         )}
                       />
-                 
+                 </div>
                     </div>
                     <div className='mb-3 m-2 grid grid-cols-3 items-start gap-2 space-x-3 space-y-0 rounded-md border p-4 shadow'>
                       <div className='col-span-3 mb-2  flex items-center'>

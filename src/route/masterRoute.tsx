@@ -65,6 +65,9 @@ import { ViewInvoice } from '@/pages/saleOrder/invoice/components/view-invoice';
 import WeightScale from '@/pages/master/weightScale';
 import { WeightScalePriceForm } from '@/pages/master/weightScale/components/weightScale-form';
 import WeightScaleApprove from '@/pages/master/weightScale/approve';
+import WeightScaleReports from '@/pages/report/weightScale';
+import PurchaseRequestReports from '@/pages/report/purchaseRequest';
+import SaleOrderReports from '@/pages/report/saleOrder';
 
 export default [
   {
@@ -383,6 +386,21 @@ export default [
   {
     path: '/daily-report',
     element: DailyReports,
+    requireRoles: 'report',
+  },
+  {
+    path: '/weightScale-report',
+    element: WeightScaleReports,
+    requireRoles: 'report',
+  },
+  {
+    path: '/purchaseRequest-report',
+    element: PurchaseRequestReports,
+    requireRoles: 'report',
+  },
+  {
+    path: '/saleOrder-report',
+    element: SaleOrderReports,
     requireRoles: 'report',
   },
   {

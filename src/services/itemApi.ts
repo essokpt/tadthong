@@ -65,6 +65,18 @@ export async function getItemGroup(){
   }
 }
 
+export async function getAccountCode(){
+  try {
+    const response = await api.get(`${endpoint}/AccountCode`);  
+    const res = await response.data
+    console.log('getAccountCode:',res);
+    
+    return res
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 export async function getItemPrice(){
   try {
     const response = await api.get(`${endpoint}/price`);  

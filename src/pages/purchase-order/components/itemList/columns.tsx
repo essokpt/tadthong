@@ -2,6 +2,7 @@ import { ColumnDef } from '@tanstack/react-table'
 import { DataTableColumnHeader } from '@/components/dataTable/data-table-column-header'
 import { PurchaseOrderItems } from './schema'
 import { CellAction } from './cell-action'
+import { toCurrency } from '@/lib/utils'
 
 export const columns: ColumnDef<PurchaseOrderItems>[] = [
   {
@@ -59,7 +60,7 @@ export const columns: ColumnDef<PurchaseOrderItems>[] = [
       return (
         <div className='flex space-x-2'>
           <span className='max-w-32 truncate font-medium sm:max-w-72 md:max-w-[31rem]'>
-            {row.getValue('quantity')}
+            {toCurrency(row.getValue('quantity'))}
           </span>
         </div>
       )

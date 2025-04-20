@@ -131,7 +131,7 @@ const formSchema = z.object({
   carRegistration: z.string(),
   driverName: z.string(),
   userId: z.number(),
-  // vat: z.number(),
+  workorderNo: z.string(),
   // amount : z.number(),
   selectLocation: z.string(),
   selectCustomer: z.string(),
@@ -176,7 +176,7 @@ export const EditModal: React.FC<EditModalProps> = ({
   async function addNewData(payload: any) {
     console.log('addNewData', payload)
     setOnloading(true)
-   
+
     if (payload.id != -1) {
       console.log('update sale oreder item', payload.id)
       const res: any = await updateSaleOrderItem(payload)
@@ -189,27 +189,25 @@ export const EditModal: React.FC<EditModalProps> = ({
           data.saleOrderItems[itemIndex] = res
         }
       }
-    }else{
+    } else {
       payload.id = 0
       payload.saleOrderId = data.id
       console.log('add new sale oreder item', payload)
       const res: any = await createSaleOrderItem(payload)
       if (res.length > 0) {
         console.log('update sale oreder item -success', res)
-          data.saleOrderItems.length = 0
-        
-          for (let index = 0; index < res.length; index++) {
-            data.saleOrderItems.push(res[index]);            
-          }
-      }
+        data.saleOrderItems.length = 0
 
+        for (let index = 0; index < res.length; index++) {
+          data.saleOrderItems.push(res[index])
+        }
+      }
     }
     setTimeout(() => {
       setOnloading(false)
     }, 1000)
   }
 
-  
   async function uploadFile(payload: any) {
     if (payload) {
       setOnloading(true)
@@ -307,7 +305,7 @@ export const EditModal: React.FC<EditModalProps> = ({
     }
   }
 
-  function addNewItem(){
+  function addNewItem() {
     setEditValue(initalValue)
     setOpenEdit(true)
   }
@@ -338,7 +336,6 @@ export const EditModal: React.FC<EditModalProps> = ({
     getCustomer().then((data) => setCustomer(data))
     getLocation().then((data) => setLocation(data))
     getCarRegistration().then((data) => setCarRegistration(data))
-
   }, [])
 
   if (!isMounted) {
@@ -567,85 +564,72 @@ export const EditModal: React.FC<EditModalProps> = ({
                           </FormItem>
                         )}
                       />
-                      {/* <FormField
+
+                      <FormField
                         control={form.control}
                         name='carRegistration'
                         render={({ field }) => (
-                          <FormItem className='space-y-1 '>
+                          <FormItem className='mt-2 grid space-y-1.5'>
                             <FormLabel>Car Registration</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <FormControl>
+                                  <Button
+                                    variant='outline'
+                                    role='combobox'
+                                    className={cn(
+                                      'justify-between',
+                                      !field.value && 'text-muted-foreground'
+                                    )}
+                                  >
+                                    {field.value
+                                      ? carRegistration.find(
+                                          (item) => item.carNo === field.value
+                                        )?.carNo
+                                      : 'Select cat registration'}
+                                    <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                                  </Button>
+                                </FormControl>
+                              </PopoverTrigger>
+                              <PopoverContent className='w-[200px] p-0'>
+                                <Command>
+                                  <CommandInput placeholder='Search cat registration...' />
+                                  <CommandList>
+                                    <CommandEmpty>
+                                      No cat registration found.
+                                    </CommandEmpty>
+                                    <CommandGroup>
+                                      {carRegistration.map((item) => (
+                                        <CommandItem
+                                          value={item.carNo}
+                                          key={item.id}
+                                          onSelect={() => {
+                                            form.setValue(
+                                              'carRegistration',
+                                              item.carNo
+                                            )
+                                          }}
+                                        >
+                                          <Check
+                                            className={cn(
+                                              'mr-2 h-4 w-4',
+                                              item.carNo === field.value
+                                                ? 'opacity-100'
+                                                : 'opacity-0'
+                                            )}
+                                          />
+                                          {item.carNo}
+                                        </CommandItem>
+                                      ))}
+                                    </CommandGroup>
+                                  </CommandList>
+                                </Command>
+                              </PopoverContent>
+                            </Popover>
                             <FormMessage />
                           </FormItem>
                         )}
-                      /> */}
-                         <FormField
-                      control={form.control}
-                      name='carRegistration'
-                      render={({ field }) => (
-                        <FormItem className='mt-2 grid space-y-1.5'>
-                          <FormLabel>Car Registration</FormLabel>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <FormControl>
-                                <Button
-                                  variant='outline'
-                                  role='combobox'
-                                  className={cn(
-                                    'justify-between',
-                                    !field.value && 'text-muted-foreground'
-                                  )}
-                                >
-                                  {field.value
-                                    ? carRegistration.find(
-                                        (item) => item.carNo === field.value
-                                      )?.carNo
-                                    : 'Select cat registration'}
-                                  <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                                </Button>
-                              </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent className='w-[200px] p-0'>
-                              <Command>
-                                <CommandInput placeholder='Search cat registration...' />
-                                <CommandList>
-                                  <CommandEmpty>
-                                    No cat registration found.
-                                  </CommandEmpty>
-                                  <CommandGroup>
-                                    {carRegistration.map((item) => (
-                                      <CommandItem
-                                        value={item.carNo}
-                                        key={item.id}
-                                        onSelect={() => {
-                                          form.setValue(
-                                            'carRegistration',
-                                            item.carNo
-                                          )
-                                        }}
-                                      >
-                                        <Check
-                                          className={cn(
-                                            'mr-2 h-4 w-4',
-                                            item.carNo === field.value
-                                              ? 'opacity-100'
-                                              : 'opacity-0'
-                                          )}
-                                        />
-                                        {item.carNo}
-                                      </CommandItem>
-                                    ))}
-                                  </CommandGroup>
-                                </CommandList>
-                              </Command>
-                            </PopoverContent>
-                          </Popover>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                      />
                       <FormField
                         control={form.control}
                         name='driverName'
@@ -660,7 +644,20 @@ export const EditModal: React.FC<EditModalProps> = ({
                           </FormItem>
                         )}
                       />
+                      <FormField
+                        control={form.control}
+                        name='workorderNo'
+                        render={({ field }) => (
+                          <FormItem className='space-y-1'>
+                            <FormLabel>Work Order No</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
 
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                       <FormField
                         control={form.control}
                         name='status'
@@ -718,65 +715,53 @@ export const EditModal: React.FC<EditModalProps> = ({
                         </TableCaption>
                         <TableHeader>
                           <TableRow>
-                          <TableHead className='w-[7rem]'>
-                          รหัสสินค้า
+                            <TableHead className='items-center'>
+                              Action
                             </TableHead>
-                            <TableHead className='w-[10rem]'>
-                            สินค้า
+
+                            <TableHead className='w-[7rem]'>
+                              รหัสสินค้า
                             </TableHead>
+                            <TableHead className='w-[10rem]'>สินค้า</TableHead>
                             <TableHead>จำนวน</TableHead>
-                          <TableHead>หักความชื้น</TableHead>
-                          <TableHead>หักเจือปน</TableHead>
-                          <TableHead>หักอื่นๆ</TableHead>
+                            <TableHead>หักความชื้น</TableHead>
+                            <TableHead>หักเจือปน</TableHead>
+                            <TableHead>หักอื่นๆ</TableHead>
 
-                          <TableHead>ราคาต่อหน่วย</TableHead>
-                          <TableHead>หักเงินค่าชั่ง</TableHead>
-                          <TableHead>หักค่าลง</TableHead>
-                          <TableHead>หักเงินอื่นๆ</TableHead>
+                            <TableHead>ราคาต่อหน่วย</TableHead>
+                            <TableHead>หักเงินค่าชั่ง</TableHead>
+                            <TableHead>หักค่าลง</TableHead>
+                            <TableHead>หักเงินอื่นๆ</TableHead>
 
-                          <TableHead>มูลค่า</TableHead>
-                          <TableHead>ราคาลูกค้า</TableHead>
-                          <TableHead>จำนวนลูกค้า</TableHead>
-                          <TableHead>ผลต่างราคา</TableHead>
-                          <TableHead>ผลต่างจำนวน</TableHead>
-                          <TableHead>มูลค่าลูกค้า</TableHead>
-                          <TableHead>ความชื้นต้นทาง</TableHead>
-                          <TableHead>ความชื้นลูกค้า</TableHead>
-                          <TableHead>เลขใบชั่งลูกค้า</TableHead>
-                            <TableHead className='items-center'>
-                              Action
-                            </TableHead>
-                            {/* <TableHead className='w-[7rem]'>
-                              Item Code
-                            </TableHead>
-                            <TableHead className='w-[10rem]'>
-                              Item Name
-                            </TableHead>
-                            <TableHead>Quantity</TableHead>
-                            <TableHead>Humidity</TableHead>
-                            <TableHead>Adulteration</TableHead>
-                            <TableHead>Other</TableHead>
-                            <TableHead>Unit Price</TableHead>
-                            <TableHead>Weighing Money</TableHead>
-                            <TableHead>Ship Down</TableHead>
-                            <TableHead>Cash Other</TableHead>
-                            <TableHead>Amount</TableHead>
-                            <TableHead>Customer Price</TableHead>
-                            <TableHead>Customer Weight</TableHead>
-                            <TableHead>Different Price</TableHead>
-                            <TableHead>Different Quantity</TableHead>
-                            <TableHead>Customer Amount</TableHead>
-                            <TableHead>Source Humidity</TableHead>
-                            <TableHead>Customer Humidity</TableHead>
-                            <TableHead>Customer Queue No.</TableHead>
-                            <TableHead className='items-center'>
-                              Action
-                            </TableHead> */}
+                            <TableHead>มูลค่า</TableHead>
+                            <TableHead>ราคาลูกค้า</TableHead>
+                            <TableHead>จำนวนลูกค้า</TableHead>
+                            <TableHead>ผลต่างราคา</TableHead>
+                            <TableHead>ผลต่างจำนวน</TableHead>
+                            <TableHead>มูลค่าลูกค้า</TableHead>
+                            <TableHead>ความชื้นต้นทาง</TableHead>
+                            <TableHead>ความชื้นลูกค้า</TableHead>
+                            <TableHead>เลขใบชั่งลูกค้า</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
                           {data.saleOrderItems?.map((item) => (
                             <TableRow key={item.id}>
+                              <TableCell hidden={!isEdit}>
+                                <div className='flex items-center gap-2'>
+                                  <IconEdit
+                                    size={20}
+                                    color='blue'
+                                    onClick={() => updateItem(item)}
+                                  />
+
+                                  <IconTrash
+                                    size={20}
+                                    color='red'
+                                    onClick={() => deleteItem(item)}
+                                  />
+                                </div>
+                              </TableCell>
                               <TableCell className='font-medium'>
                                 {item.itemMaster?.code}
                               </TableCell>
@@ -805,44 +790,24 @@ export const EditModal: React.FC<EditModalProps> = ({
                               <TableCell>
                                 {item.destinationWeighingScale}
                               </TableCell>
-                              <TableCell hidden={!isEdit}>
-                                <div className='flex items-center gap-2'>
-                                  {/* <Button
-                                  loading={onloading}
-                                  size='icon'
-                                  variant='ghost'
-                                  className='rounded-full'
-                                  
-                                >
-                                  
-                                </Button> */}
-                                  <IconEdit
-                                    size={20}
-                                    onClick={() => updateItem(item)}
-                                  />
-
-                                  <IconTrash
-                                    size={20}
-                                    onClick={() => deleteItem(item)}
-                                  />
-                                </div>
-                              </TableCell>
                             </TableRow>
                           ))}
                         </TableBody>
                         <TableFooter>
                           <TableRow>
-                         
-                          <TableCell colSpan={15} className={`${isEdit ? 'text-left' : 'hidden'}`}>
-                            <Badge
-                              className='h-7 w-[7rem] text-white hover:bg-primary'
-                              variant={'default'}
-                              onClick={() => addNewItem()}
+                            <TableCell
+                              colSpan={15}
+                              className={`${isEdit ? 'text-left' : 'hidden'}`}
                             >
-                              <IconPlus size={20} className='mr-2 h-4 w-4' />
-                              Add Item
-                            </Badge>
-                          </TableCell>
+                              <Badge
+                                className='h-7 w-[7rem] text-white hover:bg-primary'
+                                variant={'default'}
+                                onClick={() => addNewItem()}
+                              >
+                                <IconPlus size={20} className='mr-2 h-4 w-4' />
+                                Add Item
+                              </Badge>
+                            </TableCell>
                           </TableRow>
                         </TableFooter>
                       </Table>
@@ -896,7 +861,6 @@ export const EditModal: React.FC<EditModalProps> = ({
                             </TableRow>
                           ))}
                         </TableBody>
-                        
                       </Table>
                     </div>
                     <div className={`${isEdit ? 'none' : 'hidden'}`}>

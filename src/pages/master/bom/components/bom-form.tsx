@@ -36,7 +36,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/custom/button'
-import { cn } from '@/lib/utils'
+import { cn, toCurrency } from '@/lib/utils'
 import { Layout, LayoutBody } from '@/components/custom/layout'
 import { useNavigate } from 'react-router-dom'
 //import { Calendar } from '@/components/ui/calendar'
@@ -317,7 +317,7 @@ export function BomForm({ className, ...props }: SignUpFormProps) {
                           <TableCell className='text-left'>
                             {item.itemMasterName}
                           </TableCell>
-                          <TableCell>{item.quantity}</TableCell>
+                          <TableCell>{toCurrency(item.quantity)}</TableCell>
                           <TableCell>{item.scrap}</TableCell>
                           <TableCell>{item.inEffectiveDate}</TableCell>
                           <TableCell>{item.outEffectiveDate}</TableCell>

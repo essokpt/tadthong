@@ -4,6 +4,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { DataTableColumnHeader } from '@/components/dataTable/data-table-column-header'
 import { PurchaseRequestItem } from './schema'
 import { CellAction } from './cell-action'
+import { toCurrency } from '@/lib/utils'
 
 export const columns: ColumnDef<PurchaseRequestItem>[] = [
   {
@@ -113,7 +114,7 @@ export const columns: ColumnDef<PurchaseRequestItem>[] = [
         <div className='flex space-x-2'>
          
           <span className='max-w-32 truncate font-medium sm:max-w-72 md:max-w-[31rem]'>
-            {row.getValue('quantity')}
+            {toCurrency(row.getValue('quantity'))}
           </span>
         </div>
       )
@@ -129,7 +130,7 @@ export const columns: ColumnDef<PurchaseRequestItem>[] = [
         <div className='flex space-x-2'>
          
           <span className='max-w-32 truncate font-medium sm:max-w-72 md:max-w-[31rem]'>
-            {row.getValue('price')}
+            {toCurrency(row.getValue('price'))}
           </span>
         </div>
       )
@@ -145,7 +146,7 @@ export const columns: ColumnDef<PurchaseRequestItem>[] = [
         <div className='flex space-x-2'>
          
           <span className='max-w-32 truncate font-medium sm:max-w-72 md:max-w-[31rem]'>
-            {row.getValue('amount')}
+            {toCurrency(row.getValue('amount'))}
           </span>
         </div>
       )

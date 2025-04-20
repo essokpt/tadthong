@@ -1,6 +1,7 @@
 import { TableCell, TableRow } from '@/components/ui/table'
 import { PurchaseOrder } from './schema'
 import { Loading } from '@/components/custom/loading'
+import { toCurrency } from '@/lib/utils'
 
 interface EditModalProps {
   data: PurchaseOrder
@@ -21,12 +22,12 @@ export const ExpandData: React.FC<EditModalProps> = ({ data }) => {
             <TableCell >{item.itemMaster?.name}</TableCell>
             <TableCell>{item.specification}</TableCell>
             <TableCell>{item.quantity}</TableCell>
-            <TableCell>{item.price?.toFixed(2)}</TableCell>
-            <TableCell>{item.discountPercent?.toFixed(2)}</TableCell>
-            <TableCell>{item.discountUnit?.toFixed(2)}</TableCell>
-            <TableCell>{item.discountTotal?.toFixed(2)}</TableCell>
-            <TableCell>{item.amount?.toFixed(2)}</TableCell>
-            <TableCell>{item.vat?.toFixed(2)}</TableCell>
+            <TableCell>{toCurrency(item.price)}</TableCell>
+            <TableCell>{toCurrency(item.discountPercent)}</TableCell>
+            <TableCell>{toCurrency(item.discountUnit)}</TableCell>
+            <TableCell>{toCurrency(item.discountTotal)}</TableCell>
+            <TableCell>{toCurrency(item.amount)}</TableCell>
+            <TableCell>{toCurrency(item.vat)}</TableCell>
             <TableCell>{item.status}</TableCell>
           </TableRow>
         ))

@@ -3,6 +3,38 @@ import api from '../../config/SetupAxios'
 const endpoint = '/Report'
 
 //export const getCustomer = (url: string) =>  axios.get(url).then((res) => res.data);
+export async function getWeightScaleReport(fromDate:string, toDate:string, productId:number){
+  try {
+    const response = await api.get(`${endpoint}/WeightScale?fromDate=${fromDate}&toDate=${toDate}&productId=${productId}`);  
+    const res = await response.data
+    return res
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+
+export async function getSaleOrderReport(fromDate:string, toDate:string, productId:number, customerId:number, woCode:string){
+  try {
+    const response = await api.get(`${endpoint}/SaleOrderReport?fromDate=${fromDate}&toDate=${toDate}&productId=${productId}&customerId=${customerId}&woCode=${woCode}`);  
+    const res = await response.data
+    return res
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function getPurchaseRequestReport(fromDate:string, toDate:string, productId:number, venderId:number, prCode:string){
+  try {
+    const response = await api.get(`${endpoint}/PurchaseRequest?fromDate=${fromDate}&toDate=${toDate}&productId=${productId}&venderId=${venderId}&prCode=${prCode}`);  
+    const res = await response.data
+    return res
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+
 
 export async function getForecast(pageNumber:number, pageSize:number){
   try {

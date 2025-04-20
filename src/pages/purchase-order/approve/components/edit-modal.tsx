@@ -41,6 +41,7 @@ import {
   IconInfoCircle,
 } from '@tabler/icons-react'
 import usePermission from '@/hooks/use-permission'
+import { toCurrency } from '@/lib/utils'
 
 interface EditModalProps {
   isOpen: boolean
@@ -421,13 +422,13 @@ export const EditModal: React.FC<EditModalProps> = ({
                             </TableCell>
                             <TableCell>{item.itemMaster?.name}</TableCell>
                             <TableCell>{item.specification}</TableCell>
-                            <TableCell>{item.quantity}</TableCell>
-                            <TableCell>{item.price}</TableCell>
-                            <TableCell>{item.discountPercent}</TableCell>
-                            <TableCell>{item.discountUnit}</TableCell>
-                            <TableCell>{item.discountTotal}</TableCell>
-                            <TableCell>{item.amount}</TableCell>
-                            <TableCell>{item.vat}</TableCell>
+                            <TableCell>{toCurrency(item.quantity)}</TableCell>
+                            <TableCell>{toCurrency(item.price)}</TableCell>
+                            <TableCell>{toCurrency(item.discountPercent)}</TableCell>
+                            <TableCell>{toCurrency(item.discountUnit)}</TableCell>
+                            <TableCell>{toCurrency(item.discountTotal)}</TableCell>
+                            <TableCell>{toCurrency(item.amount)}</TableCell>
+                            <TableCell>{toCurrency(item.vat)}</TableCell>
                             <TableCell>{item.remark}</TableCell>
                           </TableRow>
                         ))}

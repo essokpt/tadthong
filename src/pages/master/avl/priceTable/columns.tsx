@@ -3,6 +3,7 @@ import { ColumnDef } from '@tanstack/react-table'
 import { DataTableColumnHeader } from '@/components/dataTable/data-table-column-header'
 import { VenderList } from './schema'
 import { CellAction } from './cell-action'
+import { toCurrency } from '@/lib/utils'
 //import { CellAction } from './cell-action'
 
 export const columns: ColumnDef<VenderList>[] = [
@@ -41,13 +42,13 @@ export const columns: ColumnDef<VenderList>[] = [
   {
     accessorKey: 'cost',
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Cost' />
+      <DataTableColumnHeader column={column} title='Cost(Baht)' />
     ),
     cell: ({ row }) => {
       return (
         <div className='flex space-x-2'>
           <span className='max-w-32 truncate font-medium sm:max-w-72 md:max-w-[31rem]'>
-          {parseFloat(row.getValue('cost')).toFixed(2)}
+          {toCurrency(row.getValue('cost'))}
           </span>
         </div>
       )

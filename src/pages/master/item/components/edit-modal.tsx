@@ -1,5 +1,5 @@
 'use client'
-import { useContext, useEffect, useState } from 'react'
+import { ChangeEvent, useContext, useEffect, useState } from 'react'
 import { Button } from '@/components/custom/button'
 import { useForm } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
@@ -26,6 +26,7 @@ import {
 import { Separator } from '@/components/ui/separator'
 import {
   createWip,
+  getAccountCode,
   getItemCategory,
   getItemGroup,
   getItemType,
@@ -48,7 +49,7 @@ import {
   IconInfoCircle,
   IconTrash,
 } from '@tabler/icons-react'
-import { downloadFileData } from '@/lib/utils'
+import { downloadFileData, formatCurrency, toCurrency } from '@/lib/utils'
 import { AlertModal } from '@/components/custom/alert-modal'
 import { Item } from './schema'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -70,6 +71,12 @@ interface ItemGroup {
   name: string
 }
 
+interface AccountCode {
+  id: number
+  code: string
+  name: string
+}
+
 interface ItemCategory {
   id: number
   name: string
@@ -80,6 +87,7 @@ interface Uom {
   code: string
 }
 
+
 export const EditModal: React.FC<EditModalProps> = ({
   isOpen,
   onClose,
@@ -88,11 +96,12 @@ export const EditModal: React.FC<EditModalProps> = ({
 }) => {
   const [open, setOpen] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
-  const { handleSubmit, register } = useForm()
+  const { handleSubmit, register, setValue } = useForm()
   const [onloading, setOnloading] = useState(false)
   const [uom, setUom] = useState<Uom[]>([])
   const [itemType, setType] = useState<ItemsType[]>([])
   const [itemGroup, setGroup] = useState<ItemGroup[]>([])
+  const [accountCode, setAccountCode] = useState<AccountCode[]>([])
   const [itemCategory, setCategory] = useState<ItemCategory[]>([])
   const [locations, setLocation] = useState<LocationType[]>([])
   const [deleteTitle, setdeleteTitle] = useState(null)
@@ -117,6 +126,15 @@ export const EditModal: React.FC<EditModalProps> = ({
       data.lotControlFlag = true
     }
     console.log('onCheck:', e)
+  }
+
+  const handleChangeInput = (e:ChangeEvent<HTMLInputElement>) =>{
+    console.log('handleChangeInput', e.target.id, e.target.value);
+    //const value = 
+    const numericValue = Number(e.target.value.replace(/\D/g, "")) / 100;
+    const current = numericValue ? toCurrency(numericValue) : "";
+
+    setValue(e.target.id, current)
   }
 
   async function updateData(payload: any) {
@@ -153,9 +171,8 @@ export const EditModal: React.FC<EditModalProps> = ({
     }, 1000)
   }
 
-  
-  async function uploadFile(file:any) {
-    if (file.length>0) {
+  async function uploadFile(file: any) {
+    if (file.length > 0) {
       setOnloading(true)
       const formData = new FormData()
       for (let i = 0; i < file?.length; i++) {
@@ -170,11 +187,9 @@ export const EditModal: React.FC<EditModalProps> = ({
           data.itemMasterFileAttach?.push(res[index])
         }
         console.log('uploadFiles -success', res.status)
-        
       }
       setTimeout(() => {
         setOnloading(false)
-        
       }, 3000)
     }
   }
@@ -227,6 +242,7 @@ export const EditModal: React.FC<EditModalProps> = ({
     getItemGroup().then((data) => setGroup(data))
     getItemType().then((data) => setType(data))
     getLocation().then((data) => setLocation(data))
+    getAccountCode().then((data) => setAccountCode(data))
   }, [])
 
   if (!isMounted) {
@@ -547,8 +563,6 @@ export const EditModal: React.FC<EditModalProps> = ({
                           <select
                             {...register('itemGroupId')}
                             defaultValue={data.itemGroupId}
-                            // id={item.id}
-                            // onChange={handleChangeBranch}
                             className='flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1'
                           >
                             <option
@@ -563,6 +577,120 @@ export const EditModal: React.FC<EditModalProps> = ({
                                 value={item.id}
                               >
                                 {item.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div className='grid'>
+                          <Label
+                            className='py-1 text-[0.8rem] text-muted-foreground'
+                            htmlFor='itemGroupId'
+                          >
+                            Account Code-1
+                          </Label>
+                          <select
+                            {...register('accountCode1')}
+                            defaultValue={data.accountCode1}
+                            className='flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1'
+                          >
+                            {accountCode?.map((item) => (
+                              <option
+                                className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
+                                value={item.code}
+                              >
+                                {item.code},{item.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div className='grid'>
+                          <Label
+                            className='py-1 text-[0.8rem] text-muted-foreground'
+                            htmlFor='itemGroupId'
+                          >
+                            Account Code-2
+                          </Label>
+                          <select
+                            {...register('accountCode2')}
+                            defaultValue={data.accountCode2}
+                            className='flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1'
+                          >
+                            {accountCode?.map((item) => (
+                              <option
+                                className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
+                                value={item.code}
+                              >
+                                {item.code},{item.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div className='grid'>
+                          <Label
+                            className='py-1 text-[0.8rem] text-muted-foreground'
+                            htmlFor='itemGroupId'
+                          >
+                            Account Code-3
+                          </Label>
+                          <select
+                            {...register('accountCode3')}
+                            defaultValue={data.accountCode3}
+                            className='flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1'
+                          >
+                            {accountCode?.map((item) => (
+                              <option
+                                className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
+                                value={item.code}
+                              >
+                                {item.code},{item.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div className='grid'>
+                          <Label
+                            className='py-1 text-[0.8rem] text-muted-foreground'
+                            htmlFor='itemGroupId'
+                          >
+                            Account Code-4
+                          </Label>
+                          <select
+                            {...register('accountCode4')}
+                            defaultValue={data.accountCode4}
+                            className='flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1'
+                          >
+                            {accountCode?.map((item) => (
+                              <option
+                                className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
+                                value={item.code}
+                              >
+                                {item.code},{item.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div className='grid'>
+                          <Label
+                            className='py-1 text-[0.8rem] text-muted-foreground'
+                            htmlFor='itemGroupId'
+                          >
+                            Account Code-5
+                          </Label>
+                          <select
+                            {...register('accountCode5')}
+                            defaultValue={data.accountCode5}
+                            className='flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1'
+                          >
+                            {accountCode?.map((item) => (
+                              <option
+                                className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
+                                value={item.code}
+                              >
+                                {item.code},{item.name}
                               </option>
                             ))}
                           </select>
@@ -792,13 +920,15 @@ export const EditModal: React.FC<EditModalProps> = ({
                             className='py-1 text-[0.8rem] text-muted-foreground'
                             htmlFor='standardCost'
                           >
-                            Standard Cost
+                            Standard Cost(Baht)
                           </Label>
                           <Input
+                            id='standardCost'
                             readOnly={editble}
                             className='text-[0.8rem]'
                             {...register('standardCost')}
-                            defaultValue={data.standardCost}
+                            defaultValue={toCurrency(data.standardCost)}
+                            onChange={handleChangeInput}
                           />
                         </div>
 
@@ -807,16 +937,20 @@ export const EditModal: React.FC<EditModalProps> = ({
                             className='py-1 text-[0.8rem] text-muted-foreground'
                             htmlFor='averageCost'
                           >
-                            Average Cost
+                            Average Cost(Baht)
                           </Label>
                           <Input
+                            id='averageCost'
                             readOnly={editble}
                             className='text-[0.8rem]'
                             {...register('averageCost')}
-                            defaultValue={data.averageCost}
+                            defaultValue={formatCurrency(data.averageCost)}
+                            onChange={handleChangeInput}
+                           // onchange={(e) => formatCurrency(e)}
                           />
                         </div>
-                       
+
+                      
                         {/* <div className='grid grid-cols-3 gap-2 py-2'> */}
                         <div className='mt-6 flex items-start space-x-2 space-y-0 rounded-md border p-2 shadow'>
                           <Checkbox
@@ -828,12 +962,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                             }
                             defaultChecked={data.combineMtFlag}
                           />
-                          {/* <input
-                              id='combineMtFlag'
-                              type='checkbox' 
-                              onChange={onCheckLotControlFlag} 
-                             defaultChecked={data.combineMtFlag}
-                             /> */}
+                        
                           <label
                             htmlFor='combineMtFlag'
                             className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
@@ -841,7 +970,8 @@ export const EditModal: React.FC<EditModalProps> = ({
                             Combine Mt-Flag
                           </label>
                         </div>
-                        <div className='mt-4 flex items-start space-x-2 space-y-0 rounded-md border p-2 shadow'>
+
+                        <div className='mt-6 flex items-start space-x-2 space-y-0 rounded-md border p-2 shadow'>
                           <Checkbox
                             id='lotControlFlag'
                             {...register('lotControlFlag')}
@@ -859,7 +989,6 @@ export const EditModal: React.FC<EditModalProps> = ({
                         </div>
 
                         <br />
-                       
 
                         <div className='col-span-3 float-end mt-6 grid'>
                           <Button
@@ -876,14 +1005,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                     </CardContent>
                   </Card>
                   <br></br>
-                  {/* <Button
-                    variant='button'
-                    className='float-end'
-                    loading={onloading}
-                    type='submit'
-                  >
-                    Save changes
-                  </Button> */}
+              
                 </TabsContent>
               </form>
               <TabsContent value='file'>

@@ -38,6 +38,7 @@ import {
   createInventoryHistory,
 } from '@/services/inventoryApi'
 import usePermission from '@/hooks/use-permission'
+import { toCurrency } from '@/lib/utils'
 
 interface ReceiveModalProps {
   isOpen: boolean
@@ -193,10 +194,10 @@ export const ReceiveModal: React.FC<ReceiveModalProps> = ({
                           {item.itemMaster?.code}
                         </TableCell>
                         <TableCell>{item.itemMaster?.name}</TableCell>
-                        <TableCell>{item.quantity}</TableCell>
-                        <TableCell>{item.received}</TableCell>
+                        <TableCell>{toCurrency(item.quantity)}</TableCell>
+                        <TableCell>{toCurrency(item.received)}</TableCell>
 
-                        <TableCell>{item.balance}</TableCell>
+                        <TableCell>{toCurrency(item.balance)}</TableCell>
                         <TableCell>
                           <select
                             //defaultValue={item.branch.branchName}

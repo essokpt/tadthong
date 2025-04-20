@@ -3,6 +3,7 @@ import { DataTableColumnHeader } from '@/components/dataTable/data-table-column-
 import { Invoice} from './schema'
 import { CellAction } from './cell-action'
 import { format } from 'date-fns'
+import { toCurrency } from '@/lib/utils'
 
 export const columns: ColumnDef<Invoice>[] = [
   
@@ -75,14 +76,14 @@ export const columns: ColumnDef<Invoice>[] = [
   {
     accessorKey: 'amount',
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Amount' />
+      <DataTableColumnHeader column={column} title='Amount(Baht)' />
     ),
     cell: ({ row }) => {   
       return (
         <div className='flex space-x-2'>
          
           <span className='max-w-32 truncate font-medium sm:max-w-72 md:max-w-[31rem]'>
-            {row.getValue('amount')}
+            {toCurrency(row.getValue('amount'))}
           </span>
         </div>
       )

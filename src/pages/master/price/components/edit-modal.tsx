@@ -46,6 +46,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PriceDataTable } from './priceTable/priceDataTable'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import InputCurrency from '@/components/custom/inputCurrency'
 // import { PriceList } from './priceTable/schema'
 
 interface EditModalProps {
@@ -223,7 +224,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                               control={form.control}
                               name='selectedCustomer'
                               render={({ field }) => (
-                                <FormItem className='grid space-y-1.5 mt-2'>
+                                <FormItem className='mt-2 grid space-y-1.5'>
                                   <FormLabel>Customer</FormLabel>
                                   <Popover>
                                     <PopoverTrigger asChild>
@@ -319,7 +320,13 @@ export const EditModal: React.FC<EditModalProps> = ({
                                 </FormItem>
                               )}
                             /> */}
-                            <FormField
+                            <InputCurrency
+                              value={0}
+                              label='Price(Baht)'
+                              name='price'
+                              placeholder={'input price'}
+                            />
+                            {/* <FormField
                               control={form.control}
                               name='price'
                               render={({ field }) => (
@@ -339,7 +346,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                                   <FormMessage />
                                 </FormItem>
                               )}
-                            />
+                            /> */}
 
                             <Button
                               loading={onloading}
@@ -365,8 +372,6 @@ export const EditModal: React.FC<EditModalProps> = ({
 
             <br />
           </div>
-
-
         </DialogContent>
       </Dialog>
     </>
