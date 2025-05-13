@@ -333,7 +333,7 @@ export const EditModal: React.FC<AlertModalProps> = ({
                 <TabsTrigger value='information'>
                   General Information
                 </TabsTrigger>
-                <TabsTrigger value='account'>Billing</TabsTrigger>
+                <TabsTrigger value='account'>Billing Address / Ship To Address</TabsTrigger>
                 <TabsTrigger value='file'>File Attached</TabsTrigger>
               </TabsList>
               <TabsContent value='information' className='h-full'>
