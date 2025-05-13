@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Link } from 'react-router-dom'
 import { IconChevronDown } from '@tabler/icons-react'
 import { Button, buttonVariants } from '../custom/button'
@@ -26,21 +27,19 @@ import { SideLink } from '@/data/sidelinks'
 //import { isRole } from '@/services/service'
 //import useLocalStorage from '@/hooks/use-local-storage'
 
-
 interface NavProps extends React.HTMLAttributes<HTMLDivElement> {
   isCollapsed: boolean
   links: SideLink[]
   closeNav: () => void
 }
-function isRole(role:any){ 
+function isRole(role: any) {
   const userroles = localStorage.getItem('permisstions')
- const isUserRole = userroles?.includes(role)
+  const isUserRole = userroles?.includes(role)
   // const isUserRole = array1.find((element) => element === roles);
   //console.log('find array:', role);
- // console.log('user roles:', localStorage.getItem('roles'));
-   
+  // console.log('user roles:', localStorage.getItem('roles'));
+
   return !isUserRole
- 
 }
 
 export default function Nav({
@@ -51,8 +50,7 @@ export default function Nav({
 }: NavProps) {
   const renderLink = ({ sub, ...rest }: SideLink) => {
     const key = `${rest.title}-${rest.href}`
-   
-    
+
     if (isCollapsed && sub)
       return (
         <NavLinkIconDropdown
@@ -70,10 +68,9 @@ export default function Nav({
       return (
         <NavLinkDropdown {...rest} sub={sub} key={key} closeNav={closeNav} />
       )
-     if(!isRole(rest.role)){
+    if (!isRole(rest.role)) {
       return <NavLink {...rest} key={key} closeNav={closeNav} />
-     }
-    
+    }
   }
   return (
     <div
@@ -84,7 +81,7 @@ export default function Nav({
       )}
     >
       <TooltipProvider delayDuration={0}>
-      <nav className='grid gap-1 group-[[data-collapsed=true]]:justify-center group-[[data-collapsed=true]]:px-2'>
+        <nav className='grid gap-1 group-[[data-collapsed=true]]:justify-center group-[[data-collapsed=true]]:px-2'>
           {links.map(renderLink)}
         </nav>
       </TooltipProvider>
@@ -97,7 +94,6 @@ interface NavLinkProps extends SideLink {
   closeNav: () => void
 }
 
-
 function NavLink({
   title,
   icon,
@@ -109,7 +105,6 @@ function NavLink({
   const { checkActiveNav } = useCheckActiveNav()
   return (
     <Link
-     
       to={href}
       onClick={closeNav}
       className={cn(
@@ -145,11 +140,13 @@ function NavLinkDropdown({ title, icon, label, sub, closeNav }: NavLinkProps) {
       <CollapsibleTrigger
         className={cn(
           buttonVariants({ variant: 'ghost', size: 'sm' }),
-          'group h-12 w-full justify-start rounded-none px-6'
+          'group h-12 w-full justify-start rounded-none px-6 hi'
         )}
       >
-        <div className='mr-2'>{icon}</div>
-        {title}
+        <div className='mr-2' >
+          {icon}
+        </div>
+        {title}test
         {label && (
           <div className='ml-2 rounded-lg bg-primary px-1 text-[0.625rem] text-primary-foreground'>
             {label}
@@ -166,7 +163,11 @@ function NavLinkDropdown({ title, icon, label, sub, closeNav }: NavLinkProps) {
       <CollapsibleContent className='collapsibleDropdown' asChild>
         <ul>
           {sub!.map((sublink) => (
-            <li hidden={isRole(sublink.role)} key={sublink.title} className='my-1 ml-8'>
+            <li
+              hidden={isRole(sublink.role)}
+              key={sublink.title}
+              className='my-1 ml-8'
+            >
               <NavLink {...sublink} subLink closeNav={closeNav} />
             </li>
           ))}

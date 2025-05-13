@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { HTMLAttributes, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -115,7 +116,7 @@ const formSchema = z.object({
   accountCode3: z.string(),
   accountCode4: z.string(),
   accountCode5: z.string(),
-  type: z.string(),
+  type: z.string().min(1),
   purchaseLeadTime: z.string(),
   manufacturingLeadTime: z.string(),
   weight: z.string(),
@@ -129,7 +130,7 @@ const formSchema = z.object({
   standardCost: z.number(),
   averageCost: z.number(),
   convertFactor: z.number(),
-  selectedLocation: z.string(),
+  selectedLocation: z.string().min(1),
   locationId: z.number(),
   combineMtFlag: z.boolean(),
   lotControlFlag: z.boolean(),
@@ -201,7 +202,7 @@ export function ItemForm({ className, ...props }: SignUpFormProps) {
     console.log('File data:', payload)
   }
 
-  async function onSubmit(data: any) {
+  async function onSubmit(data: z.infer<typeof formSchema>) {
     setIsLoading(true)
     const locatId: any = locations.find((x) => x.name === data.selectedLocation)
     if (locatId) data.locationId = locatId.id
@@ -223,11 +224,12 @@ export function ItemForm({ className, ...props }: SignUpFormProps) {
         const res: any = await createWip(response.id)
         console.log('CreateWip', res.data)
       }
-      data.files = files
-      if (data.files) {
+      const filesData = files
+     // data.files = files
+      if (filesData) {
         const formData = new FormData()
-        for (let i = 0; i < data.files?.length; i++) {
-          formData.append('files', data.files[i])
+        for (let i = 0; i < filesData?.length; i++) {
+          formData.append('files', filesData[i])
           formData.append('itemMasterId', response.id)
         }
 

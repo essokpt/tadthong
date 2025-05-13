@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/custom/button'
@@ -14,6 +15,14 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
 import {
   Dialog,
   DialogContent,
@@ -42,6 +51,9 @@ import {
 } from '@tabler/icons-react'
 import usePermission from '@/hooks/use-permission'
 import { toCurrency } from '@/lib/utils'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface EditModalProps {
   isOpen: boolean
@@ -52,18 +64,32 @@ interface EditModalProps {
 //   target: EventTarget & T
 // }
 
+const formSchema = z.object({
+  id: z.number().nullable(),  
+  approveBy: z.string().nullable(),
+  cause: z.string().nullable(),
+  type: z.string().min(1, { message: 'Please select your action to submit.' }),
+})
+
 export const EditModal: React.FC<EditModalProps> = ({
   isOpen,
   onClose,
   data,
 }) => {
   const [isMounted, setIsMounted] = useState(false)
-  const { handleSubmit, register } = useForm()
+  const { register } = useForm()
   const [onloading, setOnloading] = useState(false)
   const [venders, setVender] = useState<VenderType[]>([])
   const [locations, setLocation] = useState<LocationType[]>([])
-  const [action, setAction] = useState('')
   const rule: any = usePermission('purchaseOrder')
+
+   const form = useForm<z.infer<typeof formSchema>>({
+      resolver: zodResolver(formSchema),
+      defaultValues: {    
+        approveBy: localStorage.getItem('user'),
+        cause: data.cause
+      },
+    })
 
   const openFile = (file: any) => {
     window.open(
@@ -74,23 +100,22 @@ export const EditModal: React.FC<EditModalProps> = ({
     )
   }
 
-  async function updateData(payload: any) {
-    // setOnloading(true)
-    if (action === 'approved') {
-      payload.status = 'Approved'
-    }
-    if (action === 'rejected') {
-      payload.status = 'Rejected'
-    }
+  async function updateData(payload: z.infer<typeof formSchema>) {
+     setOnloading(true)
+    // if (action === 'approved') {
+    //   payload.status = 'Approved'
+    // }
+    // if (action === 'rejected') {
+    //   payload.status = 'Rejected'
+    // }
 
-    payload.id = data.id
-    payload.approveBy = localStorage.getItem('user')
-    console.log('updateData:', payload)
+    // payload.id = data.id
+    // payload.approveBy = localStorage.getItem('user')
+    //console.log('updateData:', payload)
 
     const res: any = await approvePurchaseOrder(payload)
     console.log('approvePurchaseOrder:', res)
     if (res.status == 200) {
-      setAction('')
       onClose()
     }
   }
@@ -126,7 +151,8 @@ export const EditModal: React.FC<EditModalProps> = ({
           <Card>
             <CardContent className='h-[40rem] space-y-2 overflow-scroll'>
               <div className='grid gap-4'>
-                <form onSubmit={handleSubmit(updateData)}>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(updateData)}>
                   {/* <div className='grid grid-cols-1 gap-2 '> */}
                   <div className='mb-3 mt-2 grid grid-cols-1 items-start gap-2 space-x-3 space-y-0 rounded-md border p-4 shadow'>
                     <div className='mb-2  flex items-center'>
@@ -143,15 +169,17 @@ export const EditModal: React.FC<EditModalProps> = ({
                         className='text-[0.8rem]'
                         {...register('cause')}
                         // defaultValue={data.remark}
+                         onChange={(event) => {
+                              form.setValue('cause', event.target.value)
+                            }}
                       />
                     </div>
-                    <div>
+                    {/* <div>
                       <Label className='py-1' htmlFor='action'>
                         Action
                       </Label>
                       <select
-                        //defaultValue='Approved'
-                        //onChange={handleChangeRole}
+                        
                         {...register('status')}
                         className='flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1'
                       >
@@ -172,7 +200,38 @@ export const EditModal: React.FC<EditModalProps> = ({
                           Reject
                         </option>
                       </select>
-                    </div>
+                    </div> */}
+
+                     <FormField
+                          control={form.control}
+                          name='type'
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Action</FormLabel>
+                              <Select
+                                onValueChange={(event) => {
+                                  field.onChange(event)
+                                  form.setValue('id', parseInt(data.id))
+                                }}
+                                defaultValue={field.value}
+                              >
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder='Select action to display' />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value='Approved'>
+                                    Approved
+                                  </SelectItem>
+                                  <SelectItem value='Reject'>Reject</SelectItem>
+                                </SelectContent>
+                              </Select>
+
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                   </div>
 
                   {/* <div className='grid gap-4'> */}
@@ -512,6 +571,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                     </Button>
                   </DialogFooter>
                 </form>
+                </Form>
               </div>
             </CardContent>
           </Card>

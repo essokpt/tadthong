@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AlertModal } from '@/components/custom/alert-modal'
 import { Button } from '@/components/custom/button'
 
@@ -138,7 +139,7 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
 
   const sendApprove = async () => {
     setLoading(true)
-    let today = new Date()
+    const today = new Date()
     const userId: any = localStorage.getItem('userId')
     const newApprove = {
       code: `AP-${approveData.code}`,

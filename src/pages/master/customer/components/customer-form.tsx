@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { HTMLAttributes, useState } from 'react'
 import { useForm } from 'react-hook-form'
 //import { zodResolver } from '@hookform/resolvers/zod'
@@ -142,7 +143,7 @@ export function CustomerForm({ className, ...props }: SignUpFormProps) {
   const { userInputCallback, dataValue } = useThaiAddress()
   const debounceValue = useDebounce(userInputCallback, 800)
 
-  let today = new Date()
+  const today = new Date()
   const navigate = useNavigate()
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -181,7 +182,7 @@ export function CustomerForm({ className, ...props }: SignUpFormProps) {
       payload.remark = uuidv4()
       billings.push(payload)
     } else {
-      let existingIndex = billings.findIndex((x) => x.remark == payload.remark)
+      const existingIndex = billings.findIndex((x) => x.remark == payload.remark)
       if (existingIndex != -1) {
         billings[existingIndex] = payload
       }
@@ -200,24 +201,22 @@ export function CustomerForm({ className, ...props }: SignUpFormProps) {
     if (response.status == 200) {
       if (response.data.id > 0) {
         console.log('create customer -success', response)
-  
+
         //data.files = files
         if (files?.length > 0) {
-         
           const formData = new FormData()
           for (let i = 0; i < files?.length; i++) {
             formData.append('files', files[i])
             formData.append('customerId', response.data.id)
           }
-  
+
           const res: any = await customerUploadFiles(formData)
           if (res.status == 200) {
             console.log('uploadFiles -success', res.status)
           }
         }
         navigate('/master/customer', { replace: true })
-      }   
-     
+      }
     } else {
       setIsLoading(false)
       setBilling([])
@@ -294,7 +293,7 @@ export function CustomerForm({ className, ...props }: SignUpFormProps) {
                 <TabsTrigger value='information'>
                   General Information
                 </TabsTrigger>
-                <TabsTrigger value='account'>Billing</TabsTrigger>
+                <TabsTrigger value='account'>Billing Address / Ship To Address</TabsTrigger>
               </TabsList>
               <TabsContent value='information'>
                 <Form {...form}>
@@ -346,7 +345,7 @@ export function CustomerForm({ className, ...props }: SignUpFormProps) {
                         )}
                       />
 
-                      <FormField
+                      {/* <FormField
                         control={form.control}
                         name='specialIntruction'
                         render={({ field }) => (
@@ -358,7 +357,8 @@ export function CustomerForm({ className, ...props }: SignUpFormProps) {
                             <FormMessage />
                           </FormItem>
                         )}
-                      />
+                      /> */}
+
                       <FormField
                         control={form.control}
                         name='meng'
@@ -372,7 +372,7 @@ export function CustomerForm({ className, ...props }: SignUpFormProps) {
                           </FormItem>
                         )}
                       />
-                      <FormField
+                      {/* <FormField
                         control={form.control}
                         name='costmarkup'
                         render={({ field }) => (
@@ -384,9 +384,9 @@ export function CustomerForm({ className, ...props }: SignUpFormProps) {
                             <FormMessage />
                           </FormItem>
                         )}
-                      />
+                      /> */}
 
-                      <FormField
+                      {/* <FormField
                         control={form.control}
                         name='creditLimitOrder'
                         render={({ field }) => (
@@ -398,8 +398,8 @@ export function CustomerForm({ className, ...props }: SignUpFormProps) {
                             <FormMessage />
                           </FormItem>
                         )}
-                      />
-                      <FormField
+                      /> */}
+                      {/* <FormField
                         control={form.control}
                         name='creditLimitItem'
                         render={({ field }) => (
@@ -411,7 +411,7 @@ export function CustomerForm({ className, ...props }: SignUpFormProps) {
                             <FormMessage />
                           </FormItem>
                         )}
-                      />
+                      /> */}
                       <FormField
                         control={form.control}
                         name='currency'

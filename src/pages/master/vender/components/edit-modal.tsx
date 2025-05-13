@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useContext, useEffect, useState } from 'react'
 import { Button } from '@/components/custom/button'
 import { useForm } from 'react-hook-form'
@@ -208,7 +209,7 @@ export const EditModal: React.FC<EditModalProps> = ({
 
       if (res.status == 200) {
         console.log(res.data)
-        let updateIndex = data.venderBillings.findIndex((x) => x.id == editId)
+        const updateIndex = data.venderBillings.findIndex((x) => x.id == editId)
         if (updateIndex != -1) {
           data.venderBillings[updateIndex] = payload
           console.log('update new address ', data.venderBillings[updateIndex])
@@ -393,7 +394,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                         defaultValue={data.bankAccount}
                       />
                     </div>
-                    <div className='grid'>
+                    {/* <div className='grid'>
                       <Label
                         className='py-1 text-[0.8rem] text-muted-foreground'
                         htmlFor='specialIntruction'
@@ -406,7 +407,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                         {...register('specialIntruction')}
                         defaultValue={data.specialIntruction}
                       />
-                    </div>
+                    </div> */}
 
                     <div className='grid'>
                       <Label

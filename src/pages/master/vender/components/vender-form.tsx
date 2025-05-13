@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { HTMLAttributes, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -198,7 +199,7 @@ export function VenderForm({ className, ...props }: SignUpFormProps) {
       payload.remark = uuidv4()
       billings.push(payload)
     } else {
-      let existingIndex = billings.findIndex((x) => x.remark == payload.remark)
+      const existingIndex = billings.findIndex((x) => x.remark == payload.remark)
       if (existingIndex != -1) {
         billings[existingIndex] = payload
       }
@@ -375,7 +376,7 @@ export function VenderForm({ className, ...props }: SignUpFormProps) {
                           </FormItem>
                         )}
                       />
-                      <FormField
+                      {/* <FormField
                         control={form.control}
                         name='specialIntruction'
                         render={({ field }) => (
@@ -387,7 +388,7 @@ export function VenderForm({ className, ...props }: SignUpFormProps) {
                             <FormMessage />
                           </FormItem>
                         )}
-                      />
+                      /> */}
                       <FormField
                         control={form.control}
                         name='paymentTerm'

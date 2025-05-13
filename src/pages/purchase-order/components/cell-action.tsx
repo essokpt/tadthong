@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AlertModal } from '@/components/custom/alert-modal'
 import { Button } from '@/components/custom/button'
 import {
@@ -198,9 +199,9 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
   }
 
   function printHeader(doc: any, value: PurchaseOrder) {
-    let bodyItems = []
+    const bodyItems = []
     for (let index = 0; index < value.purchaseOrderItems.length; index++) {
-      let item = [
+      const item = [
         index + 1,
         value.purchaseOrderItems[index].itemMaster.code,
         value.purchaseOrderItems[index].itemMaster.name,
@@ -306,7 +307,7 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
       body: bodyItems,
     })
 
-     let finalY = doc.lastAutoTable.finalY || 5
+     const finalY = doc.lastAutoTable.finalY || 5
      doc.rect(14,finalY+3,182,37)
 
      doc.text('หมายเหตุ : ', printX + 15, finalY + 8)

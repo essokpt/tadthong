@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { SyntheticEvent, useContext, useEffect, useState } from 'react'
 import { Button } from '@/components/custom/button'
 import { useForm } from 'react-hook-form'
@@ -151,6 +152,7 @@ export const EditModal: React.FC<AlertModalProps> = ({
     setIsLoading(true)
     console.log('deleteFile:', deleteId)
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const res: any = await customerDeleteFileAttach(deleteId)
 
     if (res.status == 200) {
@@ -211,7 +213,7 @@ export const EditModal: React.FC<AlertModalProps> = ({
       const res: any = await updateCustomerBilling(payload)
       if (res.status == 200) {
         console.log(res.data)
-        let updateIndex = data.customerBillings.findIndex(
+        const updateIndex = data.customerBillings.findIndex(
           (x) => x.id == payload.id
         )
         if (updateIndex != -1) {
@@ -395,7 +397,7 @@ export const EditModal: React.FC<AlertModalProps> = ({
                         defaultValue={data.tax}
                       />
                     </div>
-                    <div className='grid'>
+                    {/* <div className='grid'>
                       <Label
                         className='py-1 text-[0.8rem] text-muted-foreground'
                         htmlFor='specialIntruction'
@@ -408,7 +410,7 @@ export const EditModal: React.FC<AlertModalProps> = ({
                         {...register('specialIntruction')}
                         defaultValue={data.specialIntruction}
                       />
-                    </div>
+                    </div> */}
                     <div>
                       <Label
                         className='py-1 text-[0.8rem] text-muted-foreground'
@@ -424,7 +426,7 @@ export const EditModal: React.FC<AlertModalProps> = ({
                       />
                     </div>
 
-                    <div>
+                    {/* <div>
                       <Label
                         className='py-1 text-[0.8rem] text-muted-foreground'
                         htmlFor='costmarkup'
@@ -437,8 +439,8 @@ export const EditModal: React.FC<AlertModalProps> = ({
                         {...register('costmarkup')}
                         defaultValue={data.costmarkup}
                       />
-                    </div>
-                    <div className='grid'>
+                    </div> */}
+                    {/* <div className='grid'>
                       <Label
                         className='py-1 text-[0.8rem] text-muted-foreground'
                         htmlFor='creditLimitOrder'
@@ -451,8 +453,8 @@ export const EditModal: React.FC<AlertModalProps> = ({
                         {...register('creditLimitOrder')}
                         defaultValue={data.creditLimitOrder}
                       />
-                    </div>
-                    <div>
+                    </div> */}
+                    {/* <div>
                       <Label
                         className='py-1 text-[0.8rem] text-muted-foreground'
                         htmlFor='creditLimitItem'
@@ -465,7 +467,7 @@ export const EditModal: React.FC<AlertModalProps> = ({
                         {...register('creditLimitItem')}
                         defaultValue={data.creditLimitItem}
                       />
-                    </div>
+                    </div> */}
                     <div className='grid'>
                       <Label
                         className='py-1 text-[0.8rem] text-muted-foreground'
