@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 import { ChangeEvent, useContext, useEffect, useState } from 'react'
 import { Button } from '@/components/custom/button'
@@ -678,7 +679,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                             className='py-1 text-[0.8rem] text-muted-foreground'
                             htmlFor='itemGroupId'
                           >
-                            Account Code-5
+                            Cost Center
                           </Label>
                           <select
                             {...register('accountCode5')}

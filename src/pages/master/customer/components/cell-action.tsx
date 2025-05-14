@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AlertModal } from '@/components/custom/alert-modal'
 import { Button } from '@/components/custom/button'
 import {

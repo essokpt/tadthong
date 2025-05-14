@@ -146,7 +146,7 @@ function NavLinkDropdown({ title, icon, label, sub, closeNav }: NavLinkProps) {
         <div className='mr-2' >
           {icon}
         </div>
-        {title}test
+        {title}
         {label && (
           <div className='ml-2 rounded-lg bg-primary px-1 text-[0.625rem] text-primary-foreground'>
             {label}

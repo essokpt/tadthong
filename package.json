@@ -45,6 +45,7 @@
     "cmdk": "^0.2.1",
     "date-fns": "^3.3.1",
     "dayjs": "^1.11.10",
+    "export-to-csv": "^1.4.0",
     "jspdf": "^2.5.2",
     "jspdf-autotable": "^3.8.4",
     "lucide-react": "^0.359.0",

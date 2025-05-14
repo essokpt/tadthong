@@ -1,9 +1,28 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { mkConfig, generateCsv, download } from 'export-to-csv'
+
+const csvConfig = mkConfig({
+  fieldSeparator: ',',
+  filename: 'export', // export file name (without .csv)
+  decimalSeparator: '.',
+  useKeysAsHeaders: true,
+})
+
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
+
+export const exportCsv = (data: any) => {
+    // const rowData = rows.map((row) => {
+    
+    // })
+
+    const csv = generateCsv(csvConfig)(data)
+    download(csvConfig)(csv)
+  }
 
 export const toCurrency = (value: number) =>
   new Intl.NumberFormat("th-TH", {

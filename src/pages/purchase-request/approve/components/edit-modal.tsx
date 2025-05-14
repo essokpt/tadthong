@@ -63,9 +63,6 @@ interface EditModalProps {
   data: PurchaseRequest
 }
 
-// interface ChangeEvent<T = Element> extends SyntheticEvent<T> {
-//   target: EventTarget & T
-// }
 const today = new Date()
 
 const formSchema = z.object({
@@ -84,34 +81,21 @@ export const EditModal: React.FC<EditModalProps> = ({
 }) => {
   const [isMounted, setIsMounted] = useState(false)
   const [onloading, setOnloading] = useState(false)
-  //const [action, setAction] = useState('')
 
   const { register } = useForm()
   const { setRefresh } = useContext(ApiContext) as ApiType
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {    
+    defaultValues: {
       actionBy: localStorage.getItem('user'),
       createAt: format(today, 'yyyy-MM-dd'),
       approveBy: localStorage.getItem('user'),
-      remark: data.cause
+      remark: data.cause,
     },
   })
 
   async function updateData(payload: z.infer<typeof formSchema>) {
-     setOnloading(true)
-    // if (action === 'approved') {
-    //   payload.type = 'Approved'
-    // }
-    // if (action === 'rejected') {
-    //   payload.type = 'Rejected'
-    // }
-
-    // payload.id = data.id
-    // payload.actionBy = localStorage.getItem('user')
-    // payload.createAt = format(today, 'yyyy-MM-dd')
-    // payload.approveBy = localStorage.getItem('user')
-    console.log('updateData:', payload)
+    setOnloading(true)
 
     const res: any = await approvePurchaseRequest(payload)
 
@@ -133,11 +117,6 @@ export const EditModal: React.FC<EditModalProps> = ({
       'noreferrer'
     )
   }
-
-  // function handleChangeRole(e: ChangeEvent<HTMLSelectElement>) {
-  //   setAction(e.target.value)
-  //   console.log('action', e.target.value)
-  // }
 
   useEffect(() => {
     setIsMounted(true)
@@ -169,7 +148,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                             Approve Action.
                           </Label>
                         </div>
-                       
+
                         <FormField
                           control={form.control}
                           name='type'
@@ -200,35 +179,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                             </FormItem>
                           )}
                         />
-                         {/* <FormField
-                        control={form.control}
-                        name='cause'
-                        render={({ field }) => (
-                          <FormItem className='space-y-1'>
-                            <FormLabel>Cause</FormLabel>
-                            <FormControl>
-                              <Input 
-                                {...field}
-                                // onChange={(event:any) => {
-                                //   field.onChange(event)
-                                // }}
-                                // defaultValue={data.cause}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      /> */}
-                          {/* <div className='grid'>
-                          <Label className='py-1' htmlFor='remark'>
-                            ID
-                          </Label>
-                          <Input
-                            className='text-[0.8rem]'
-                            {...register('id')}
-                            defaultValue={data.id}
-                          />
-                        </div> */}
+
                         <div className='grid'>
                           <Label className='py-1' htmlFor='remark'>
                             Comment
@@ -242,37 +193,8 @@ export const EditModal: React.FC<EditModalProps> = ({
                             }}
                           />
                         </div>
-                        {/* <div>
-                        <Label className='py-1' htmlFor='action'>
-                          Action
-                        </Label>
-                        <select
-                        
-                          defaultValue='Approved'
-                          onChange={handleChangeRole}
-                          className='flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1'
-                        >
-                          <option
-                            className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
-                            value={data.status}
-                          ></option>
-                          <option
-                            className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
-                            value='approved'
-                          >
-                            Approved
-                          </option>
-                          <option
-                            className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
-                            value='rejected'
-                          >
-                            Reject
-                          </option>
-                        </select>
-                      </div> */}
                       </div>
 
-                      {/* <div className='grid gap-4'> */}
                       <div className='mb-3 mt-2 grid grid-cols-1 items-start gap-2 space-x-3 space-y-0 rounded-md border p-4 shadow'>
                         <div className='mb-2  flex items-center'>
                           <IconInfoCircle />
@@ -508,15 +430,6 @@ export const EditModal: React.FC<EditModalProps> = ({
                                 </TableCell>
 
                                 <TableCell className='w-[8rem]'>
-                                  {/* <Button
-                                  size='icon'
-                                  variant='ghost'
-                                  className='rounded-full'
-                                  onClick={() => openFile(item.path)}
-                                >
-                                  <IconEye size={20} />
-                                </Button> */}
-
                                   <IconEye
                                     size={20}
                                     onClick={() => openFile(item.path)}

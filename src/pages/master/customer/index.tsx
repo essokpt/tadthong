@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Layout, LayoutBody } from '@/components/custom/layout'
 // import { DataTable } from './components/data-table'
 import { getCustomer, searchCustomer } from '@/services/customerApi'

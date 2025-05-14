@@ -939,14 +939,14 @@ export function ItemForm({ className, ...props }: SignUpFormProps) {
                         name='accountCode5'
                         render={({ field }) => (
                           <FormItem className='space-y-1'>
-                            <FormLabel>Account Code-5</FormLabel>
+                            <FormLabel>Cost Center</FormLabel>
                             <Select
                               onValueChange={field.onChange}
                               defaultValue={field.value}
                             >
                               <FormControl>
                                 <SelectTrigger>
-                                  <SelectValue placeholder='Select Account Code' />
+                                  <SelectValue placeholder='Select Cost Center' />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
@@ -997,22 +997,7 @@ export function ItemForm({ className, ...props }: SignUpFormProps) {
                       
                     </div>
 
-                    {/* </CardContent> */}
-                    {/* <CardFooter>
-                        <Button>Save changes</Button>
-                      </CardFooter> */}
-                    {/* </Card>
-                  </TabsContent>
-                  <TabsContent value='planing'>
-                    <Card> */}
-                    {/* <CardHeader>
-                        <CardTitle>Planing</CardTitle>
-                        <CardDescription>
-                          Change your password here. After saving, you'll be
-                          logged out.
-                        </CardDescription>
-                      </CardHeader> */}
-                    {/* <CardContent className='space-y-2'> */}
+                
                     <div className='grid grid-cols-3 gap-2 rounded-md border p-4 m-2 shadow'>
                       <div className='col-span-3 mb-3 mt-3 flex items-center '>
                         <IconInfoCircle />
