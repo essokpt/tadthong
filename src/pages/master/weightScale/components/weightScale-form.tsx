@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { HTMLAttributes, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -93,9 +94,9 @@ export function WeightScalePriceForm({ className, ...props }: SignUpFormProps) {
   const [venderItem, setVenderItem] = useState<venderItem[]>([])
 
   const navigate = useNavigate()
-  let today = new Date()
-  let dateCode = format(today, 'yyyy-MM-dd')
-  let newCode = dateCode.split('-')
+  const today = new Date()
+  const dateCode = format(today, 'yyyy-MM-dd')
+  const newCode = dateCode.split('-')
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

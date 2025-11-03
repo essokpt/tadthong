@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Link } from 'react-router-dom'
 import { IconChevronDown } from '@tabler/icons-react'
@@ -24,23 +25,36 @@ import {
 import { cn } from '@/lib/utils'
 import useCheckActiveNav from '@/hooks/use-check-active-nav'
 import { SideLink } from '@/data/sidelinks'
-//import { isRole } from '@/services/service'
-//import useLocalStorage from '@/hooks/use-local-storage'
 
 interface NavProps extends React.HTMLAttributes<HTMLDivElement> {
   isCollapsed: boolean
   links: SideLink[]
   closeNav: () => void
 }
+
 function isRole(role: any) {
   const userroles = localStorage.getItem('permisstions')
   const isUserRole = userroles?.includes(role)
-  // const isUserRole = array1.find((element) => element === roles);
-  //console.log('find array:', role);
-  // console.log('user roles:', localStorage.getItem('roles'));
-
+ 
   return !isUserRole
 }
+
+// function isMaster(role: any) {
+//   const userroles = localStorage.getItem('permisstions')
+//   const roles = userroles ? JSON.parse(userroles) : []
+
+//   const isUserRole = roles.find((item: any) => item.master === role)
+
+//   if (isUserRole) {
+//     console.log(' ok :', isUserRole)
+//     return true
+//   } else {
+//     console.log(' not found :', isUserRole)
+//     return false
+//   }
+// }
+
+
 
 export default function Nav({
   links,
@@ -64,14 +78,20 @@ export default function Nav({
     if (isCollapsed)
       return <NavLinkIcon {...rest} key={key} closeNav={closeNav} />
 
-    if (sub)
+    if (sub) {
+      
+     // if (!isMaster(rest.role)) return
       return (
         <NavLinkDropdown {...rest} sub={sub} key={key} closeNav={closeNav} />
       )
-    if (!isRole(rest.role)) {
+    } 
+   
+
+    if (isRole(rest.role)) {      
       return <NavLink {...rest} key={key} closeNav={closeNav} />
     }
   }
+
   return (
     <div
       data-collapsed={isCollapsed}
@@ -140,16 +160,15 @@ function NavLinkDropdown({ title, icon, label, sub, closeNav }: NavLinkProps) {
       <CollapsibleTrigger
         className={cn(
           buttonVariants({ variant: 'ghost', size: 'sm' }),
-          'group h-12 w-full justify-start rounded-none px-6 hi'
+          'hi group h-12 w-full justify-start rounded-none px-6'
         )}
       >
-        <div className='mr-2' >
-          {icon}
-        </div>
+        <div className='mr-2'>{icon}</div>
+
         {title}
         {label && (
           <div className='ml-2 rounded-lg bg-primary px-1 text-[0.625rem] text-primary-foreground'>
-            {label}
+            {label}test2
           </div>
         )}
         <span

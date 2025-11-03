@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
@@ -43,6 +44,7 @@ import { IconPencilPlus } from '@tabler/icons-react'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
+
 const formSchema = z.object({
   code: z.string(),
   cause: z.string().min(0),
@@ -54,6 +56,7 @@ const formSchema = z.object({
   status: z.string(),
   createAt: z.string(),
   createBy: z.string(),
+ 
 })
 
 export function WorkOrderForm() {
@@ -67,10 +70,10 @@ export function WorkOrderForm() {
   // const [openModal, setOpenModal] = useState(false)
 
   const navigate = useNavigate()
-  let today = new Date()
-  let user: any = localStorage.getItem('user')
-  let dateCode = formatDate(today, 'yyyy-MM-dd')
-  let newCode = dateCode.split('-')
+  const today = new Date()
+  const user: any = localStorage.getItem('user')
+  const dateCode = formatDate(today, 'yyyy-MM-dd')
+  const newCode = dateCode.split('-')
   // const { handleSubmit, register, setValue } = useForm()
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -150,7 +153,6 @@ export function WorkOrderForm() {
         <Separator />
         <br />
 
-       
         <Card>
           <CardContent className='space-y-2'>
             <Form {...form}>
@@ -171,6 +173,7 @@ export function WorkOrderForm() {
                         </FormItem>
                       )}
                     />
+                   
 
                     <FormField
                       control={form.control}
@@ -306,6 +309,8 @@ export function WorkOrderForm() {
                                         value={item.name}
                                         key={item.id}
                                         onSelect={() => {
+                                          console.log('select item', item);
+                                          form.setValue('unit', item.stockingUom)
                                           form.setValue('selectItem', item.name)
                                         }}
                                       >

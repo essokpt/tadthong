@@ -49,6 +49,7 @@ export const schema = z.object({
         col11: z.string(),
         col12: z.string(),
         col13: z.string(),
+        paymentType: z.string()
     }))
 })
 

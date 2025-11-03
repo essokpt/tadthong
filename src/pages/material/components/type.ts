@@ -36,6 +36,7 @@ export interface MaterilalType{
     col11: string
     col12: string
     col13: string
+    paymentType: string
 }
 
 

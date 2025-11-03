@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import api from '../../config/SetupAxios'
 
 const endpoint = '/Material'
@@ -99,6 +100,16 @@ export async function createMaterial(data:any) {
      }
    }
 
+    export async function updateMaterialItem(data:any) {
+    // console.error('login',data);
+     try {
+       const response = await api.put(`${endpoint}/UpdateItems`, data);
+       console.log('updateMaterialItem',response.status);
+       return response
+     } catch (error) {
+       console.error(error);
+     }
+   }
 export async function deleteMaterial(id:any) {
   // console.error('login',data);
       try {

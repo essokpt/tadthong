@@ -2,6 +2,7 @@ import { ColumnDef } from '@tanstack/react-table'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DataTableColumnHeader } from '@/components/dataTable/data-table-column-header'
 import { saleOrderItems } from './schema'
+import { format } from 'date-fns'
 
 export const columns: ColumnDef<saleOrderItems>[] = [
   // {
@@ -71,7 +72,23 @@ export const columns: ColumnDef<saleOrderItems>[] = [
         <div className='flex space-x-2'>
          
           <span className='max-w-32 truncate font-medium sm:max-w-72 md:max-w-[100rem]'>
-            {row.original.saleOrder?.createAt}
+            {row.original.saleOrder?.createAt !== null ? format(row.original.saleOrder?.createAt, 'dd-MM-yyyy')  : ''  }
+          </span>
+        </div>
+      )
+    },
+  },
+   {
+    accessorKey: 'saleOrder.billingDate',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title='Customer Billing Date' />
+    ),
+    cell: ({ row }) => {   
+      return (
+        <div className='flex space-x-2'>
+         
+          <span className='max-w-32 truncate font-medium sm:max-w-72 md:max-w-[100rem]'>
+            {row.original.saleOrder?.billingDate !== null ? format(row.original.saleOrder?.billingDate, 'dd-MM-yyyy')  : ''  }
           </span>
         </div>
       )

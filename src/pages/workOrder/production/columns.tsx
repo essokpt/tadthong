@@ -3,6 +3,7 @@ import { DataTableColumnHeader } from '@/components/dataTable/data-table-column-
 import { WorkOrder } from '../components/schema'
 import { CellAction } from './cell-action'
 import { format } from 'date-fns'
+import { toCurrency } from '@/lib/utils'
 
 export const columns: ColumnDef<WorkOrder>[] = [
   {
@@ -59,7 +60,7 @@ export const columns: ColumnDef<WorkOrder>[] = [
       return (
         <div className='flex space-x-2'>
           <span className='max-w-32 truncate font-medium sm:max-w-72 md:max-w-[31rem]'>
-            {row.getValue('quantity')}
+             {toCurrency(row.getValue('quantity'))}
           </span>
         </div>
       )
@@ -89,7 +90,7 @@ export const columns: ColumnDef<WorkOrder>[] = [
       return (
         <div className='flex space-x-2'>
           <span className='max-w-32 truncate font-medium sm:max-w-72 md:max-w-[31rem]'>
-            {row.getValue('received')}
+              {toCurrency(row.getValue('received'))}
           </span>
         </div>
       )
@@ -104,7 +105,7 @@ export const columns: ColumnDef<WorkOrder>[] = [
       return (
         <div className='flex space-x-2'>
           <span className='max-w-32 truncate font-medium sm:max-w-72 md:max-w-[31rem]'>
-            {row.getValue('balance')}
+            {toCurrency(row.getValue('balance'))}
           </span>
         </div>
       )

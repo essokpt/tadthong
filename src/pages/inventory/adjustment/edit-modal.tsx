@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // import { zodResolver } from '@hookform/resolvers/zod'
 // import { z } from 'zod'
 import { useEffect, useState } from 'react'
@@ -61,11 +62,13 @@ interface EditModalProps {
 const formSchema = z.object({
   id: z.number(),
   date: z.string(),
-  createAt: z.string(), 
+  createAt: z.string(),
   code: z.string(),
+  drawerBy: z.string(),
   remark: z.string(),
+  adjustType: z.string(),
   adjustmentReason: z.object({
-    desc : z.string()
+    desc: z.string(),
   }),
   userId: z.number(),
   user: z.object({
@@ -221,7 +224,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                           </FormItem>
                         )}
                       />
-                       <FormField
+                      <FormField
                         control={form.control}
                         name='adjustmentReason.desc'
                         render={({ field }) => (
@@ -301,12 +304,40 @@ export const EditModal: React.FC<EditModalProps> = ({
                         )}
                       /> */}
 
-                    
+                      <FormField
+                        control={form.control}
+                        name='drawerBy'
+                        render={({ field }) => (
+                          <FormItem className='space-y-1 '>
+                            <FormLabel>Drawer/Return By</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name='adjustType'
+                        render={({ field }) => (
+                          <FormItem className='space-y-1 '>
+                            <FormLabel>Adjust Type</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                       <FormField
                         control={form.control}
                         name='remark'
                         render={({ field }) => (
-                          <FormItem className='space-y-1 col-span-2'>
+                          <FormItem className='col-span-2 space-y-1'>
                             <FormLabel>Remark</FormLabel>
                             <FormControl>
                               <Input {...field} />
@@ -356,8 +387,6 @@ export const EditModal: React.FC<EditModalProps> = ({
                                   {item.flag}
                                 </Badge>
                               </TableCell>
-
-                              
                             </TableRow>
                           ))}
                         </TableBody>

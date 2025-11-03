@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import api from '../../config/SetupAxios'
 
 const endpoint = '/Inventory'
@@ -139,6 +140,17 @@ export async function createInventory(data:any) {
     }
   }
 
+   export async function createInventoryAdjustIn(data:any) {
+    try {
+      const response = await api.post(`${endpoint}/AdjustmentIn`, data);
+      //const res = await response.data
+      console.log('createInventoryAdjustIn',response);
+      return response
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   export async function createInventoryTransfer(data:any) {
     try {
       const response = await api.post(`${endpoint}/Transfer`, data);
@@ -162,7 +174,8 @@ export async function createInventory(data:any) {
        console.error(error);
      }
    }
-
+  
+   
   export async function updateInventory(data:any) {
     // console.error('login',data);
      try {

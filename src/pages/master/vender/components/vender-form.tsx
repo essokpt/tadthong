@@ -39,7 +39,11 @@ import { Button } from '@/components/custom/button'
 import { cn } from '@/lib/utils'
 import { Layout, LayoutBody } from '@/components/custom/layout'
 import { useNavigate } from 'react-router-dom'
-import { createVender, getVenderType, venderUploadFiles } from '@/services/vendersApi'
+import {
+  createVender,
+  getVenderType,
+  venderUploadFiles,
+} from '@/services/vendersApi'
 import { Label } from '@/components/ui/label'
 import {
   Select,
@@ -51,7 +55,12 @@ import {
 import { MagnifyingGlassIcon, PlusCircledIcon } from '@radix-ui/react-icons'
 import { BillingModal } from './billing-modal'
 import { Billing } from './billing-schema'
-import { IconEdit, IconFile, IconPencilPlus, IconTrash } from '@tabler/icons-react'
+import {
+  IconEdit,
+  IconFile,
+  IconPencilPlus,
+  IconTrash,
+} from '@tabler/icons-react'
 import { v4 as uuidv4 } from 'uuid'
 import useThaiAddress from '@/hooks/use-thaiAddress'
 import useDebounce from '@/hooks/use-debounce'
@@ -60,6 +69,7 @@ import { PageHeader } from '@/components/layouts/header'
 import FileDrag from '@/components/custom/fileDrag'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { IVenderType } from './type'
+import { zodResolver } from '@hookform/resolvers/zod'
 
 interface SignUpFormProps extends HTMLAttributes<HTMLDivElement> {}
 
@@ -67,35 +77,35 @@ const formSchema = z.object({
   //id: z.string(),
   code: z.string().min(1, { message: 'Please enter your code' }),
   companyName: z.string().min(1, { message: 'Please enter your name' }),
-  address: z.string(),
+  address: z.string().min(1, { message: 'Please enter your address' }),
   fax: z.string(),
   tax: z.string(),
   phone: z.string(),
   contactName: z.string(),
-  email: z.string().email({ message: 'Invalid email address' }),
-  district: z.string(),
-  subDistrict: z.string(),
-  province: z.string(),
-  zipcode: z.string(),
+  email: z.string(),
+  district: z.string().min(1, { message: 'Please enter your district' }),
+  subDistrict: z.string().min(1, { message: 'Please enter your sub district' }),
+  province: z.string().min(1, { message: 'Please enter your province' }),
+  zipcode: z.string().min(1, { message: 'Please enter your zipcode' }),
   country: z.string(),
   phoneExt: z.string(),
   faxExt: z.string(),
   status: z.string(),
   specialIntruction: z.string(),
   paymentTerm: z.string(),
-  paymentType: z.string(),
+  paymentType: z.string().min(1, { message: 'Please enter your payment type' }),
   currency: z.string(),
   alternatePhone: z.string(),
   latitude: z.string(),
   longtitude: z.string(),
   bankAccount: z.string(),
   remark: z.string(),
-  selectedVenderType: z.string(),
-  venderTypeId : z.number(),
-  venderType : z.object({
-    id: z.number(),
-    typeName: z.string()
-  }),
+  selectedVenderType: z.string().min(1, { message: 'Please enter your vender type' }),
+  venderTypeId: z.number(),
+  // venderType: z.object({
+  //   id: z.number(),
+  //   typeName: z.string(),
+  // }),
   venderBillings: z.array(
     z.object({
       code: z.string(),
@@ -112,8 +122,8 @@ const formSchema = z.object({
       latitude: z.string(),
       longtitude: z.string(),
       branch: z.string(),
-    })
-  ),
+    }).nullable()
+  ).nullable(),
 })
 
 const intial = {
@@ -130,13 +140,14 @@ const intial = {
   phone: '',
   email: '',
   contactName: '',
-  latitude: '',
-  longtitude: '',
+  latitude: ' ',
+  longtitude: ' ',
   selectedBranch: '',
   branch: '',
-  remark: 'new',
-  selectedVenderType : '',
-  venderTypeId : 0,
+  remark: 'New',
+  selectedVenderType: '',
+  venderTypeId: 0,
+  venderBillings: [],
 }
 
 export function VenderForm({ className, ...props }: SignUpFormProps) {
@@ -153,18 +164,36 @@ export function VenderForm({ className, ...props }: SignUpFormProps) {
   const [addressThai, setAddressThai] = useState<ThaiAddress[]>()
 
   const form = useForm<z.infer<typeof formSchema>>({
-    // resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema),
     defaultValues: {
       code: '',
       companyName: '',
       address: '',
-      phone: '',
       fax: '',
       tax: '',
+      phone: '',
       contactName: '',
       email: '',
-      remark: '',
+      district: '',
+      subDistrict: '',
+      province: '',
+      zipcode: '',
+      country: '',
+      phoneExt: '',
+      faxExt: '',
       status: 'Active',
+      specialIntruction: '-',
+      paymentTerm: '',
+      paymentType: '',
+      currency: '',
+      alternatePhone: '',
+      latitude: '',
+      longtitude: '',
+      bankAccount: '',
+      remark: 'New',
+      selectedVenderType: '',
+     // venderTypeId: 0,
+     // venderType:,
       venderBillings: [],
     },
   })
@@ -194,12 +223,16 @@ export function VenderForm({ className, ...props }: SignUpFormProps) {
   }
 
   function addNewBilling(payload: any) {
-    if (payload.remark == 'new') {
+   console.log('add New Data', payload)
+
+    if (payload.remark == 'New') {
       console.log('add New Data', payload)
       payload.remark = uuidv4()
       billings.push(payload)
     } else {
-      const existingIndex = billings.findIndex((x) => x.remark == payload.remark)
+      const existingIndex = billings.findIndex(
+        (x) => x.remark == payload.remark
+      )
       if (existingIndex != -1) {
         billings[existingIndex] = payload
       }
@@ -224,7 +257,7 @@ export function VenderForm({ className, ...props }: SignUpFormProps) {
   }
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
-    setIsLoading(true)
+     setIsLoading(true)
     data.venderBillings = billings
     console.log('create new vender', data)
 
@@ -232,10 +265,9 @@ export function VenderForm({ className, ...props }: SignUpFormProps) {
     if (response.id > 0) {
       console.log('createVender -success', response.status)
 
-      //data.files = files
       if (files?.length > 0) {
         console.log('upload file to vender id:', response);
-        
+
         const formData = new FormData()
         for (let i = 0; i < files?.length; i++) {
           formData.append('files', files[i])
@@ -255,6 +287,7 @@ export function VenderForm({ className, ...props }: SignUpFormProps) {
       setBilling([])
     }, 2000)
   }
+
   const SearchAddress: React.FC<{ dataValue?: ThaiAddress[] }> = ({
     dataValue,
   }) => {
@@ -264,7 +297,6 @@ export function VenderForm({ className, ...props }: SignUpFormProps) {
       return null
     }
 
-    
     return (
       <div
         className={cn(
@@ -293,9 +325,7 @@ export function VenderForm({ className, ...props }: SignUpFormProps) {
   }
 
   useEffect(() => {
-    
     getVenderType().then((data) => setVenderType(data))
-   
   }, [])
 
   return (
@@ -416,71 +446,73 @@ export function VenderForm({ className, ...props }: SignUpFormProps) {
                         )}
                       />
                       <FormField
-                            control={form.control}
-                            name='selectedVenderType'
-                            render={({ field }) => (
-                              <FormItem className='grid space-y-3'>
-                                <FormLabel>Vender Type</FormLabel>
-                                <Popover>
-                                  <PopoverTrigger asChild>
-                                    <FormControl>
-                                      <Button
-                                        variant='outline'
-                                        role='combobox'
-                                        className={cn(
-                                          'bg-forefround hover:bg-forefround justify-between',
-                                          !field.value &&
-                                            'text-muted-foreground'
-                                        )}
-                                      >
-                                        {field.value
-                                          ? venderTypes.find(
-                                              (item) =>
-                                                item.typeName === field.value
-                                            )?.typeName
-                                          : 'Select type'}
-                                        <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                                      </Button>
-                                    </FormControl>
-                                  </PopoverTrigger>
-                                  <PopoverContent className='w-[200px] p-0'>
-                                    <Command>
-                                      <CommandInput placeholder='Search type...' />
-                                      <CommandList>
-                                        <CommandEmpty>
-                                          No type found.
-                                        </CommandEmpty>
-                                        <CommandGroup>
-                                          {venderTypes.map((item) => (
-                                            <CommandItem
-                                              value={item.typeName}
-                                              key={item.id}
-                                              onSelect={() => {
-                                                form.setValue('selectedVenderType', item.typeName)
-                                                form.setValue('venderTypeId', item.id)
-
-                                              }}
-                                            >
-                                              <Check
-                                                className={cn(
-                                                  'mr-2 h-4 w-4',
-                                                  item.typeName === field.value
-                                                    ? 'opacity-100'
-                                                    : 'opacity-0'
-                                                )}
-                                              />
-                                              {item.typeName}
-                                            </CommandItem>
-                                          ))}
-                                        </CommandGroup>
-                                      </CommandList>
-                                    </Command>
-                                  </PopoverContent>
-                                </Popover>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
+                        control={form.control}
+                        name='selectedVenderType'
+                        render={({ field }) => (
+                          <FormItem className='grid space-y-3'>
+                            <FormLabel>Vender Type</FormLabel>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <FormControl>
+                                  <Button
+                                    variant='outline'
+                                    role='combobox'
+                                    className={cn(
+                                      'bg-forefround hover:bg-forefround justify-between',
+                                      !field.value && 'text-muted-foreground'
+                                    )}
+                                  >
+                                    {field.value
+                                      ? venderTypes.find(
+                                          (item) =>
+                                            item.typeName === field.value
+                                        )?.typeName
+                                      : 'Select type'}
+                                    <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                                  </Button>
+                                </FormControl>
+                              </PopoverTrigger>
+                              <PopoverContent className='w-[200px] p-0'>
+                                <Command>
+                                  <CommandInput placeholder='Search type...' />
+                                  <CommandList>
+                                    <CommandEmpty>No type found.</CommandEmpty>
+                                    <CommandGroup>
+                                      {venderTypes.map((item) => (
+                                        <CommandItem
+                                          value={item.typeName}
+                                          key={item.id}
+                                          onSelect={() => {
+                                            form.setValue(
+                                              'selectedVenderType',
+                                              item.typeName
+                                            )
+                                            form.setValue(
+                                              'venderTypeId',
+                                              item.id
+                                            )
+                                          }}
+                                        >
+                                          <Check
+                                            className={cn(
+                                              'mr-2 h-4 w-4',
+                                              item.typeName === field.value
+                                                ? 'opacity-100'
+                                                : 'opacity-0'
+                                            )}
+                                          />
+                                          {item.typeName}
+                                        </CommandItem>
+                                      ))}
+                                    </CommandGroup>
+                                  </CommandList>
+                                </Command>
+                              </PopoverContent>
+                            </Popover>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                       <FormField
                         control={form.control}
                         name='paymentType'

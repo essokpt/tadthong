@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
@@ -124,11 +125,11 @@ export function InvoiceForm() {
   //const [openModal, setOpenModal] = useState(false)
 
   const navigate = useNavigate()
-  let today = new Date()
-  let user: any = localStorage.getItem('user')
-  let userid: any = localStorage.getItem('userId')
-  let dateCode = formatDate(today, 'yyyy-MM-dd')
-  let newCode = dateCode.split('-')
+  const today = new Date()
+  const user: any = localStorage.getItem('user')
+  const userid: any = localStorage.getItem('userId')
+  const dateCode = formatDate(today, 'yyyy-MM-dd')
+  const newCode = dateCode.split('-')
   // const { handleSubmit, register, setValue } = useForm()
 
   const form = useForm<z.infer<typeof formSchema>>({

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from '@/components/custom/button'
 
 import { PurchaseRequestItems } from './schema'
@@ -21,6 +22,8 @@ const initialValue = {
   branchId : '',
   discount : 0,
   vat : 0,
+  nonVat: 0,
+  wt: "",
   amount : 0,  
   description: '',
   requirmentDate: '',

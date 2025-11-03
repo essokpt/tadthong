@@ -12,7 +12,8 @@ export const schema = z.object({
     vat: z.number(),
     amount : z.number(), 
     createAt: z.string(),
-    status: z.string(),      
+    status: z.string(),    
+    mergeItem: z.boolean(),  
     customerId: z.number(),
     customer: z.object({
         code: z.string(),

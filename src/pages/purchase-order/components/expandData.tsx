@@ -28,7 +28,7 @@ export const ExpandData: React.FC<EditModalProps> = ({ data }) => {
             <TableCell>{toCurrency(item.discountTotal)}</TableCell>
             <TableCell>{toCurrency(item.amount)}</TableCell>
             <TableCell>{toCurrency(item.vat)}</TableCell>
-            <TableCell>{item.status}</TableCell>
+            <TableCell colSpan={3}>{item.status}</TableCell>
           </TableRow>
         ))
       ) : (

@@ -37,6 +37,7 @@ export const customerSchema = z.object({
             code: z.string(),
             companyName : z.string()
         }),
+        billingDate: z.string(),
     })
    
           

@@ -20,6 +20,9 @@ export const customerSchema = z.object({
     userId: z.string(),
     approveBy: z.string(),
     venderId: z.string(),
+    vat : z.number(),
+    nonVat : z.number(),
+    wt : z.string(),
     vender: z.object({
         code: z.string(),
         companyName : z.string()

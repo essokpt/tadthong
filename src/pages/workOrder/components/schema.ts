@@ -43,6 +43,7 @@ export const customerSchema = z.object({
             standardCost : z.number(),
         }),
         quantity: z.number(), 
+        standardBom: z.number(), 
         pickingQuantity: z.number(), 
         pickingRequest: z.number(), 
         pickingDate: z.string(), 

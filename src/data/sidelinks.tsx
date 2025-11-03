@@ -1,28 +1,28 @@
-import {  
+import {
   IconChecklist,
-  IconComponents,  
-  IconLayoutDashboard,  
+  IconComponents,
+  IconLayoutDashboard,
   IconSettings,
   IconTruck,
   IconHome,
   IconUsers,
   IconSubtask,
   IconMapPin,
-  IconEyeCheck, 
+  IconEyeCheck,
   IconBuildingBank,
   IconHierarchy,
   IconUsersGroup,
   IconShieldCheck,
-  IconAssembly,  
+  IconAssembly,
   IconTestPipe,
   IconBusinessplan,
   IconHomeDollar,
   IconBrandUnity,
-  IconCreditCardPay,  
+  IconCreditCardPay,
   IconTruckDelivery,
   IconShoppingBag,
   IconHexagonalPrismPlus,
-  IconProgressCheck,  
+  IconProgressCheck,
   IconFileCheck,
   IconRepeat,
   IconTruckReturn,
@@ -39,6 +39,7 @@ import {
   IconCoin,
   IconDeviceTabletPlus,
   IconReport,
+  IconMoneybag,
 } from '@tabler/icons-react'
 
 export interface NavLink {
@@ -47,6 +48,7 @@ export interface NavLink {
   href: string
   icon: JSX.Element
   role?: string
+  master? : boolean
 }
 
 export interface SideLink extends NavLink {
@@ -60,14 +62,16 @@ export const sidelinks: SideLink[] = [
     href: '/',
     icon: <IconLayoutDashboard size={22} />,
     role: 'dashboard',
+    master : true
   },
   {
     title: 'Report',
     label: '',
     href: '',
+    role: 'report',
     icon: <IconReport size={22} />,
 
-    sub: [     
+    sub: [
       {
         title: 'Master Report',
         label: '',
@@ -117,13 +121,14 @@ export const sidelinks: SideLink[] = [
         icon: <IconServer2 size={22} />,
         role: 'report',
       },
-      
     ],
   },
   {
     title: 'Master Management',
     label: '',
     href: '',
+    role: 'master',
+
     icon: <IconComponents size={22} />,
     sub: [
       {
@@ -161,7 +166,7 @@ export const sidelinks: SideLink[] = [
         icon: <IconTruck size={22} />,
         role: 'vender',
       },
-     
+
       {
         title: 'Roles',
         label: '',
@@ -183,13 +188,21 @@ export const sidelinks: SideLink[] = [
         icon: <IconMapPin size={22} />,
         role: 'location',
       },
+       {
+        title: 'Expense',
+        label: '',
+        href: '/expense',
+        icon: <IconMoneybag size={22} />,
+        role: 'report',
+      },
     ],
   },
-  
+
   {
     title: 'Branch Management',
     label: '',
     href: '',
+    role: 'branch',
     icon: <IconSubtask size={22} />,
     sub: [
       {
@@ -207,11 +220,12 @@ export const sidelinks: SideLink[] = [
         role: 'manageLocation',
       },
     ],
-  },  
+  },
   {
     title: 'Items Management',
     label: '',
     href: '',
+    role: 'item',
     icon: <IconAssembly size={22} />,
 
     sub: [
@@ -270,6 +284,8 @@ export const sidelinks: SideLink[] = [
     title: 'Purchase Non-PO',
     label: '',
     href: '',
+    role: 'purchaseNon',
+
     icon: <IconCreditCardPay size={22} />,
 
     sub: [
@@ -294,6 +310,8 @@ export const sidelinks: SideLink[] = [
     title: 'Purchase by PO',
     label: '',
     href: '',
+    role: 'pr',
+
     icon: <IconDeviceTabletPlus size={22} />,
 
     sub: [
@@ -345,6 +363,8 @@ export const sidelinks: SideLink[] = [
     title: 'Work Order',
     label: '',
     href: '',
+    role: 'workOrder',
+
     icon: <IconAffiliate size={22} />,
 
     sub: [
@@ -369,13 +389,14 @@ export const sidelinks: SideLink[] = [
         icon: <IconReportAnalytics size={22} />,
         role: 'workOrder',
       },
-      
     ],
   },
   {
     title: 'Sale Orders',
     label: '',
     href: '',
+    role: 'saleOrder',
+
     icon: <IconShoppingBag size={22} />,
 
     sub: [
@@ -393,46 +414,46 @@ export const sidelinks: SideLink[] = [
         icon: <IconReceipt2 size={22} />,
         role: 'invoice',
       },
-      
     ],
   },
   {
     title: 'Inventory',
     label: '',
     href: '',
+    role: 'inventory',
+
     icon: <IconBuildingWarehouse size={22} />,
 
     sub: [
-     
       {
         title: 'Stock',
         label: '',
         href: '/stock',
         icon: <IconServer2 size={22} />,
-        role: 'inventory',
+        role: 'stock',
       },
       {
         title: 'Transfer',
         label: '',
         href: '/transfer',
         icon: <IconTransfer size={22} />,
-        role: 'inventory',
+        role: 'transfer',
       },
       {
         title: 'Adjustment',
         label: '',
         href: '/adjustment',
         icon: <IconAdjustments size={22} />,
-        role: 'inventory',
+        role: 'adjustment',
       },
       {
         title: 'History',
         label: '',
         href: '/history',
         icon: <IconHistoryToggle size={22} />,
-        role: 'inventory',
+        role: 'history',
+         master : false
       },
-      
     ],
   },
   {
@@ -441,8 +462,6 @@ export const sidelinks: SideLink[] = [
     href: '/forecast',
     icon: <IconCoin size={22} />,
     role: 'forecast',
-   
+    master : false
   },
-  
-
 ]

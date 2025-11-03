@@ -26,7 +26,9 @@ import {
 // import { z } from 'zod'
 import { Separator } from '@/components/ui/separator'
 import {
+  createItemEcount,
   createWip,
+  deleteItemEcount,
   getAccountCode,
   getItemCategory,
   getItemGroup,
@@ -34,6 +36,7 @@ import {
   itemMasterDeleteFileAttach,
   itemMasterDownloadFileAttach,
   itemMasterUploadFiles,
+  UpdateEcount,
   updateItem,
 } from '@/services/itemApi'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -46,14 +49,20 @@ import { getLocation } from '@/services/locationApi'
 import FileDrag from '@/components/custom/fileDrag'
 import {
   IconDownload,
+  IconEdit,
   IconEye,
   IconInfoCircle,
+  IconPlus,
   IconTrash,
 } from '@tabler/icons-react'
 import { downloadFileData, formatCurrency, toCurrency } from '@/lib/utils'
 import { AlertModal } from '@/components/custom/alert-modal'
 import { Item } from './schema'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Badge } from '@/components/ui/badge'
+import { ItemEcount } from './type'
+import { CreateModal } from './create-modal'
+import { useItems } from '../context/item-context'
 
 interface EditModalProps {
   isOpen: boolean
@@ -88,6 +97,12 @@ interface Uom {
   code: string
 }
 
+const intial = {
+  id: 0,
+  code: '',
+  name: '',
+  itemMasterId: 0,
+}
 
 export const EditModal: React.FC<EditModalProps> = ({
   isOpen,
@@ -105,11 +120,16 @@ export const EditModal: React.FC<EditModalProps> = ({
   const [accountCode, setAccountCode] = useState<AccountCode[]>([])
   const [itemCategory, setCategory] = useState<ItemCategory[]>([])
   const [locations, setLocation] = useState<LocationType[]>([])
-  const [deleteTitle, setdeleteTitle] = useState(null)
-  const [deleteId, setdeleteId] = useState(null)
-
+  const [deleteTitle, setdeleteTitle] = useState('')
+  const [deleteId, setdeleteId] = useState(0)
+  const [openDeleteModal, setOpenDeleteModal] = useState(false)
+  const [openEcountModal, setOpenEcountModal] = useState(false)
+  const [editEcount, setEditEcount] = useState<ItemEcount>(intial)
+  //const [ecountList, setEcountList] = useState<ItemEcount[]>()
+  const { currentRow, setCurrentRow } = useItems()
   const { setRefresh } = useContext(ApiContext) as ApiType
-
+  //let ecountItem = data.itemEcounts? data.itemEcounts : []
+  // setEcountList(data.itemEcounts)
   function onCheckCombindFlag(e: any) {
     if (e) {
       data.combineMtFlag = false
@@ -129,11 +149,11 @@ export const EditModal: React.FC<EditModalProps> = ({
     console.log('onCheck:', e)
   }
 
-  const handleChangeInput = (e:ChangeEvent<HTMLInputElement>) =>{
-    console.log('handleChangeInput', e.target.id, e.target.value);
-    //const value = 
-    const numericValue = Number(e.target.value.replace(/\D/g, "")) / 100;
-    const current = numericValue ? toCurrency(numericValue) : "";
+  const handleChangeInput = (e: ChangeEvent<HTMLInputElement>) => {
+    console.log('handleChangeInput', e.target.id, e.target.value)
+    //const value =
+    const numericValue = Number(e.target.value.replace(/\D/g, '')) / 100
+    const current = numericValue ? toCurrency(numericValue) : ''
 
     setValue(e.target.id, current)
   }
@@ -250,6 +270,47 @@ export const EditModal: React.FC<EditModalProps> = ({
     return null
   }
 
+  function updateEcount(item: ItemEcount) {
+    console.log('updateEcount:', item)
+    setEditEcount(item)
+    setOpenEcountModal(true)
+  }
+
+  function deleteEcount(payload: ItemEcount) {
+    setdeleteId(payload.id)
+    setdeleteTitle(payload.name)
+    setOpenDeleteModal(true)
+  }
+
+  async function confirmDeleteEcount() {
+    const deleteEcount = await deleteItemEcount(deleteId)
+    console.log('confirmDeleteEcount success:', deleteEcount)
+    const deleteIndex = currentRow.findIndex((x) => x.id == deleteId)
+    if (deleteIndex !== -1) {
+      const lastDelete = currentRow.filter((x) => x.id != deleteId)
+      setCurrentRow(lastDelete)
+    }
+    setOpenDeleteModal(false)
+  }
+
+  async function handleUpdateEcountData(item: any) {
+    if (item.id === 0) {
+      //create new ecount
+      item.itemMasterId = data.id
+      const newEcount = await createItemEcount([item])
+      console.log('Create new e-count success:', newEcount)
+     
+      setCurrentRow(newEcount)
+     
+    } else {
+      const updateEcount = await UpdateEcount(item)
+      console.log('Update Ecount Data:', updateEcount)
+      setCurrentRow(updateEcount)
+
+    }
+    setOpenEcountModal(false)
+  }
+
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
@@ -260,10 +321,11 @@ export const EditModal: React.FC<EditModalProps> = ({
           <Separator className='bg-primary' />
           <div className='grid gap-4'>
             <Tabs defaultValue='general' className='w-full'>
-              <TabsList className='grid w-full grid-cols-2'>
+              <TabsList className='grid w-full grid-cols-3'>
                 <TabsTrigger value='general'>General Information</TabsTrigger>
                 {/* <TabsTrigger value='planing'>Planing Information</TabsTrigger> */}
                 <TabsTrigger value='file'>File Attached</TabsTrigger>
+                <TabsTrigger value='ecount'>E-Count</TabsTrigger>
               </TabsList>
               <form onSubmit={handleSubmit(updateData)}>
                 <TabsContent value='general'>
@@ -611,7 +673,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                             className='py-1 text-[0.8rem] text-muted-foreground'
                             htmlFor='itemGroupId'
                           >
-                            Account Code-2
+                            Labor Cost
                           </Label>
                           <select
                             {...register('accountCode2')}
@@ -633,7 +695,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                             className='py-1 text-[0.8rem] text-muted-foreground'
                             htmlFor='itemGroupId'
                           >
-                            Account Code-3
+                            Overhead Cost
                           </Label>
                           <select
                             {...register('accountCode3')}
@@ -656,7 +718,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                             className='py-1 text-[0.8rem] text-muted-foreground'
                             htmlFor='itemGroupId'
                           >
-                            Account Code-4
+                            Other Cost
                           </Label>
                           <select
                             {...register('accountCode4')}
@@ -947,11 +1009,10 @@ export const EditModal: React.FC<EditModalProps> = ({
                             {...register('averageCost')}
                             defaultValue={formatCurrency(data.averageCost)}
                             onChange={handleChangeInput}
-                           // onchange={(e) => formatCurrency(e)}
+                            // onchange={(e) => formatCurrency(e)}
                           />
                         </div>
 
-                      
                         {/* <div className='grid grid-cols-3 gap-2 py-2'> */}
                         <div className='mt-6 flex items-start space-x-2 space-y-0 rounded-md border p-2 shadow'>
                           <Checkbox
@@ -963,7 +1024,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                             }
                             defaultChecked={data.combineMtFlag}
                           />
-                        
+
                           <label
                             htmlFor='combineMtFlag'
                             className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
@@ -1006,7 +1067,6 @@ export const EditModal: React.FC<EditModalProps> = ({
                     </CardContent>
                   </Card>
                   <br></br>
-              
                 </TabsContent>
               </form>
               <TabsContent value='file'>
@@ -1090,11 +1150,88 @@ export const EditModal: React.FC<EditModalProps> = ({
                   </CardContent>
                 </Card>
               </TabsContent>
+              <TabsContent value='ecount'>
+                <Card className='min-h-full overflow-scroll '>
+                  <CardContent className='h-[35rem] space-y-2'>
+                    <Table className='w-full'>
+                      <TableCaption>A list of your recent items.</TableCaption>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>E-Count code</TableHead>
+                          <TableHead>E-Count Name</TableHead>
+
+                          <TableHead>Action</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {currentRow?.map((item) => (
+                          <TableRow key={item.id}>
+                            <TableCell>{item.code}</TableCell>
+                            <TableCell>{item.name}</TableCell>
+
+                            <TableCell className='w-[15rem]'>
+                              <Button
+                                size='icon'
+                                variant='ghost'
+                                className='rounded-full'
+                                onClick={() => updateEcount(item)}
+                              >
+                                <IconEdit size={20} />
+                              </Button>
+                              <Button
+                                size='icon'
+                                variant='ghost'
+                                className='rounded-full'
+                                onClick={() => deleteEcount(item)}
+                              >
+                                <IconTrash size={20} />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                      <TableFooter>
+                        <TableRow>
+                          <TableCell className='item-center' colSpan={9}>
+                            <Badge
+                              className='text-white hover:bg-primary'
+                              variant={'default'}
+                              onClick={() => {
+                                setEditEcount(intial)
+                                setOpenEcountModal(true)
+                              }}
+                            >
+                              <IconPlus size={20} />
+                              Add E-count.
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      </TableFooter>
+                    </Table>
+                  </CardContent>
+                </Card>
+              </TabsContent>
             </Tabs>
 
             <br />
           </div>
         </DialogContent>
+
+        <CreateModal
+          isOpen={openEcountModal}
+          onClose={() => setOpenEcountModal(false)}
+          loading={false}
+          createData={(e) => handleUpdateEcountData(e)}
+          data={editEcount}
+        />
+
+        <AlertModal
+          isOpen={openDeleteModal}
+          onClose={() => setOpenDeleteModal(false)}
+          onConfirm={confirmDeleteEcount}
+          loading={false}
+          title={deleteTitle}
+        />
 
         <AlertModal
           isOpen={open}

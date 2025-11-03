@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Layout, LayoutBody } from '@/components/custom/layout'
 // import { DataTable } from './components/data-table'
 import { useContext, useEffect, useState } from 'react'
@@ -9,16 +10,19 @@ import { ApiContext } from '@/components/layouts/api-context'
 import { ApiType } from 'types/api'
 import { PageHeader } from '@/components/layouts/header'
 import { IconListDetails } from '@tabler/icons-react'
+import { isValidDate } from '@/lib/utils'
+import SaleOrderProvider from './context/so-context'
 
 export default function SaleOrders() {
   const [data, setData] = useState<SaleOrder[]>([])
-
+ // const { setCountRow } = useSaleOrder();
   const { refresh, setRefresh } = useContext(ApiContext) as ApiType
 
   const getData = () => {
     setData([])
     console.log('Get SaleOrders data')
     getSaleOrder().then((data) => setData(data))
+   // setCountRow(data.length || 0)
     setRefresh(false)
   }
 
@@ -27,7 +31,17 @@ export default function SaleOrders() {
     if (str == '') {
       getData()
     } else {
-      searchSaleOrder(str).then((data) => setData(data))
+     // console.log('search:', str);
+      if(isValidDate(str)) {
+        const dateParts = str.split("-");
+        const formattedDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+        console.log('Formatted Date:', formattedDate);
+        searchSaleOrder(formattedDate).then((data) => setData(data))
+        
+      }else{
+        searchSaleOrder(str).then((data) => setData(data))
+      }
+    
     }
   }
 
@@ -38,6 +52,7 @@ export default function SaleOrders() {
   return (
     <Layout>
       <LayoutBody className='flex flex-col' fixedHeight>
+        <SaleOrderProvider>
         <PageHeader
           label='Sale Orders'
           icon={<IconListDetails size={45} className='mt-2 ' />}
@@ -50,6 +65,7 @@ export default function SaleOrders() {
             queryData={(e) => queryData(e)}
           />
         </div>
+        </SaleOrderProvider>
       </LayoutBody>
     </Layout>
   )

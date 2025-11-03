@@ -30,7 +30,7 @@ export function ExpandTable({ data }: DataTableProps) {
   return (
     <div className='space-y-4'>
       <div className='rounded-md border '>
-        <Table className='w-[80rem]'>
+        <Table className='w-[90rem]'>
           <TableCaption>A list of your recent items.</TableCaption>
           <TableHeader className='bg-secondary'>
             <TableRow>
@@ -41,8 +41,10 @@ export function ExpandTable({ data }: DataTableProps) {
               <TableHead>Discount</TableHead>
               <TableHead>Amount</TableHead>
               <TableHead>Vat</TableHead>
+              {/* <TableHead>Non vat</TableHead> */}
+              <TableHead>WT</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Approve By</TableHead>
+              <TableHead className='w-[7rem]'>Approve By</TableHead>
               <TableHead className='w-[7rem]'>Request By</TableHead>
               <TableHead >Remark</TableHead>
 
@@ -59,10 +61,12 @@ export function ExpandTable({ data }: DataTableProps) {
                     </TableCell>
                     <TableCell>{item.code}</TableCell>
                     <TableCell>{item.vender?.companyName}</TableCell>
-                    <TableCell>{item.deliveryDate}</TableCell>
+                    <TableCell>{format(item.deliveryDate, 'dd-MM-yyyy')}</TableCell>
                     <TableCell>{toCurrency(item.discount)}</TableCell>
                     <TableCell>{toCurrency(item.amount)}</TableCell>
                     <TableCell>{toCurrency(item.vat)}</TableCell>
+                    {/* <TableCell>{toCurrency(item.nonVat)}</TableCell> */}
+                    <TableCell>{item.wt}</TableCell>
                     <TableCell>
                       <AppStatus status={item.status?.toLocaleLowerCase()}/>
                       </TableCell>
@@ -87,7 +91,7 @@ export function ExpandTable({ data }: DataTableProps) {
                         <TableHead>Discount Total</TableHead>
                         <TableHead>Amount</TableHead>
                         <TableHead>Vat</TableHead>
-                        <TableHead>Remark</TableHead>
+                        <TableHead colSpan={3}>Remark</TableHead>
                       </TableRow>
                       <ExpandData data={item} />
                     </>

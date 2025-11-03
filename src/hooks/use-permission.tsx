@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from 'react'
 import { PermissionRole } from 'types/permission'
 
@@ -21,7 +22,7 @@ export default function usePermission( args: string) {
     if(isPermission){ 
       setRule(isPermission)
      // return isPermission
-     console.log('find resource', isPermission);   
+    // console.log('find resource', isPermission);   
     }   
   }
   useEffect(() => {

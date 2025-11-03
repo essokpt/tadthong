@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import userTableMock from "@/components/mockdata/userTableMock"
 
 import api from '../../config/SetupAxios'

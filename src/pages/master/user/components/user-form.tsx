@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { HTMLAttributes, SyntheticEvent, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -61,6 +62,7 @@ import { PageHeader } from '@/components/layouts/header'
 import { ThaiAddress } from 'types/thaiaddress'
 import useThaiAddress from '@/hooks/use-thaiAddress'
 import useDebounce from '@/hooks/use-debounce'
+import { Checkbox } from '@/components/ui/checkbox'
 
 interface SignUpFormProps extends HTMLAttributes<HTMLDivElement> {}
 
@@ -92,6 +94,7 @@ const formSchema = z.object({
   lastName: z.string().min(1, {
     message: 'Please enter your password',
   }),
+  isSelectPoReciveDate: z.boolean(),
   address: z.string(),
   phoneNumber: z.string(),
   username: z.string(),
@@ -150,30 +153,33 @@ export function UserForm({ className, ...props }: SignUpFormProps) {
       dateOfHire: '2024-04-20',
       branchesUser: [],
       status: 'Active',
+      isSelectPoReciveDate: false,
       //userRoleBranch: [{ firstname: '1', lastname: '1' }],
     },
   })
 
   function addNewData(payload: any) {
-    if(payload.id > 0 ){
-      console.log('edit role', payload);
-      
-      setSelectRoleBranch(selectRoleBranch.map(artwork => {
-        if (artwork.id === payload.id) {
-          // Create a *new* object with changes
-          return { ...artwork, 
-            RoleBranchesId: payload.RoleBranchesId,
-            branchId: payload.branchId,
-            branchName: payload.branchName,
-            roleName: payload.roleName   
-          };
-        } else {
-          // No changes
-          return artwork;
-        }
-      }));
-      
-    }else{
+    if (payload.id > 0) {
+      console.log('edit role', payload)
+
+      setSelectRoleBranch(
+        selectRoleBranch.map((artwork) => {
+          if (artwork.id === payload.id) {
+            // Create a *new* object with changes
+            return {
+              ...artwork,
+              RoleBranchesId: payload.RoleBranchesId,
+              branchId: payload.branchId,
+              branchName: payload.branchName,
+              roleName: payload.roleName,
+            }
+          } else {
+            // No changes
+            return artwork
+          }
+        })
+      )
+    } else {
       payload.id = selectRoleBranch.length + 1
       console.log('addNewData', payload)
       selectRoleBranch.push(payload)
@@ -244,10 +250,11 @@ export function UserForm({ className, ...props }: SignUpFormProps) {
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
     setIsLoading(true)
-   
+
     data.dateOfBirth = format(data.birth, 'yyyy-MM-dd')
     data.dateOfHire = format(data.hire, 'yyyy-MM-dd')
     console.log('submit data:', data)
+    
     const respone: any = await createUser(data)
     if (respone.id) {
       data.id = respone.id
@@ -292,7 +299,9 @@ export function UserForm({ className, ...props }: SignUpFormProps) {
           <div className={cn('grid gap-4', className)} {...props}>
             <Tabs defaultValue='information' className='w-full'>
               <TabsList className='grid w-full grid-cols-2'>
-                <TabsTrigger value='information'>General Information</TabsTrigger>
+                <TabsTrigger value='information'>
+                  General Information
+                </TabsTrigger>
                 <TabsTrigger value='account'>Branch & Role</TabsTrigger>
               </TabsList>
               <TabsContent value='information'>
@@ -404,6 +413,7 @@ export function UserForm({ className, ...props }: SignUpFormProps) {
                           </FormItem>
                         )}
                       />
+
                       <FormField
                         control={form.control}
                         name='birth'
@@ -496,6 +506,25 @@ export function UserForm({ className, ...props }: SignUpFormProps) {
                           </FormItem>
                         )}
                       />
+                      <div className='mt-5'>
+                        <FormField
+                          control={form.control}
+                          name='isSelectPoReciveDate'
+                          render={({ field }) => (
+                            <FormItem className='mt-5 flex h-[37px] flex-row items-start space-x-3 space-y-0 rounded-md border p-2.5  shadow'>
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                />
+                              </FormControl>
+                              <div className='space-y-1 leading-none'>
+                                <FormLabel>Enable PO-Receipt Date</FormLabel>
+                              </div>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
                     </div>
                     <div className='mb-3 mt-2 grid grid-cols-3 items-start gap-2 space-x-3 space-y-0 rounded-md border p-4 shadow'>
                       <div className='col-span-3 mb-2  flex items-center'>
@@ -649,7 +678,11 @@ export function UserForm({ className, ...props }: SignUpFormProps) {
                         )}
                       />
                     </div>
-                    <Button className='mt-2 w-full' loading={isLoading} variant='button'>
+                    <Button
+                      className='mt-2 w-full'
+                      loading={isLoading}
+                      variant='button'
+                    >
                       Create
                     </Button>
                   </form>
@@ -677,18 +710,18 @@ export function UserForm({ className, ...props }: SignUpFormProps) {
 
                         <TableCell>
                           <Button
-                          size='icon'
-                          variant='ghost'
-                          className='rounded-full'
-                          onClick={() => {
-                            setOpenModal(true)
-                            console.log(item);
-                            
-                            setEditValue(item)
-                          }}
-                        >
-                          <IconEdit size={20} />
-                        </Button> 
+                            size='icon'
+                            variant='ghost'
+                            className='rounded-full'
+                            onClick={() => {
+                              setOpenModal(true)
+                              console.log(item)
+
+                              setEditValue(item)
+                            }}
+                          >
+                            <IconEdit size={20} />
+                          </Button>
                           <Button
                             size='icon'
                             variant='ghost'

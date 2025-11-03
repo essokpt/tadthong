@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Layout, LayoutBody } from '@/components/custom/layout'
 // import { DataTable } from './components/data-table'
 import { useContext, useEffect, useState } from 'react'
@@ -9,6 +10,7 @@ import { ApiContext } from '@/components/layouts/api-context'
 import { ApiType } from 'types/api'
 import { PageHeader } from '@/components/layouts/header'
 import { IconListCheck } from '@tabler/icons-react'
+import { isValidDate } from '@/lib/utils'
 
 export default function WorkOrders() {
   const [data, setData] = useState<WorkOrder[]>([])
@@ -26,7 +28,14 @@ export default function WorkOrders() {
     if (str == '') {
       getData()
     } else {
-      searchWorkOrder(str).then((data) => setData(data))
+      if(isValidDate(str)) {
+        const dateParts = str.split('-')
+        const formattedDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`
+        console.log('Formatted Date:', formattedDate)
+        searchWorkOrder(formattedDate).then((data) => setData(data))
+      } else {
+        searchWorkOrder(str).then((data) => setData(data))
+      }
     }
   }
 

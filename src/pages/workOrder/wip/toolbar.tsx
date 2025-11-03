@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Cross2Icon, PlusCircledIcon } from '@radix-ui/react-icons'
 import { Button } from '@/components/custom/button'
 import { Input } from '@/components/ui/input'
@@ -81,13 +82,14 @@ export const ToolBar: React.FC<SerachModalProps> = ({ queryData, filterMonth,fil
           className='h-8 w-[150px] lg:w-[250px]'
         />
         <Button
+        disabled={!query}
           variant='outline'
           size='sm'
           className='h-8 px-2 lg:px-3'
           onClick={() => queryData(query)}
         >
           <SearchIcon className='mr-2 h-4 w-4' />
-          Search
+          Search Item
         </Button>
         {query && (
           <Button variant='ghost' onClick={reset} className='h-8 px-2 lg:px-3'>

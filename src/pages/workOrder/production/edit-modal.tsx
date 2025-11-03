@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 import { SyntheticEvent, useEffect, useState } from 'react'
 import { Button } from '@/components/custom/button'
@@ -116,7 +117,9 @@ export const EditModal: React.FC<EditModalProps> = ({
       (item) => item.id == e.target.id
     )
     if (findIndex != -1) {
-      data.workOrderUsages[findIndex].pickingRequest = parseFloat(e.target.value)
+      data.workOrderUsages[findIndex].pickingRequest = parseFloat(
+        e.target.value
+      )
       //updateItem(findIndex)
     }
 
@@ -125,15 +128,15 @@ export const EditModal: React.FC<EditModalProps> = ({
 
   async function updateData(payload: z.infer<typeof formSchema>) {
     setOnloading(true)
-    console.log('updateData:', payload)
-  //const receiveValue = payload.receiveRequest
-    payload.received =  payload.receiveRequest
-   // data.received = pareInt(data.received + receiveValue)
+  //  console.log('updateData:', payload)
+    //const receiveValue = payload.receiveRequest
+    payload.received = payload.receiveRequest
+    // data.received = pareInt(data.received + receiveValue)
     const userid: any = localStorage.getItem('userId')
     //const res: any = await updateProduction(payload)
 
-    const res:any = await updateItem(payload.receiveRequest)
-    if(res){    
+    const res: any = await updateItem(payload.receiveRequest)
+    if (res) {
       // stock
       const stock = {
         itemMasterId: payload.itemMasterId,
@@ -145,7 +148,7 @@ export const EditModal: React.FC<EditModalProps> = ({
       }
       // console.log('add stock:', [stock])
 
-       await createInventory([stock])
+        await createInventory([stock])
 
       // save history
       const history = {
@@ -164,7 +167,6 @@ export const EditModal: React.FC<EditModalProps> = ({
 
       // console.log('createInventoryHistory:', history)
        await createInventoryHistory([history])
-
     }
     //}
     setTimeout(() => {
@@ -173,24 +175,24 @@ export const EditModal: React.FC<EditModalProps> = ({
     }, 1500)
   }
 
-  async function updateItem(receiveValue:any) {
+  async function updateItem(receiveValue: any) {
     // setOnloading(true)
     const value = parseInt(receiveValue)
-   if(value > 0){
-    data.received = data.received + value
-    data.balance = data.quantity - data.received
-   }
-    console.log('updateItem:', data)
-   const res: any = await updateWorkOrderItems(data)
+    if (value > 0) {
+      data.received = data.received + value
+      data.balance = data.quantity - data.received
+    }
+    console.log('updateWorkOrderItems:', data)
+    const res: any = await updateWorkOrderItems(data)
 
     if (res.status == 200) {
+      console.log('UpdateProduction status:', data.workOrderUsages)
+
       const response: any = await UpdateProductionWip(data.workOrderUsages)
-      console.log('UpdateProductionWip:', response)
+      console.log('UpdateProduction status:', response)
 
-     return true
+      return true
     }
-
-   
   }
 
   useEffect(() => {
@@ -313,11 +315,10 @@ export const EditModal: React.FC<EditModalProps> = ({
                             />
                           </div>
 
-                        
                           <FormField
                             control={form.control}
                             name='receiveRequest'
-                            render={({field}) => (
+                            render={({ field }) => (
                               <FormItem className='space-y-1'>
                                 <FormLabel>Receipt Request</FormLabel>
                                 <FormControl>
@@ -408,7 +409,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                             )}
                           />
                         </div>
-                      
+
                         {/* <div className='grid'>
                           <Button
                             loading={onloading}
@@ -480,29 +481,13 @@ export const EditModal: React.FC<EditModalProps> = ({
                                   : ''}
                               </TableCell>
                               <TableCell>{item.remark}</TableCell>
-                              {/* <TableCell className='w-[8rem]'>
-                              <Button
-                                size='icon'
-                                variant='ghost'
-                                className='rounded-full'
-                                onClick={() => updatePurchaseItem(item)}
-                              >
-                                <IconRefresh size={20} />
-                              </Button>
-
-                            
-                            </TableCell> */}
                             </TableRow>
                           ))}
                         </TableBody>
                         <TableFooter>
                           <TableRow>
                             <TableCell colSpan={10} className='text-right'>
-                              <Button
-                                loading={onloading}
-                                // onClick={updateItem}
-                                variant='button'
-                              >
+                              <Button loading={onloading} variant='button'>
                                 <IconRefresh size={20} className='mr-2' />
                                 Update
                               </Button>

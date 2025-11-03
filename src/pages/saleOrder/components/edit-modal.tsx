@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 import { useContext, useEffect, useState } from 'react'
 import { Button } from '@/components/custom/button'
@@ -80,6 +81,11 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
+import { Checkbox } from '@/components/ui/checkbox'
+import InputCurrency from '@/components/custom/inputCurrency'
+import { Calendar } from '@/components/ui/calendar'
+import { CalendarIcon } from '@radix-ui/react-icons'
+import { format } from 'date-fns'
 //import { PlusCircledIcon } from '@radix-ui/react-icons'
 
 interface EditModalProps {
@@ -132,7 +138,10 @@ const formSchema = z.object({
   driverName: z.string(),
   userId: z.number(),
   workorderNo: z.string(),
-  // amount : z.number(),
+  transportationCost: z.number(),
+  shipTo: z.string(),
+  quota: z.string(),
+  inComplete: z.boolean(),
   selectLocation: z.string(),
   selectCustomer: z.string(),
   locationId: z.number(),
@@ -141,6 +150,9 @@ const formSchema = z.object({
   status: z.string(),
   createAt: z.string(),
   createBy: z.string(),
+  billingDate: z.date({
+    required_error: 'A date of customer billing is required.',
+  }),
 })
 
 export const EditModal: React.FC<EditModalProps> = ({
@@ -244,6 +256,8 @@ export const EditModal: React.FC<EditModalProps> = ({
 
   async function updateData(data: any) {
     setOnloading(true)
+    data.billingDate = format(data.billingDate, 'yyyy-MM-dd')
+
     console.log('updateData:', data)
 
     const res: any = await updateSaleOrder(data)
@@ -380,6 +394,53 @@ export const EditModal: React.FC<EditModalProps> = ({
                             <FormControl>
                               <Input {...field} readOnly />
                             </FormControl>
+
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name='billingDate'
+                        render={({ field }) => (
+                          <FormItem className='flex flex-col'>
+                            <FormLabel>Customer Billing Date</FormLabel>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <FormControl>
+                                  <Button
+                                    variant={'outline'}
+                                    className={cn(
+                                      'w-[350px] pl-3 text-left font-normal',
+                                      !field.value && 'text-muted-foreground'
+                                    )}
+                                  >
+                                    {field.value ? (
+                                      format(field.value, 'dd-MM-yyyy')
+                                    ) : (
+                                      <span>Pick a date</span>
+                                    )}
+                                    <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
+                                  </Button>
+                                </FormControl>
+                              </PopoverTrigger>
+                              <PopoverContent
+                                className='w-auto p-0'
+                                align='start'
+                              >
+                                <Calendar
+                                  mode='single'
+                                  selected={field.value}
+                                  onSelect={field.onChange}
+                                  // disabled={(date) =>
+                                  //   date > new Date() ||
+                                  //   date < new Date('1900-01-01')
+                                  // }
+                                  initialFocus
+                                />
+                              </PopoverContent>
+                            </Popover>
 
                             <FormMessage />
                           </FormItem>
@@ -672,6 +733,60 @@ export const EditModal: React.FC<EditModalProps> = ({
                           </FormItem>
                         )}
                       />
+                      <InputCurrency
+                        name='transportationCost'
+                        label='Transportation Cost'
+                        placeholder='0.00'
+                        className='mt-2'
+                        defaultValue={0}
+                      />
+                      <FormField
+                        control={form.control}
+                        name='shipTo'
+                        render={({ field }) => (
+                          <FormItem className='space-y-1'>
+                            <FormLabel>Ship To</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name='quota'
+                        render={({ field }) => (
+                          <FormItem className='space-y-1'>
+                            <FormLabel>Quota</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <div className='mt-7'>
+                        <FormField
+                          control={form.control}
+                          name='inComplete'
+                          render={({ field }) => (
+                            <FormItem className='mt-7 flex h-[37px] flex-row items-start space-x-3 space-y-0 rounded-md border p-2.5  shadow'>
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                />
+                              </FormControl>
+                              <div className='space-y-1 leading-none'>
+                                <FormLabel>Incomplete</FormLabel>
+                              </div>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
                       <FormField
                         control={form.control}
                         name='cause'

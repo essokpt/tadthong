@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 //import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { SyntheticEvent, useContext, useEffect, useState } from 'react'
@@ -123,7 +124,7 @@ export const EditModal: React.FC<EditModalProps> = ({
 }) => {
   const [isMounted, setIsMounted] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  //const [updateLoading, setUpdateLoading] = useState(false)
+  const [updateLoading, setUpdateLoading] = useState(false)
   const [openModal, setOpenModal] = useState(false)
 
   const [itemMaster, setItemMaster] = useState<ItemType[]>([])
@@ -197,7 +198,7 @@ export const EditModal: React.FC<EditModalProps> = ({
   }
 
   async function updateBomItem(id: any) {
-    //setUpdateLoading(true)
+    setUpdateLoading(true)
     const updateItem = data.bomItems.findIndex((item) => item.id == id)
     console.log('updateBomItem:', data.bomItems[updateItem])
 
@@ -208,6 +209,10 @@ export const EditModal: React.FC<EditModalProps> = ({
         console.log('updateBomItem success')
       }
     }
+
+    setTimeout(() => {
+      setUpdateLoading(false)
+    }, 1000)
   }
 
   async function updateGeneralData(payload: any) {
@@ -256,9 +261,9 @@ export const EditModal: React.FC<EditModalProps> = ({
     const changeItem: any = data.bomItems.findIndex(
       (item) => item.id == e.target.id
     )
-      // const numericValue = Number(e.target.value.replace(/\D/g, "")) / 100;
-      //   const current = numericValue ? toCurrency(numericValue) : "";
-    data.bomItems[changeItem].quantity =  parseFloat(e.target.value)
+    // const numericValue = Number(e.target.value.replace(/\D/g, "")) / 100;
+    //   const current = numericValue ? toCurrency(numericValue) : "";
+    data.bomItems[changeItem].quantity = parseFloat(e.target.value)
     //console.log('handleChangePrice id', id)
     console.log('handleChangeQuantity value', data.bomItems[changeItem])
   }
@@ -538,14 +543,23 @@ export const EditModal: React.FC<EditModalProps> = ({
 
                               <TableCell className='w-[8rem]'>
                                 <div className='flex items-center gap-3'>
-                                  <IconEdit
-                                    size={20}
-                                    onClick={() => updateBomItem(item.id)}
-                                  />
-                                  <IconTrash
-                                    size={20}
-                                    onClick={() => deleteBomItem(item)}
-                                  />
+                                  {updateLoading ? (
+                                    <>
+                                    <div className='h-5 w-5 animate-spin rounded-full border-2 border-blue-500 border-t-transparent' ></div>
+                                    updating...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <IconEdit
+                                        size={20}
+                                        onClick={() => updateBomItem(item.id)}
+                                      />
+                                      <IconTrash
+                                        size={20}
+                                        onClick={() => deleteBomItem(item)}
+                                      />
+                                    </>
+                                  )}
                                 </div>
                               </TableCell>
                             </TableRow>

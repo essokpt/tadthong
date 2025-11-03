@@ -31,6 +31,9 @@ export function ExpandTable({ data }: DataTableProps) {
               {/* <TableHead className='w-[20rem]'>Vender Name</TableHead> */}
               <TableHead>Quantity</TableHead>
               <TableHead>Total</TableHead>
+              <TableHead>Vat</TableHead>
+              {/* <TableHead>Non Vat</TableHead> */}
+              <TableHead>WT</TableHead>
               <TableHead>Amount</TableHead>
               {/* <TableHead>Amount</TableHead>
               <TableHead>Vat</TableHead> */}
@@ -86,6 +89,10 @@ export function ExpandTable({ data }: DataTableProps) {
                     {/* <TableCell>{item.vender.companyName}</TableCell> */}
                     <TableCell>{toCurrency(item.sumQty)}</TableCell>
                     <TableCell>{toCurrency(item.total)}</TableCell>
+                    <TableCell>{toCurrency(item.vat)}</TableCell>
+                    {/* <TableCell>{toCurrency(item.nonVat)}</TableCell> */}
+                    <TableCell>{item.wt}</TableCell>
+
                     <TableCell>{toCurrency(item.amount)}</TableCell>
                     <TableCell>
                     <AppStatus status={item.status?.toLocaleLowerCase()}/>
@@ -109,7 +116,7 @@ export function ExpandTable({ data }: DataTableProps) {
                         <TableHead>Total</TableHead>
                         <TableHead>Vat</TableHead>
                         <TableHead>Amount</TableHead>
-                        <TableHead>Remark</TableHead>
+                        <TableHead colSpan={4}>Remark</TableHead>
                     </TableRow>
 
                        <ExpandData data={item} />

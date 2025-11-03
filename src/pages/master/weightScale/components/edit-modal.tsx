@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 //import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useContext, useEffect, useState } from 'react'
@@ -230,6 +231,8 @@ export const EditModal: React.FC<EditModalProps> = ({
       onClose()
     }, 1000)
   }
+
+  
 
   async function confirmDeleteItem() {
     setIsLoading(true)

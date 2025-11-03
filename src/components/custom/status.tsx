@@ -14,6 +14,8 @@ export const AppStatus: React.FC<StatusProps> = ({ status }) => {
       return <Badge className='bg-wait hover:bg-wait text-white' variant='default'>  {str.toUpperCase()} </Badge>;
     case 'new order':
       return <Badge className='bg-new hover:bg-new text-white' variant='default'> {str.toUpperCase()} </Badge>;
+    case 'new':
+      return <Badge className='bg-new hover:bg-new text-white' variant='default'> {str.toUpperCase()} </Badge>;
     case 'new saleorder':
         return <Badge className='bg-new hover:bg-new text-white' variant='default'> {str.toUpperCase()} </Badge>;
     case 'approved':

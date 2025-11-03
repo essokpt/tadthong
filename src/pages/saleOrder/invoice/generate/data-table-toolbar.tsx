@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Cross2Icon } from '@radix-ui/react-icons'
 import { Table } from '@tanstack/react-table'
 import { Button } from '@/components/custom/button'
@@ -10,11 +11,6 @@ import { format } from 'date-fns'
 import { createInvoice, updateSaleOrderCompleted } from '@/services/saleOrderApi'
 import { useNavigate } from 'react-router-dom'
 import { PlusCircleIcon, SearchIcon } from 'lucide-react'
-//import { useNavigate } from 'react-router-dom';
-//import { DataTableViewOptions } from './data-table-view-options'
-
-// import { priorities, statuses } from '../mockdata/data'
-// import { DataTableFacetedFilter } from './data-table-faceted-filter'
 
 
 interface DataTableToolbarProps<TData> {
@@ -50,12 +46,12 @@ export function DataTableToolbar<TData>({
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
 
-  async function GenerateInvoice(){
-    //setOnloading(true)
+  async function GenerateInvoice(value:any) {
+    setOnloading(true)
     console.log('GenerateInvoice Data:',confirmSelect);
-    let today = new Date()    
-    let dateCode = format(today, 'yyyy-MM-dd')
-    let newCode = dateCode.split('-')
+    const today = new Date()    
+    const dateCode = format(today, 'yyyy-MM-dd')
+    const newCode = dateCode.split('-')
     const newInvoice = {
       code: 'INV-' + newCode[0] + newCode[1] + newCode[2],   
       currency: 'THA',
@@ -64,11 +60,12 @@ export function DataTableToolbar<TData>({
       total: 1,
       customerId: confirmSelect[0].saleOrder?.customerId,      
       amount: 1,
-      
+      mergeItem: value.mergeItem,
       createAt: format(today, 'yyyy-MM-dd'),
       status: 'New',
       remark: 'Auto generate invoice',
       invoiceItems: confirmSelect,
+      userId : localStorage.getItem('userId')
     }
     console.log('create invoice :', newInvoice)
 

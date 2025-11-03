@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Layout, LayoutBody } from '@/components/custom/layout'
 // import { DataTable } from './components/data-table'
 import { useContext, useEffect, useState } from 'react'
@@ -19,6 +20,7 @@ import { columns } from './components/itemList/columns'
 import { PurchaseRequestItems } from './components/itemList/schema'
 import { TablePagination } from '@/components/custom/pagination'
 import { PaginationType } from 'types/pagination'
+import { isValidDate } from '@/lib/utils'
 
 const initialValue = {
   pageSize: 5,
@@ -60,7 +62,14 @@ export default function PurchaseRequests() {
       getData(1)
     } else if (enableMainFilter) {
       setSearch(true)
-      searchPurchaseRequest(str).then((data) => setData(data))
+      if (isValidDate(str)) {
+        const dateParts = str.split('-')
+        const formattedDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`
+        console.log('Formatted Date:', formattedDate)
+        searchPurchaseRequest(formattedDate).then((data) => setData(data))
+      } else {
+        searchPurchaseRequest(str).then((data) => setData(data))
+      }
     } else {
       setSearch(true)
       getPurchaseRequestItems(str).then((data) => setPrItems(data))
@@ -100,9 +109,7 @@ export default function PurchaseRequests() {
                 onChangeSize={(e) => getPageSize(e)}
               />
             </>
-         
           )}
-           
         </div>
       </LayoutBody>
     </Layout>

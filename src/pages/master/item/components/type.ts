@@ -1,6 +1,12 @@
 import { PriceType } from "../../price/components/type"
 import { VenderType } from "../../vender/components/type"
 
+export interface ItemEcount{
+    id: number
+    code: string
+    name: string
+    itemMasterId: number
+}
 export interface ItemType{
     id: string
     code: string
@@ -54,7 +60,12 @@ export interface ItemType{
     }
     location : {
         id : number
-        name : string
+        name : string,
+        warehouse : {
+            id : number
+            name : string,
+           
+        }
     }
     itemGroup : {
         id : number

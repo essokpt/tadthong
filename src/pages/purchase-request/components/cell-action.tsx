@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AlertModal } from "@/components/custom/alert-modal";
 import { Button } from "@/components/custom/button";
 import 'jspdf-autotable'
@@ -35,7 +36,9 @@ const initialValue = {
   companyId : '',
   branchId : '',
   discount : 0,
-  vat : 0,
+  vat: 0,
+  nonVat: 0,
+  wt: "",
   amount : 0,  
   description: '',
   requirmentDate: '',
@@ -100,9 +103,9 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
 
 
   function printHeader(doc:any, value:PurchaseRequest){
-    let bodyItems = [];  
+    const bodyItems = [];  
     for (let index = 0; index < value.purchaseRequestItems.length; index++) {
-      let item = [
+      const item = [
         index+1, 
         value.purchaseRequestItems[index].quantity,
         value.purchaseRequestItems[index].itemMaster.code,
@@ -180,7 +183,7 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
       body: bodyItems,
   })
 
-  let finalY = doc.lastAutoTable.finalY || 5
+  const finalY = doc.lastAutoTable.finalY || 5
   doc.text('Remark : ',printX + 15, finalY + 10)
   doc.text(`${value.remark}`,printX + 32, finalY + 10)
 

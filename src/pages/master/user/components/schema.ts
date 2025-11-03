@@ -23,7 +23,8 @@ export const schema = z.object({
   status : z.string(),
   username : z.string(),
   password : z.string(),
-  userImage : z.string()
+  userImage : z.string(),
+  isSelectPoReciveDate: z.boolean()
 })
 
 export type User = z.infer<typeof schema>

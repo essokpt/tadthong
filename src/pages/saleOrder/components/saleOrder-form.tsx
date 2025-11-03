@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
@@ -39,7 +40,7 @@ import {
 import { Card, CardContent } from '@/components/ui/card'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { formatDate } from 'date-fns'
+import { format, formatDate } from 'date-fns'
 import { Textarea } from '@/components/ui/textarea'
 import { getLocation } from '@/services/locationApi'
 import { LocationType } from '@/pages/location/components/type'
@@ -68,7 +69,10 @@ import { cn } from '@/lib/utils'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { CarRegistration } from './type'
-
+import { Checkbox } from '@/components/ui/checkbox'
+import InputCurrency from '@/components/custom/inputCurrency'
+import { Calendar } from '@/components/ui/calendar'
+import { CalendarIcon } from '@radix-ui/react-icons'
 type ItemList = {
   id: number
   itemMasterId: string
@@ -138,14 +142,20 @@ const formSchema = z.object({
   carRegistration: z.string(),
   driverName: z.string(),
   userId: z.number(),
-  workorderNo : z.string(),
-  // amount : z.number(),
+  workorderNo: z.string(),
+  transportationCost: z.number(),
+  shipto: z.string(),
+  quota: z.string(),
+  inComplete: z.boolean(),
   selectLocation: z.string(),
   selectCustomer: z.string(),
   remark: z.string().min(0),
   status: z.string(),
   createAt: z.string(),
   createBy: z.string(),
+  billingDate: z.date({
+    required_error: 'A date of customer billing is required.',
+  }),
 })
 
 export function SaleOrderForm() {
@@ -159,27 +169,37 @@ export function SaleOrderForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [files, setFiles] = useState<File[]>()
 
+ // const { countRow } = useSaleOrder()
+  
   //const [openModal, setOpenModal] = useState(false)
 
   const navigate = useNavigate()
-  let today = new Date()
-  let user: any = localStorage.getItem('user')
-  let userid: any = localStorage.getItem('userId')
-  let dateCode = formatDate(today, 'yyyy-MM-dd')
-  let newCode = dateCode.split('-')
+  const today = new Date()
+  const user: any = localStorage.getItem('user')
+  const userid: any = localStorage.getItem('userId')
+  const dateCode = formatDate(today, 'yyyy-MM-dd')
+  const newCode = dateCode.split('-')
   // const { handleSubmit, register, setValue } = useForm()
+  // const runCode = countRow + 1000
+  // const convertCode = runCode.toString()
+  // console.log('convert code: ', convertCode);
+  //   console.log('count row: ', countRow);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       cause: '',
-      workorderNo : '',
+      workorderNo: '',
       code: 'SO' + newCode[0] + newCode[1] + newCode[2],
       createBy: user,
       userId: parseInt(userid),
       createAt: formatDate(today, 'yyyy-MM-dd'),
       status: 'New SaleOrder',
       remark: '',
+      transportationCost: 0,
+      shipto: '',
+      quota: '',
+      inComplete: false,
     },
   })
 
@@ -195,6 +215,7 @@ export function SaleOrderForm() {
     data.locationId = selectedLocation.id
     data.saleOrderItems = items
     data.files = files
+    data.billingDate = format(data.billingDate, 'yyyy-MM-dd')
 
     console.log('createSaleOrder data', data)
 
@@ -310,7 +331,52 @@ export function SaleOrderForm() {
                         </FormItem>
                       )}
                     />
+                    <FormField
+                      control={form.control}
+                      name='billingDate'
+                      render={({ field }) => (
+                        <FormItem className='flex flex-col'>
+                          <FormLabel>Customer Billing Date</FormLabel>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant={'outline'}
+                                  className={cn(
+                                    'w-[350px] pl-3 text-left font-normal',
+                                    !field.value && 'text-muted-foreground'
+                                  )}
+                                >
+                                  {field.value ? (
+                                    format(field.value, 'dd-MM-yyyy')
+                                  ) : (
+                                    <span>Pick a date</span>
+                                  )}
+                                  <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent
+                              className='w-auto p-0'
+                              align='start'
+                            >
+                              <Calendar
+                                mode='single'
+                                selected={field.value}
+                                onSelect={field.onChange}
+                                // disabled={(date) =>
+                                //   date > new Date() ||
+                                //   date < new Date('1900-01-01')
+                                // }
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
 
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                     <FormField
                       control={form.control}
                       name='selectLocation'
@@ -589,7 +655,7 @@ export function SaleOrderForm() {
                         <FormItem className='space-y-1'>
                           <FormLabel>Work Order No</FormLabel>
                           <FormControl>
-                            <Input {...field}  />
+                            <Input {...field} />
                           </FormControl>
 
                           <FormMessage />
@@ -610,14 +676,21 @@ export function SaleOrderForm() {
                         </FormItem>
                       )}
                     />
+                    <InputCurrency
+                      name='transportationCost'
+                      label='Transportation Cost'
+                      placeholder='0.00'
+                      className='mt-2'
+                      defaultValue={0}
+                    />
                     <FormField
                       control={form.control}
-                      name='cause'
+                      name='shipto'
                       render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Queue No.</FormLabel>
+                        <FormItem className='space-y-1'>
+                          <FormLabel>Ship To</FormLabel>
                           <FormControl>
-                            <Textarea className='resize-none' {...field} />
+                            <Input {...field} />
                           </FormControl>
 
                           <FormMessage />
@@ -626,9 +699,58 @@ export function SaleOrderForm() {
                     />
                     <FormField
                       control={form.control}
-                      name='remark'
+                      name='quota'
+                      render={({ field }) => (
+                        <FormItem className='space-y-1'>
+                          <FormLabel>Quota</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                      <FormField
+                      control={form.control}
+                      name='cause'
                       render={({ field }) => (
                         <FormItem>
+                          <FormLabel>Queue No.</FormLabel>
+                          <FormControl>
+                            <Input className='resize-none' {...field} />
+                          </FormControl>
+
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <div className='mt-7'>
+                      <FormField
+                        control={form.control}
+                        name='inComplete'
+                        render={({ field }) => (
+                          <FormItem className='mt-7 flex h-[37px] flex-row items-start space-x-3 space-y-0 rounded-md border p-2.5  shadow'>
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                            <div className='space-y-1 leading-none'>
+                              <FormLabel>Incomplete</FormLabel>
+                            </div>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  
+                    <FormField
+                      control={form.control}
+                      name='remark'
+                      render={({ field }) => (
+                        <FormItem className='col-span-2'>
                           <FormLabel>Remark</FormLabel>
                           <FormControl>
                             <Textarea className='resize-none' {...field} />
@@ -652,7 +774,7 @@ export function SaleOrderForm() {
                       <TableCaption>A list of your recent items.</TableCaption>
                       <TableHeader>
                         <TableRow>
-                        <TableHead className='items-center'>Action</TableHead>
+                          <TableHead className='items-center'>Action</TableHead>
 
                           <TableHead>รหัสสินค้า</TableHead>
                           <TableHead>สินค้า</TableHead>
@@ -675,7 +797,6 @@ export function SaleOrderForm() {
                           <TableHead>ความชื้นต้นทาง</TableHead>
                           <TableHead>ความชื้นลูกค้า</TableHead>
                           <TableHead>เลขใบชั่งลูกค้า</TableHead>
-                          
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -731,7 +852,6 @@ export function SaleOrderForm() {
                             <TableCell>
                               {item.destinationWeighingScale}
                             </TableCell>
-                            
                           </TableRow>
                         ))}
                       </TableBody>

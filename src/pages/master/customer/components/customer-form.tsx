@@ -53,30 +53,31 @@ import useThaiAddress from '@/hooks/use-thaiAddress'
 import useDebounce from '@/hooks/use-debounce'
 import { PageHeader } from '@/components/layouts/header'
 import FileDrag from '@/components/custom/fileDrag'
+import { zodResolver } from '@hookform/resolvers/zod'
 //import { zodResolver } from '@hookform/resolvers/zod'
 
 interface SignUpFormProps extends HTMLAttributes<HTMLDivElement> {}
 
 const formSchema = z.object({
-  code: z.string().min(1, { message: 'Please enter your email' }),
+  code: z.string().min(1, { message: 'Please enter code' }),
   companyName: z.string().min(1, {
-    message: 'Please enter your password',
+    message: 'Please enter company name',
   }),
-  address: z.string().min(0),
+  address: z.string().min(1, { message: 'Please enter address' }),
   fax: z.string(),
   ext: z.string(),
   tax: z.string(),
-  type: z.string(),
+  type: z.string().min(1, { message: 'Please enter payment type' }),
   phone: z.string(),
   attn: z.string(),
-  email: z.string().email({ message: 'Invalid email address' }),
-  status: z.string(),
+  status: z.string().min(1, { message: 'Please enter status' }),
+  email: z.string(),
   remark: z.string(),
   country: z.string(),
-  district: z.string(),
-  subDistrict: z.string(),
-  province: z.string(),
-  zipcode: z.string(),
+  district: z.string().min(1, { message: 'Please enter district' }),
+  subDistrict: z.string().min(1, { message: 'Please enter sub district' }),
+  province: z.string().min(1, { message: 'Please enter province' }),
+  zipcode: z.string().min(1, { message: 'Please enter zipcode' }),
   paymentTerm: z.string(),
   currency: z.string(),
   creditHold: z.boolean(),
@@ -87,27 +88,28 @@ const formSchema = z.object({
   alternateFax: z.string(),
   specialIntruction: z.string(),
   meng: z.string(),
-  costmarkup: z.string().min(1),
+  costmarkup: z.string(),
   paymenTerm: z.string(),
   createAt: z.string(),
   customerBillings: z.array(
     z.object({
-      type: z.string(),
-      code: z.string(),
-      name: z.string(),
-      address: z.string(),
-      district: z.string(),
-      subDistrict: z.string(),
-      province: z.string(),
-      zipcode: z.string(),
-      country: z.string(),
-      phone: z.string(),
-      email: z.string(),
-      contactName: z.string(),
-      latitude: z.string(),
-      longtitude: z.string(),
-      branch: z.string(),
-    })
+        type: z.string(),
+        code: z.string(),
+        name: z.string(),
+        address: z.string(),
+        district: z.string(),
+        subDistrict: z.string(),
+        province: z.string(),
+        zipcode: z.string(),
+        country: z.string(),
+        phone: z.string(),
+        email: z.string(),
+        contactName: z.string(),
+        latitude: z.string(),
+        longtitude: z.string(),
+        branch: z.string(),
+      })
+      .nullable()
   ),
 })
 
@@ -147,10 +149,39 @@ export function CustomerForm({ className, ...props }: SignUpFormProps) {
   const navigate = useNavigate()
 
   const form = useForm<z.infer<typeof formSchema>>({
-    //resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema),
     defaultValues: {
+      code: '',
+      companyName: '',
+      address: '',
+      fax: '',
+      ext: '',
+      tax: '',
+      type: '',
+      phone: '',
+      attn: '',
+      email: '',
+      remark: '',
+      country: '',
+      district: '',
+      subDistrict: '',
+      province: '',
+      zipcode: '',
+      paymentTerm: '',
+      currency: '',
+      creditHold: false,
+      creditLimitOrder: '',
+      creditLimitItem: '',
+      alternatePhone: '',
+      phoneExt: '',
+      alternateFax: '',
+      specialIntruction: '',
+      meng: '',
+      costmarkup: '',
+      paymenTerm: '',
       status: 'Active',
       createAt: format(today, 'yyyy-MM-dd'),
+      customerBillings: [],
     },
   })
 
@@ -182,7 +213,9 @@ export function CustomerForm({ className, ...props }: SignUpFormProps) {
       payload.remark = uuidv4()
       billings.push(payload)
     } else {
-      const existingIndex = billings.findIndex((x) => x.remark == payload.remark)
+      const existingIndex = billings.findIndex(
+        (x) => x.remark == payload.remark
+      )
       if (existingIndex != -1) {
         billings[existingIndex] = payload
       }
@@ -195,6 +228,7 @@ export function CustomerForm({ className, ...props }: SignUpFormProps) {
     setIsLoading(true)
     data.customerBillings = billings
     console.log('create data', data)
+
     const response: any = await createCustomer(data)
     console.log('create customer -success', response)
 
@@ -202,7 +236,6 @@ export function CustomerForm({ className, ...props }: SignUpFormProps) {
       if (response.data.id > 0) {
         console.log('create customer -success', response)
 
-        //data.files = files
         if (files?.length > 0) {
           const formData = new FormData()
           for (let i = 0; i < files?.length; i++) {
@@ -293,7 +326,9 @@ export function CustomerForm({ className, ...props }: SignUpFormProps) {
                 <TabsTrigger value='information'>
                   General Information
                 </TabsTrigger>
-                <TabsTrigger value='account'>Billing Address / Ship To Address</TabsTrigger>
+                <TabsTrigger value='account'>
+                  Billing Address / Ship To Address
+                </TabsTrigger>
               </TabsList>
               <TabsContent value='information'>
                 <Form {...form}>
@@ -501,7 +536,6 @@ export function CustomerForm({ className, ...props }: SignUpFormProps) {
                     </div>
                     <div className='mb-3 grid grid-cols-3 items-start gap-2 space-x-3 space-y-0 rounded-md border p-4 shadow'>
                       <div className='col-span-3 mb-2  flex items-center'>
-                        {/* <IconMap /> */}
                         <Label htmlFor='terms' className='ml-3 text-lg'>
                           Address.
                         </Label>

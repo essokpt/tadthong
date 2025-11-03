@@ -129,7 +129,7 @@ export const EditModal: React.FC<EditModalProps> = ({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className='h-screen max-w-full'>
+        <DialogContent className='h-full max-w-full  overflow-scroll'>
           <DialogHeader>
             <DialogTitle>Approve </DialogTitle>
           </DialogHeader>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AlertModal } from "@/components/custom/alert-modal";
 import { Button } from "@/components/custom/button";
 import {
@@ -16,6 +17,7 @@ import { ApiContext } from "@/components/layouts/api-context";
 import { ApiType } from "types/api";
 import { IconEye, IconSettingsDown } from "@tabler/icons-react";
 import usePermission from "@/hooks/use-permission";
+import { useItems } from "../context/item-context";
 
 interface DataTableRowActionsProps{
     row: Item
@@ -89,6 +91,12 @@ const initialValue = {
   accountCode3: '',
   accountCode4: '',
   accountCode5: '',
+  itemEcounts: [{
+    id: 0,
+    code: '',
+    name: '',
+    itemMasterId: 0,
+  }]
 
 }
 
@@ -104,10 +112,12 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
 
   const { setRefresh } = useContext(ApiContext) as ApiType
   const rule: any = usePermission('item')
-
+  const { setCurrentRow } = useItems()
+ 
   function updateAction(row:any) {   
     setIsEdit(true) 
     setEditValue(row)
+    setCurrentRow(row.itemEcounts)
     console.log('update row',row);  
   }
 
@@ -172,8 +182,9 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
           <DropdownMenuItem
            disabled={!rule[0]?.canUpdate}
             onClick={() => { 
-              setEditble(true)
+              
               updateAction(row)
+              setEditble(true)
             }}
           >
             <Edit className="mr-2 h-4 w-4" /> Update

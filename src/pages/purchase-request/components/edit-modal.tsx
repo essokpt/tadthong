@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/custom/button'
 import { useForm } from 'react-hook-form'
@@ -57,6 +58,17 @@ import { CreateModal } from './create-modal'
 import { Badge } from '@/components/ui/badge'
 import usePermission from '@/hooks/use-permission'
 
+const vatSelect = [
+  { value: 0, name: 'Non vat' },
+  { value: 7, name: '7%' },
+  { value: 0, name: '0%' },
+]
+
+const wtProp = [
+  { value: '1%', name: '1%' },
+  { value: '3%', name: '3%' },
+  { value: '5%', name: '5%' },
+]
 interface EditModalProps {
   isOpen: boolean
   onClose: () => void
@@ -105,7 +117,7 @@ export const EditModal: React.FC<EditModalProps> = ({
   isOpen,
   onClose,
   data,
-  editble
+  editble,
 }) => {
   const [isMounted, setIsMounted] = useState(false)
   const { handleSubmit, register } = useForm()
@@ -420,7 +432,69 @@ export const EditModal: React.FC<EditModalProps> = ({
                         defaultValue={data.department}
                       />
                     </div>
-
+                    <div className='grid'>
+                      <Label
+                        className='py-1 text-[0.8rem] text-muted-foreground'
+                        htmlFor='vat'
+                      >
+                        Vat
+                      </Label>
+                       <select
+                        // id={item.id}
+                        // onChange={handleChangeRole}
+                        {...register('vat')}
+                        defaultValue={data.vat}
+                        className='flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1'
+                      >
+                        {vatSelect.map((item) => (
+                          <option
+                            className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
+                            value={item.value}
+                            key={item.value}
+                          >
+                            {item.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    {/* <div className='grid'>
+                      <Label
+                        className='py-1 text-[0.8rem] text-muted-foreground'
+                        htmlFor='nonVat'
+                      >
+                        Non Vat
+                      </Label>
+                      <Input
+                        className='text-[0.8rem]'
+                        {...register('nonVat')}
+                        defaultValue={data.nonVat}
+                      />
+                    </div> */}
+                    <div className='grid'>
+                      <Label
+                        className='py-1 text-[0.8rem] text-muted-foreground'
+                        htmlFor='wt'
+                      >
+                        WT
+                      </Label>
+                      <select
+                        // id={item.id}
+                        // onChange={handleChangeRole}
+                        {...register('wt')}
+                        defaultValue={data.wt}
+                        className='flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1'
+                      >
+                        {wtProp.map((item) => (
+                          <option
+                            className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
+                            value={item.value}
+                            key={item.value}
+                          >
+                            {item.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                     <div className='grid '>
                       <Label
                         className='py-1 text-[0.8rem] text-muted-foreground'
@@ -463,7 +537,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                         defaultValue={data.cause}
                       />
                     </div>
-                    <div className='col-span-2 grid'>
+                    <div className='grid'>
                       <Label
                         className='py-1 text-[0.8rem] text-muted-foreground'
                         htmlFor='remark'

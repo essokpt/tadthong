@@ -64,7 +64,7 @@ export const columns: ColumnDef<PurchaseOrder>[] = [
         <div className='flex space-x-2'>
          
           <span className='max-w-32 truncate font-medium sm:max-w-72 md:max-w-[31rem]'>
-            {row.getValue('deliveryDate')}
+            {format(row.getValue('deliveryDate'), 'dd-MM-yyyy')}
           </span>
         </div>
       )

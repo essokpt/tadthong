@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Layout, LayoutBody } from '@/components/custom/layout'
 // import { DataTable } from './components/data-table'
 import { useContext, useEffect, useState } from 'react'
@@ -19,6 +20,7 @@ import { PurchaseOrderItems } from './components/itemList/schema'
 import { columns } from './components/itemList/columns'
 import { TablePagination } from '@/components/custom/pagination'
 import { PaginationType } from 'types/pagination'
+import { isValidDate } from '@/lib/utils'
 
 const initialValue = {
   pageSize: 5,
@@ -40,7 +42,7 @@ export default function PurchaseOrders() {
   const getData = (pageReq: number) => {
     setData([])
     console.log('Get PO data')
-    getPurchaseOrder(pageReq, pagination.pageSize).then((data) =>     {
+    getPurchaseOrder(pageReq, pagination.pageSize).then((data) => {
       setData(data.data)
       setPagination(data.paginations)
     })
@@ -54,7 +56,14 @@ export default function PurchaseOrders() {
       getData(1)
     } else if (enableMainFilter) {
       setSearch(true)
-      searchPurchaseOrder(str).then((data) => setData(data))
+      if (isValidDate(str)) {
+        const dateParts = str.split('-')
+        const formattedDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`
+        console.log('Formatted Date:', formattedDate)
+        searchPurchaseOrder(formattedDate).then((data) => setData(data))
+      } else {
+        searchPurchaseOrder(str).then((data) => setData(data))
+      }
     } else {
       setSearch(true)
       getPurchaseOrderItems(str).then((data) => setPoItems(data))
@@ -92,13 +101,13 @@ export default function PurchaseOrders() {
             <ItemsDataTable data={poItems} columns={columns} />
           ) : (
             <>
-            <ExpandTable data={data} />
-            <br></br>
-            <TablePagination
-              data={pagination}
-              onChangePage={(e) => getData(e)}
-              onChangeSize={(e) => getPageSize(e)}
-            />
+              <ExpandTable data={data} />
+              <br></br>
+              <TablePagination
+                data={pagination}
+                onChangePage={(e) => getData(e)}
+                onChangeSize={(e) => getPageSize(e)}
+              />
             </>
           )}
         </div>

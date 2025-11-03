@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 import { SyntheticEvent, useEffect, useState } from 'react'
 import { Button } from '@/components/custom/button'
@@ -68,7 +69,7 @@ import {
 import { ConfirmDelete } from './confirm-delete'
 import FileDrag from '@/components/custom/fileDrag'
 //import { useNavigate } from 'react-router-dom'
-import { cn, downloadFileData } from '@/lib/utils'
+import { cn, downloadFileData, toCurrency } from '@/lib/utils'
 import { AlertModal } from '@/components/custom/alert-modal'
 // import { ApiContext } from '@/components/layouts/api-context'
 // import { ApiType } from 'types/api'
@@ -166,11 +167,12 @@ export const EditModal: React.FC<EditModalProps> = ({
       (item) => item.id == e.target.id
     )
     if (findIndex != -1) {
-      const qty = parseInt(e.target.value)
+      const qty = parseFloat(e.target.value)
       data.workOrderUsages[findIndex].quantity = qty
+
       if (qty >= data.workOrderUsages[findIndex].pickingQuantity) {
-        data.workOrderUsages[findIndex].pickingBalance =
-          qty - data.workOrderUsages[findIndex].pickingQuantity
+        data.workOrderUsages[findIndex].pickingBalance = data.quantity * qty
+         // qty - data.workOrderUsages[findIndex].pickingQuantity
       }
 
       //updateItem(findIndex)
@@ -691,7 +693,8 @@ export const EditModal: React.FC<EditModalProps> = ({
                               <TableHead>Item Code</TableHead>
                               <TableHead>Item Name</TableHead>
                               <TableHead>Specifications</TableHead>
-                              <TableHead>Quantity</TableHead>
+                              <TableHead>Standard Bom</TableHead>
+                              <TableHead>Estimate Bom</TableHead>
                               <TableHead>Issued</TableHead>
                               <TableHead>Balance</TableHead>
                               <TableHead>Last Picking Date</TableHead>
@@ -711,6 +714,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                                 <TableCell>
                                   {item.itemMaster?.specification}
                                 </TableCell>
+                                <TableCell>{toCurrency(item.standardBom)}</TableCell>
                                 <TableCell>
                                   {/* <input 
                             className='bg-black'
@@ -728,13 +732,13 @@ export const EditModal: React.FC<EditModalProps> = ({
                                     type='number'
                                     min={item.pickingQuantity}
                                     id={item.id}
-                                    defaultValue={item.quantity}
+                                    defaultValue={item.quantity? toCurrency(item.quantity) : toCurrency(0)}
                                     onChange={handleChangeQuantity}
                                   />
                                 </TableCell>
 
-                                <TableCell>{item.pickingQuantity}</TableCell>
-                                <TableCell>{item.pickingBalance}</TableCell>
+                                <TableCell>{toCurrency(item.pickingQuantity)}</TableCell>
+                                <TableCell>{toCurrency(item.pickingBalance)}</TableCell>
                                 <TableCell>
                                   {item.pickingDate
                                     ? format(item.pickingDate, 'dd-MM-yyyy')

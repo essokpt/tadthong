@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
-import { useContext, useEffect, useState } from 'react'
+import { ChangeEvent, useContext, useEffect, useState } from 'react'
 import { Button } from '@/components/custom/button'
 import { useForm } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
@@ -23,12 +24,20 @@ import {
 import { Separator } from '@/components/ui/separator'
 import { ImportMaterial } from './schema'
 
-import { updateMaterial } from '@/services/materialApi'
+import { updateMaterial, updateMaterialItem } from '@/services/materialApi'
 import { LocationType } from '@/pages/location/components/type'
 import { getLocation } from '@/services/locationApi'
 import { ApiContext } from '@/components/layouts/api-context'
 import { ApiType } from 'types/api'
 import { IconChecklist, IconInfoCircle } from '@tabler/icons-react'
+// import {
+//   Select,
+//   SelectContent,
+//   SelectGroup,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from '@/components/ui/select'
 
 interface EditModalProps {
   isOpen: boolean
@@ -50,14 +59,28 @@ export const EditModal: React.FC<EditModalProps> = ({
 
   const { setRefresh } = useContext(ApiContext) as ApiType
 
-  async function updateData(data: any) {
+  async function updateData(payload: any) {
     setOnloading(true)
-    console.log('updateData:', data)
 
-    const res: any = await updateMaterial(data)
+    const sumAmount = data.materials?.reduce(
+      (sum, item) =>
+        sum +
+        Number(item.priceReceipt) *
+          (Number(item.weightIn) - Number(item.weightOut)),
+      0
+    )
+
+    payload.amount = Math.abs(sumAmount)
+    console.log('updateData:', data)
+    //payload.materials = data.materials
+    const res: any = await updateMaterial(payload)
 
     if (res.status == 200) {
-      console.log('updateMaterial success')
+      console.log('updateMaterial items', data.materials)
+
+      const respone =  await updateMaterialItem(data.materials)
+       console.log('updateMaterial items', respone)
+
     }
 
     setTimeout(() => {
@@ -65,6 +88,41 @@ export const EditModal: React.FC<EditModalProps> = ({
       setRefresh(true)
       onClose()
     }, 1000)
+  }
+
+  function handleChangeValue(e: ChangeEvent<HTMLInputElement>) {
+    const itemIndex: any = data.materials.findIndex(
+      (item) => item.id == Number(e.target.id)
+    )
+    console.log('handleSelectOriginal', e.target.id)
+
+    if (itemIndex != -1) {
+      data.materials[itemIndex].weightIn = e.target.value
+      console.log('handleSelectOriginal', itemIndex, e.target.value)
+    }
+  }
+
+  function handleChangeValueWeightOut(e: ChangeEvent<HTMLInputElement>) {
+    const itemIndex: any = data.materials.findIndex(
+      (item) => item.id == Number(e.target.id)
+    )
+    console.log('handleChangeValueWeightOut', e.target.id)
+
+    if (itemIndex != -1) {
+      data.materials[itemIndex].weightOut = e.target.value
+      console.log('handleChangeValueWeightOut', itemIndex, e.target.value)
+    }
+  }
+
+  const handleChangeType = (e: ChangeEvent<HTMLSelectElement>) => {
+    const itemIndex: any = data.materials.findIndex(
+      (item) => item.id == Number(e.target.id)
+    )
+    if (itemIndex != -1) {
+      data.materials[itemIndex].paymentType = e.target.value
+            console.log('handleChangeType',  data.materials[itemIndex])
+
+    }
   }
 
   useEffect(() => {
@@ -165,7 +223,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                     Location
                   </Label>
                   <select
-                   disabled={!isEdit}
+                    disabled={!isEdit}
                     {...register('locationId')}
                     defaultValue={data.locationId}
                     className='flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1'
@@ -252,10 +310,11 @@ export const EditModal: React.FC<EditModalProps> = ({
                       </TableHead>
                       <TableHead>ประเภท (code1)</TableHead>
                       <TableHead>บริษัท (code2)</TableHead>
+                      <TableHead className='w-[8rem]'>Payment Type</TableHead>
                       <TableHead>สินค้า (code3)</TableHead>
                       <TableHead>การขนส่ง (code4)</TableHead>
-                      <TableHead>ความชื้น% (remark1)</TableHead>
-                      <TableHead>สิ่งเจือปน% (remark2)</TableHead>
+                      <TableHead>ความชื้น% (Work Order)</TableHead>
+                      <TableHead>สิ่งเจือปน% (Quota)</TableHead>
                       <TableHead>หมายเหตุ (remark3)</TableHead>
                       <TableHead>ราคา (price)</TableHead>
                       <TableHead className='w-[6rem]'>
@@ -288,13 +347,70 @@ export const EditModal: React.FC<EditModalProps> = ({
                         <TableCell>{item.dateIn}</TableCell>
                         <TableCell>{item.timeIn}</TableCell>
 
-                        <TableCell>{item.weightIn}</TableCell>
+                        <TableCell>
+                          {/* {item.weightIn} */}
+
+                          <Input
+                            id={item.id.toString()}
+                            className='text-[0.8rem]'
+                            min={0}
+                            // type='number'
+                            onChange={handleChangeValue}
+                            defaultValue={item.weightIn}
+                          />
+                        </TableCell>
                         <TableCell>{item.dateOut}</TableCell>
                         <TableCell>{item.timeOut}</TableCell>
-                        <TableCell>{item.weightOut}</TableCell>
+                        <TableCell>
+                          {/* {item.weightOut} */}
+                          <Input
+                            id={item.id.toString()}
+                            className='text-[0.8rem]'
+                            min={0}
+                            // type='number'
+                            onChange={handleChangeValueWeightOut}
+                            defaultValue={item.weightOut}
+                          />
+                        </TableCell>
                         <TableCell>{item.typeCode}</TableCell>
 
                         <TableCell>{item.customerCode}</TableCell>
+
+                        <TableCell>
+                          <select
+                            defaultValue={item.paymentType}
+                            id={item.id.toString()}
+                            onChange={handleChangeType}
+                            className='flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1'
+                          >
+                            <option
+                              className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
+                              value='Cash'
+                            >
+                              Cash
+                            </option>
+                            <option
+                              className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
+                              value='Cradit'
+                            >
+                              Cradit
+                            </option>
+                          </select>
+                        </TableCell>
+                        {/* <TableCell>
+                          <Select id={item.id} onValueChange={handleChangeType}>
+                            <SelectTrigger className='w-[180px]'>
+                              <SelectValue placeholder='Select a type' />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectGroup>
+                                <SelectItem value='Cash'>Cash</SelectItem>
+                                <SelectItem value='Cradit'>Cradit</SelectItem>
+                              </SelectGroup>
+                            </SelectContent>
+                          </Select>
+                        </TableCell> */}
+
                         <TableCell>{item.productCode}</TableCell>
                         <TableCell>{item.col1}</TableCell>
                         <TableCell>{item.col2}</TableCell>

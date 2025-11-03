@@ -25,9 +25,6 @@ import {
 
 import { columns } from './components/columns'
 import { Tabs, TabsContent } from '@/components/ui/tabs'
-// import ThemeSwitch from '@/components/layouts/theme-switch'
-// import { TopNav } from '@/components/layouts/top-nav'
-// import { UserNav } from '@/components/layouts/user-nav'
 import { Layout, LayoutBody } from '@/components/custom/layout'
 import { DataTable } from './components/dataTable'
 import { Overview } from './components/overview'
@@ -54,11 +51,13 @@ export default function Dashboard() {
   const currentDate = new Date()
   function onSubmit(data: z.infer<typeof FormSchema>) {
     console.log(data)
-    getData(format(data.fromDate, 'dd-MM-yyyy'), format(data.toDate, 'dd-MM-yyyy'))
+    getData(
+      format(data.fromDate, 'dd-MM-yyyy'),
+      format(data.toDate, 'dd-MM-yyyy')
+    )
   }
 
-  const getData = (fromDate:string, toDate:string) => {
-    
+  const getData = (fromDate: string, toDate: string) => {
     getDashboard(fromDate, toDate).then((data) => {
       setSummary(data.summary)
       setProduct(data.product)
@@ -68,30 +67,25 @@ export default function Dashboard() {
   }
 
   useEffect(() => {
-    getData(format(currentDate, 'dd-MM-yyyy'), format(currentDate, 'dd-MM-yyyy'))
+    getData(
+      format(currentDate, 'dd-MM-yyyy'),
+      format(currentDate, 'dd-MM-yyyy')
+    )
   }, [])
   return (
     <Layout>
-      {/* ===== Top Heading ===== */}
-      {/* <LayoutHeader className='m-4 border-2 rounded-md border-primary'>
-        <TopNav />
-        <div className='ml-auto flex items-center space-x-4'>
-          <Search />
-          <ThemeSwitch />
-          <UserNav />
-        </div>
-      </LayoutHeader> */}
+     
 
       {/* ===== Main ===== */}
-      <LayoutBody className='m-4 rounded-md border-2 border-primary'>
+      <LayoutBody className='m-4 rounded-md '>
         <div className='flex items-center  justify-between space-y-2'>
           <h1 className='text-2xl font-bold tracking-tight md:text-3xl'>
-            Dashboard
+            Dashboard 
           </h1>
         </div>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
+          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6 mt-2'>
             <div className='grid gap-4'>
               <div className='grid grid-cols-3 items-start gap-2 space-x-3 space-y-0 rounded-md border p-4 shadow'>
                 <FormField
@@ -179,9 +173,7 @@ export default function Dashboard() {
                   )}
                 />
                 <div className='py-1'>
-                
-                <Button  type='submit'>Search</Button>
-
+                  <Button type='submit'>Search</Button>
                 </div>
               </div>
             </div>

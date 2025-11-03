@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { SyntheticEvent, useContext, useEffect, useState } from 'react'
 import { Button } from '@/components/custom/button'
 import { useForm } from 'react-hook-form'
@@ -32,6 +33,7 @@ import { ApiType } from 'types/api'
 import { IconCheck, IconChecklist, IconSum } from '@tabler/icons-react'
 import { Summary } from './schema'
 import usePermission from '@/hooks/use-permission'
+import { formatCurrency } from '@/lib/utils'
 
 interface EditModalProps {
   isOpen: boolean
@@ -74,11 +76,11 @@ export const EditModal: React.FC<EditModalProps> = ({
 
   async function updateData(payload: any) {
     setOnloading(true)
-    let today = new Date()
+    const today = new Date()
     if (action === 'approved') {
       payload.status = 'approved'
-      let userId = localStorage.getItem('userId');
-      payload.userId = userId? parseInt(userId) : 0
+      const userId = localStorage.getItem('userId')
+      payload.userId = userId ? parseInt(userId) : 0
     }
     if (action === 'reject') {
       payload.status = 'reject'
@@ -86,6 +88,9 @@ export const EditModal: React.FC<EditModalProps> = ({
     payload.id = data.id
     payload.approvedBy = localStorage.getItem('user')
     payload.approveDate = format(today, 'yyyy-MM-dd')
+    payload.locationId = data.locationId
+    payload.amount = Number(summary.sumAmount)
+
     console.log('updateData:', payload)
 
     const res: any = await updateMaterial(payload)
@@ -189,27 +194,27 @@ export const EditModal: React.FC<EditModalProps> = ({
                                 น้ำหนักชั่งเข้า
                               </TableCell>
                               <TableCell className='text-left'>
-                                {summary.sumWeightIn}
+                                {formatCurrency(summary.sumWeightIn)}
                               </TableCell>
                               <TableCell className='text-center text-base'>
                                 น้ำหนักชั่งออก
                               </TableCell>
                               <TableCell className='text-left'>
-                                {summary.sumWeightOut}
+                                {formatCurrency(summary.sumWeightOut)}
                               </TableCell>
                               <TableCell className='text-center text-base'>
                                 น้ำหนักสุทธิ
                               </TableCell>
                               <TableCell className='text-left'>
                                 {summary.sumWeightNet
-                                  ? summary.sumWeightNet
-                                  : 0}
+                                  ? formatCurrency(summary.sumWeightNet)
+                                  : 0.00}
                               </TableCell>
                               <TableCell className='text-center text-base'>
                                 หักความชื้น
                               </TableCell>
                               <TableCell className='text-left'>
-                                {summary.sumHumiduty ? summary.sumHumiduty : 0}
+                                {summary.sumHumiduty ? formatCurrency(summary.sumHumiduty) : 0.00}
                               </TableCell>
                             </TableRow>
                             <TableRow>
@@ -218,28 +223,28 @@ export const EditModal: React.FC<EditModalProps> = ({
                               </TableCell>
                               <TableCell className='text-left'>
                                 {summary.sumadulteration
-                                  ? summary.sumadulteration
-                                  : 0}
+                                  ? formatCurrency(summary.sumadulteration)
+                                  : 0.00 }
                               </TableCell>
                               <TableCell className='text-center text-base'>
                                 หักอื่นๆ
                               </TableCell>
                               <TableCell className='text-left'>
-                                {summary.sumOther ? summary.sumOther : 0}
+                                {summary.sumOther ? formatCurrency(summary.sumOther) : 0.00}
                               </TableCell>
                               <TableCell className='text-center text-base'>
                                 น้ำหนักคงเหลือ
                               </TableCell>
                               <TableCell className='text-left'>
                                 {summary.sumWeightBalace
-                                  ? summary.sumWeightBalace
-                                  : 0}
+                                  ? formatCurrency(summary.sumWeightBalace)
+                                  : 0.00 }
                               </TableCell>
                               <TableCell className='text-center text-base'>
                                 จำนวนเงิน
                               </TableCell>
                               <TableCell className='text-left'>
-                                {summary.sumAmount ? summary.sumAmount : 0}
+                                {summary.sumAmount ? formatCurrency(summary.sumAmount) : 0.00 }
                               </TableCell>
                             </TableRow>
                             <TableRow>
@@ -247,25 +252,25 @@ export const EditModal: React.FC<EditModalProps> = ({
                                 หักเงินค่าชั่ง
                               </TableCell>
                               <TableCell className='text-left'>
-                                {summary.sumCol7 ? summary.sumCol7 : 0}
+                                {summary.sumCol7 ? formatCurrency(summary.sumCol7) : 0.00}
                               </TableCell>
                               <TableCell className='text-center text-base'>
                                 หักค่าลง
                               </TableCell>
                               <TableCell className='text-left'>
-                                {summary.sumShiping ? summary.sumShiping : 0}
+                                {summary.sumShiping ? formatCurrency(summary.sumShiping) : 0.00}
                               </TableCell>
                               <TableCell className='text-center text-base'>
                                 หักเงินอื่นๆ
                               </TableCell>
                               <TableCell className='text-left'>
-                                {summary.sumMoney ? summary.sumMoney : 0}
+                                {summary.sumMoney ? formatCurrency(summary.sumMoney) : 0.00}
                               </TableCell>
                               <TableCell className='text-center text-base'>
                                 เงินคงเหลือ
                               </TableCell>
                               <TableCell className='text-left'>
-                                {summary.sumBalance ? summary.sumBalance : 0}
+                                {summary.sumBalance ? formatCurrency(summary.sumBalance) : 0.00}
                               </TableCell>
                             </TableRow>
                           </TableBody>
@@ -288,6 +293,56 @@ export const EditModal: React.FC<EditModalProps> = ({
                           </TableCaption>
                           <TableHeader>
                             <TableRow>
+                              <TableHead>Import ID (Ident)</TableHead>
+                              <TableHead className='w-[6rem]'>
+                                เลขที่ชั่งเข้า (ticket1)
+                              </TableHead>
+                              <TableHead className='w-[6rem]'>
+                                เลขที่ชั่งออก (ticket2)
+                              </TableHead>
+                              <TableHead className='w-[6rem]'>
+                                ทะเบียนรถ (truck)
+                              </TableHead>
+                              <TableHead>วันชั่งเข้า (datein)</TableHead>
+                              <TableHead>เวลาชั่งเข้า (timein)</TableHead>
+                              <TableHead className='w-[6rem]'>
+                                น้ำหนักชั่งเข้า (w1)
+                              </TableHead>
+                              <TableHead>วันชั่งออก (dateout)</TableHead>
+                              <TableHead>เวลาชั่งออก (timeout)</TableHead>
+                              <TableHead className='w-[6rem]'>
+                                น้ำหนักชั่งออก (w2)
+                              </TableHead>
+                              <TableHead>ประเภท (code1)</TableHead>
+                              <TableHead>บริษัท (code2)</TableHead>
+                              <TableHead className='w-[8rem]'>Payment Type</TableHead>
+
+                              <TableHead>สินค้า (code3)</TableHead>
+                              <TableHead>การขนส่ง (code4)</TableHead>
+                              <TableHead>ความชื้น% (Work Order)</TableHead>
+                              <TableHead>สิ่งเจือปน% (Quota)</TableHead>
+                              <TableHead>หมายเหตุ (remark3)</TableHead>
+                              <TableHead>ราคา (price)</TableHead>
+                              <TableHead className='w-[6rem]'>
+                                หักความชื้น (adj_w1)
+                              </TableHead>
+                              <TableHead className='w-[6rem]'>
+                                หักสิ่งเจือปน (adj_w2)
+                              </TableHead>
+                              <TableHead>หักอื่นๆ (adj_w3)</TableHead>
+                              <TableHead className='w-[6rem]'>
+                                หักเงินค่าชั่ง (adj_m1)
+                              </TableHead>
+                              <TableHead>หักค่าลง (adj_m2)</TableHead>
+                              <TableHead className='w-[6rem]'>
+                                หักเงินอื่นๆ (adj_m3)
+                              </TableHead>
+                              <TableHead>Print 1 (print1)</TableHead>
+                              <TableHead>Print 2 (print2)</TableHead>
+                              <TableHead>CheckSum (chksum)</TableHead>
+                              <TableHead>Status (status)</TableHead>
+                            </TableRow>
+                            {/* <TableRow>
                               <TableHead className='w-[100px]'>
                                 Import Id
                               </TableHead>
@@ -321,7 +376,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                               <TableHead>Col11</TableHead>
                               <TableHead>Col12</TableHead>
                               <TableHead>Col13</TableHead>
-                            </TableRow>
+                            </TableRow> */}
                           </TableHeader>
                           <TableBody>
                             {data.materials?.map((item) => (
@@ -333,20 +388,21 @@ export const EditModal: React.FC<EditModalProps> = ({
                                 <TableCell>{item.dateIn}</TableCell>
                                 <TableCell>{item.timeIn}</TableCell>
 
-                                <TableCell>{item.weightIn}</TableCell>
+                                <TableCell>{formatCurrency(parseFloat(item.weightIn))}</TableCell>
                                 <TableCell>{item.dateOut}</TableCell>
                                 <TableCell>{item.timeOut}</TableCell>
-                                <TableCell>{item.weightOut}</TableCell>
+                                <TableCell>{formatCurrency(parseFloat(item.weightOut))}</TableCell>
                                 <TableCell>{item.typeCode}</TableCell>
 
                                 <TableCell>{item.customerCode}</TableCell>
+                                <TableCell>{item.paymentType}</TableCell>
                                 <TableCell>{item.productCode}</TableCell>
                                 <TableCell>{item.col1}</TableCell>
                                 <TableCell>{item.col2}</TableCell>
                                 <TableCell>{item.col3}</TableCell>
 
                                 <TableCell>{item.remark}</TableCell>
-                                <TableCell>{item.priceReceipt}</TableCell>
+                                <TableCell>{formatCurrency(parseFloat(item.priceReceipt))}</TableCell>
                                 <TableCell>{item.col4}</TableCell>
                                 <TableCell>{item.col5}</TableCell>
                                 <TableCell>{item.col6}</TableCell>

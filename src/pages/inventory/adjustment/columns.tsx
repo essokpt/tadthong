@@ -3,6 +3,7 @@ import { DataTableColumnHeader } from '@/components/dataTable/data-table-column-
 import { Adjustment} from './schema'
 import { CellAction } from './cell-action'
 import { Badge } from '@/components/ui/badge'
+import { format } from 'date-fns'
 
 export const columns: ColumnDef<Adjustment>[] = [
   {
@@ -15,7 +16,7 @@ export const columns: ColumnDef<Adjustment>[] = [
         <div className='flex space-x-2'>
          
           <span className='max-w-32 truncate font-medium sm:max-w-72 md:max-w-[31rem]'>
-          {row.getValue('createAt')}
+           {format(row.original.createAt, 'dd-MM-yyyy')}
           </span>
         </div>
       )
@@ -69,7 +70,22 @@ export const columns: ColumnDef<Adjustment>[] = [
       )
     },
   },      
- 
+ {
+    accessorKey: 'drawerBy',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title='Drawer/Return By' />
+    ),
+    cell: ({ row }) => {   
+      return (
+        <div className='flex space-x-2'>
+         
+          <span className='max-w-32 truncate font-medium sm:max-w-72 md:max-w-[31rem]'>
+          {row.getValue('drawerBy')}
+          </span>
+        </div>
+      )
+    },
+  },    
   {
     accessorKey: 'remark',
     header: ({ column }) => (

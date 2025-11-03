@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { HTMLAttributes, SyntheticEvent, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { formatDate } from 'date-fns'
@@ -51,6 +52,7 @@ import { SelectItemModal } from './selectItem-modal'
 import { AdjustItem } from './adjust-item-schema'
 import {
   createInventoryAdjust,
+  createInventoryAdjustIn,
   createInventoryHistory,
   getAdjustmentReason,
 } from '@/services/inventoryApi'
@@ -60,6 +62,9 @@ import { Check, ChevronsUpDown } from 'lucide-react'
 import { z } from 'zod'
 import { IReason } from './type'
 import { Badge } from '@/components/ui/badge'
+import { RadioGroupItem } from '@/components/ui/radio-group'
+import { RadioGroup } from '@radix-ui/react-radio-group'
+import { AdjustInModal } from './adjustIn-modal'
 
 interface SignUpFormProps extends HTMLAttributes<HTMLDivElement> {}
 interface ChangeEvent<T = Element> extends SyntheticEvent<T> {
@@ -70,15 +75,19 @@ const formSchema = z.object({
   userId: z.number(),
   selectReason: z.string(),
   adjustmentReasonId: z.number(),
-  remark: z.string().min(0),
+  drawerBy: z.string(),
+  remark: z.string(),
   createAt: z.string(),
   createBy: z.string(),
+  adjustType: z.enum(['adjust-in', 'adjust-out'], {
+    required_error: 'You need to select a notification type.',
+  }),
 })
 
 export function AdjustForm({ className, ...props }: SignUpFormProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [openSelect, setOpenSelect] = useState(false)
-
+  const [openAdjustIn, setOpenAdjustIn] = useState(false)
   const [adjustmentReason, setAdjustmentReason] = useState<IReason[]>([])
 
   const [selectedAdjustItems, setSelectedAdjustItems] = useState<AdjustItem[]>(
@@ -87,9 +96,9 @@ export function AdjustForm({ className, ...props }: SignUpFormProps) {
 
   //const { handleSubmit, register } = useForm()
 
-  let today = new Date()
-  let user: any = localStorage.getItem('user')
-  let userId: any = localStorage.getItem('userId')
+  const today = new Date()
+  const user: any = localStorage.getItem('user')
+  const userId: any = localStorage.getItem('userId')
 
   const navigate = useNavigate()
 
@@ -98,7 +107,10 @@ export function AdjustForm({ className, ...props }: SignUpFormProps) {
     defaultValues: {
       createBy: user,
       userId: parseInt(userId),
+      drawerBy: '',
+      remark: '',
       createAt: formatDate(today, 'yyyy-MM-dd'),
+      adjustType: 'adjust-in',
     },
   })
 
@@ -131,47 +143,69 @@ export function AdjustForm({ className, ...props }: SignUpFormProps) {
   }
 
   function addNewData(payload: any) {
-    console.log('add Newdata to form', payload)
+    if(form.getValues('adjustType') === 'adjust-in') {
+    console.log('add Newdata to adjust-in', payload)
+
+      setSelectedAdjustItems((prevItems) => [
+        ...prevItems,
+        {
+          ...payload[0],
+        },
+      ])
+    }else{
+          console.log('add Newdata to adjust-out', payload)
+
     setSelectedAdjustItems(payload)
+    }
   }
 
   async function onSubmit(data: any) {
-    setIsLoading(true)
-    const userid:any = localStorage.getItem('userId')
+   // setIsLoading(true)
+    const userid: any = localStorage.getItem('userId')
     data.inventoryAdjustItems = selectedAdjustItems
-    console.log('create transfer', data)
+    console.log('create adjustment', data)
 
-    const respone: any = await createInventoryAdjust(data)
-    console.log('respone', respone)
-    if (respone.status == 200) {
-       // save history
-        const history = {
-          StockType: 'Adjustment',
-          Ref: respone.data.code,
-          StockBy: localStorage.getItem('user'),
-          ReceiveQuantity: selectedAdjustItems[0].receiveQuantity,
-          Unit: 'pcs',
-          Status: 'Completed',
-          ItemMasterId: data.Ite,
-          LocationId: selectedAdjustItems[0].locationId,
-          warehouseId: selectedAdjustItems[0].warehouseDestinationId,
-          branchesId: localStorage.getItem('branchId'),
-          userId: parseInt(userid)
-        }
-  
-        console.log('createInventoryHistory:', history)
-        await createInventoryHistory([history])
-        setTimeout(() => {
-          setIsLoading(false)
-         
-        }, 1000)
+    
+    if(form.getValues('adjustType') === 'adjust-in'){
+      const res = await createInventoryAdjustIn(data)
+      console.log('create adjust-in res', res);
+      
+    }
+    else{
+    const res = await createInventoryAdjust(data)
+    
+    console.log('respone', res)
+    if (res?.status == 200) {
+      // save history
+      const history = {
+        StockType: data.adjustType,
+        Ref: res.data.code,
+        StockBy: localStorage.getItem('user'),
+        ReceiveQuantity: selectedAdjustItems[0].receiveQuantity,
+        Unit: 'pcs',
+        Status: 'Completed',
+        ItemMasterId: 0,
+        LocationId: selectedAdjustItems[0].locationId,
+        warehouseId: selectedAdjustItems[0].location?.warehouse?.id || 1,
+        branchesId: localStorage.getItem('branchId'),
+        userId: parseInt(userid),
+      }
+
+      console.log('createInventoryHistory:', history)
+      await createInventoryHistory([history])
+      setTimeout(() => {
+        setIsLoading(false)
+      }, 1000)
 
       setIsLoading(false)
-      navigate('/adjustment', { replace: true })
+     
     }
+  }
     setTimeout(() => {
       setIsLoading(false)
     }, 2000)
+
+     navigate('/adjustment', { replace: true })
   }
 
   useEffect(() => {
@@ -198,7 +232,7 @@ export function AdjustForm({ className, ...props }: SignUpFormProps) {
                           General Information.
                         </Label>
                       </div>
-                      
+
                       <FormField
                         control={form.control}
                         name='createAt'
@@ -258,7 +292,7 @@ export function AdjustForm({ className, ...props }: SignUpFormProps) {
                                   <CommandInput placeholder='Search location...' />
                                   <CommandList>
                                     <CommandEmpty>
-                                      No location found.
+                                      No reason found.
                                     </CommandEmpty>
                                     <CommandGroup>
                                       {adjustmentReason.map((item) => (
@@ -266,8 +300,14 @@ export function AdjustForm({ className, ...props }: SignUpFormProps) {
                                           value={item.desc}
                                           key={item.id}
                                           onSelect={() => {
-                                            form.setValue('selectReason', item.desc )
-                                            form.setValue('adjustmentReasonId', item.id )
+                                            form.setValue(
+                                              'selectReason',
+                                              item.desc
+                                            )
+                                            form.setValue(
+                                              'adjustmentReasonId',
+                                              item.id
+                                            )
                                           }}
                                         >
                                           <Check
@@ -293,14 +333,64 @@ export function AdjustForm({ className, ...props }: SignUpFormProps) {
 
                       <FormField
                         control={form.control}
-                        name='remark'
+                        name='drawerBy'
                         render={({ field }) => (
                           <FormItem className='space-y-1'>
+                            <FormLabel>Drawer/Return By</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name='remark'
+                        render={({ field }) => (
+                          <FormItem className='col-span-2 space-y-1'>
                             <FormLabel>Remark</FormLabel>
                             <FormControl>
                               <Input {...field} />
                             </FormControl>
 
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name='adjustType'
+                        render={({ field }) => (
+                          <FormItem className='space-y-3 '>
+                            <FormLabel>Select adjust type...</FormLabel>
+                            <FormControl>
+                              <RadioGroup
+                                onValueChange={(value) => field.onChange(value)}
+                                defaultValue={'adjust-in'}
+                                className='flex items-center gap-3'
+                              >
+                                <FormItem className='flex items-center gap-3'>
+                                  <FormControl>
+                                    <RadioGroupItem value='adjust-in' />
+                                  </FormControl>
+                                  <FormLabel className='py-0 font-normal'>
+                                    Adjust-In
+                                  </FormLabel>
+                                </FormItem>
+                                <FormItem className='flex items-center gap-3'>
+                                  <FormControl>
+                                    <RadioGroupItem value='adjust-out' />
+                                  </FormControl>
+                                  <FormLabel className='font-normal'>
+                                    Adjust-Out
+                                  </FormLabel>
+                                </FormItem>
+                              </RadioGroup>
+                            </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -391,12 +481,19 @@ export function AdjustForm({ className, ...props }: SignUpFormProps) {
                               <Badge
                                 className='text-white hover:bg-primary'
                                 variant={'default'}
-                                onClick={() => setOpenSelect(true)}
+                                onClick={() => {
+                                  if (form.getValues('adjustType') === 'adjust-in') {
+                                    setOpenAdjustIn(true)
+                                  } else {
+                                    setOpenSelect(true)
+                                  }
+                                  console.log('open modal', form.getValues('adjustType'));
+                                  
+                                }}
                               >
                                 <IconPlus size={20} />
                                 Add Item.
                               </Badge>
-                             
                             </TableCell>
                           </TableRow>
                         </TableFooter>
@@ -425,6 +522,13 @@ export function AdjustForm({ className, ...props }: SignUpFormProps) {
           isOpen={openSelect}
           onClose={() => setOpenSelect(false)}
           createData={(e) => addNewData(e)}
+        />
+
+        <AdjustInModal
+          isOpen={openAdjustIn}
+          onClose={() => setOpenAdjustIn(false)}
+          createData={(e) => addNewData(e)}
+          loading={isLoading}
         />
       </LayoutBody>
     </Layout>

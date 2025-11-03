@@ -57,6 +57,8 @@ export const customerSchema = z.object({
     discount : z.number(),
     amount : z.number(),
     vat : z.number(),
+    nonVat : z.number(),
+    wt : z.string(),
     remark: z.string(),   
     status: z.string(),
     purchaseOrderFileAttach: z.array(z.object({

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/custom/button'
@@ -130,19 +131,19 @@ export const CreateModal: React.FC<EditModalProps> = ({
   function handleChangeCutQty(item: any) {
     // after amount = (CustomerWeight - CuttingWeight) x AfterCutPrice
     console.log('handleChangeCutQty', item.target.value)
-    let qty = form.getValues('quantity')
-    let sumAfterQty = qty - parseInt(item.target.value)
+    const qty = form.getValues('quantity')
+    const sumAfterQty = qty - parseInt(item.target.value)
     form.setValue('afterCutQuantity', sumAfterQty)
     sumAfterAmount()
   }
 
   function handleChangeQuantity(item: any) {
     console.log('handleChangeQuantity', item)
-    let price = form.getValues('unitPrice')
-    let sumAmount = price * parseInt(item.target.value)
+    const price = form.getValues('unitPrice')
+    const sumAmount = price * parseInt(item.target.value)
     form.setValue('amount', sumAmount)
-    let cuttingQty = form.getValues('cuttingWeight')
-    let sumAfterQty =
+    const cuttingQty = form.getValues('cuttingWeight')
+    const sumAfterQty =
       cuttingQty > 0 ? parseInt(item.target.value) - cuttingQty : 0
     form.setValue('afterCutQuantity', sumAfterQty)
     //sumAfterAmount(sumAfterQty, 'qty')
@@ -150,34 +151,34 @@ export const CreateModal: React.FC<EditModalProps> = ({
 
   function handleChangeUnitPrice(item: any) {
     console.log('handleChangeUnitPrice', item.target.value)
-    let qty = form.getValues('quantity')
-    let sumAmount = qty * parseInt(item.target.value)
+    const qty = form.getValues('quantity')
+    const sumAmount = qty * parseInt(item.target.value)
     form.setValue('amount', sumAmount)
-    let cutting = form.getValues('underCutPrice')
-    let sumAfterprice = cutting > 0 ? parseInt(item.target.value) - cutting : 0
+    const cutting = form.getValues('underCutPrice')
+    const sumAfterprice = cutting > 0 ? parseInt(item.target.value) - cutting : 0
     form.setValue('afterCutPrice', sumAfterprice)
     //sumAfterAmount(sumAfterprice, 'price')
   }
 
   function handleChangeCustomerQty() {
     // console.log('handleChangeCustomerQty', value.target.value) adulteration
-    let qty = form.getValues('quantity')
-    let humidity = form.getValues('humidity')
-    let adulteration = form.getValues('adulteration')
-    let other = form.getValues('other')
+    const qty = form.getValues('quantity')
+    const humidity = form.getValues('humidity')
+    const adulteration = form.getValues('adulteration')
+    const other = form.getValues('other')
 
-    let sumAmount = qty - humidity - adulteration - other
+    const sumAmount = qty - humidity - adulteration - other
     form.setValue('cuttingWeight', sumAmount)
     sumAfterAmount()
   }
   function handleChangeCustomerPrice() {
     // console.log('handleChangeCustomerQty', value.target.value) adulteration
-    let unitPrice = form.getValues('unitPrice')
-    let weighingMoney = form.getValues('weighingMoney')
-    let shipDown = form.getValues('shipDown')
-    let cashOther = form.getValues('cashOther')
+    const unitPrice = form.getValues('unitPrice')
+    const weighingMoney = form.getValues('weighingMoney')
+    const shipDown = form.getValues('shipDown')
+    const cashOther = form.getValues('cashOther')
 
-    let sumAmount = unitPrice - weighingMoney - shipDown - cashOther
+    const sumAmount = unitPrice - weighingMoney - shipDown - cashOther
     form.setValue('underCutPrice', sumAmount)
 
     sumAfterAmount()
@@ -185,8 +186,8 @@ export const CreateModal: React.FC<EditModalProps> = ({
 
   function handleChangeCutPrice(item: any) {
     console.log('handleChangeCutPrice', item.target.value)
-    let price = form.getValues('unitPrice')
-    let sumAmount = price - parseInt(item.target.value)
+    const price = form.getValues('unitPrice')
+    const sumAmount = price - parseInt(item.target.value)
     form.setValue('afterCutPrice', sumAmount)
 
     sumAfterAmount()
@@ -202,8 +203,8 @@ export const CreateModal: React.FC<EditModalProps> = ({
     //   sumAfterAmount = item * qty
     // }
 
-    let customerQty = form.getValues('cuttingWeight')
-    let customerPrice = form.getValues('underCutPrice')
+    const customerQty = form.getValues('cuttingWeight')
+    const customerPrice = form.getValues('underCutPrice')
 
     form.setValue('afterAmount', customerQty * customerPrice)
   }

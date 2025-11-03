@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { SyntheticEvent, useContext, useEffect, useState } from 'react'
 import { Button } from '@/components/custom/button'
 import { useForm } from 'react-hook-form'
@@ -59,6 +60,7 @@ const initalUser = {
   userImage: '',
   subDistrict: '',
   district: '',
+  isSelectPoReciveDate: false
 }
 
 const formSchema = z.object({
@@ -214,13 +216,13 @@ export default function UserProfile() {
           icon={<IconUser size={45} className='mt-2 ' />}
         />
         <div className='-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-x-12 lg:space-y-0'>
-          {data.id && data.userImage ? (
+          {data.id? (
             <div className='grid gap-4'>
-              <Card>
+              <Card >
                 <CardContent className='h-full space-y-2'>
                   <Form {...form}>
                     <form onSubmit={form.handleSubmit(updateData)}>
-                      <div className='grid grid-cols-3 gap-2 '>
+                      <div className='mt-6 grid grid-cols-3 gap-2 '>
                         <FormField
                           control={form.control}
                           name='id'

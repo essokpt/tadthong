@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
@@ -65,11 +66,30 @@ import { cn, toCurrency } from '@/lib/utils'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
+//import InputCurrency from '@/components/custom/inputCurrency'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 //interface SignUpFormProps extends HTMLAttributes<HTMLDivElement> {}
 
 // interface ChangeEvent<T = Element> extends SyntheticEvent<T> {
 //   target: EventTarget & T
 // }
+const vatSelect = [
+  { value: -1, name: 'Non vat' },
+  { value: 7, name: '7%' },
+  { value: 0, name: '0%' },
+]
+
+const wtProp = [
+  { value: '1%', name: '1%' },
+  { value: '3%', name: '3%' },
+  { value: '5%', name: '5%' },
+]
 
 type ItemList = {
   id: string
@@ -111,12 +131,45 @@ const formSchema = z.object({
   department: z.string(),
   selectVender: z.string(),
   userName: z.string(),
-  selectLocation: z.string(),
-  code: z.string(),
+  selectLocation: z.string().min(1),
+  code: z.string().min(1),
   description: z.string(),
-  remark: z.string().min(0),
+  remark: z.string(),
   status: z.string(),
   requirmentDate: z.string(),
+  venderId: z.number(),
+  locationId: z.number(),
+  companyId: z.number(),
+  sumQty: z.number(),
+  total: z.number(),
+  sumVat: z.number(),
+  amount: z.number(),
+  userId: z.number(),
+  branchId: z.number(),
+  createAt: z.string(),
+  wt: z.string(),
+  vat: z.number(),
+  nonVat: z.number(),
+  purchaseRequestItems: z
+    .array(
+      z.object({
+        id: z.string(),
+        venderId: z.string(),
+        venderCode: z.string(),
+        venderName: z.string(),
+        itemMasterId: z.string(),
+        code: z.string(),
+        itemName: z.string(),
+        quantity: z.number(),
+        price: z.number(),
+        amount: z.number(),
+        total: z.number(),
+        includeVat: z.number(),
+        specification: z.string(),
+        remark: z.string(),
+      })
+    )
+    .min(1),
 })
 
 export function PRForm() {
@@ -134,11 +187,13 @@ export function PRForm() {
   const [grandTotal, setGrandTotal] = useState(0)
 
   const navigate = useNavigate()
-  let today = new Date()
-  let user: any = localStorage.getItem('user')
-  let dateCode = formatDate(today, 'yyyy-MM-dd')
-  let newCode = dateCode.split('-')
+  const today = new Date()
+  const user: any = localStorage.getItem('user')
+  const dateCode = formatDate(today, 'yyyy-MM-dd')
+  const newCode = dateCode.split('-')
   // const { handleSubmit, register, setValue } = useForm()
+  const userid: any = localStorage.getItem('userId')
+  const branchid: any = localStorage.getItem('branchId')
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -148,14 +203,48 @@ export function PRForm() {
       reason: '',
       description: '',
       department: '',
-      selectLocation: '1',
+      selectLocation: '',
       code: 'PR' + newCode[0] + newCode[1] + newCode[2],
       userName: user,
       requirmentDate: formatDate(today, 'yyyy-MM-dd'),
       status: 'New Order',
       remark: '',
+      venderId: 1,
+      locationId: 0,
+      companyId: 1,
+      sumQty: 0,
+      total: 0,
+      sumVat: 0,
+      amount: 0,
+      vat: 0,
+      nonVat: 0,
+      wt: '',
+      userId: parseInt(userid),
+      branchId: parseInt(branchid),
+      createAt: format(today, 'yyyy-MM-dd'),
+      purchaseRequestItems: [],
     },
   })
+
+  const handleChangeVat = () => {
+    console.log('handleChangeVat')
+    const vatSelect = form.getValues('vat')
+    if (vatSelect != -1) {
+      for (let index = 0; index < items.length; index++) {
+        const includeVat = items[index].total * (vatSelect / 100)
+        items[index].includeVat = includeVat
+        items[index].amount = items[index].total + includeVat
+      }
+    } else {
+      // nonVat process
+      for (let index = 0; index < items.length; index++) {
+        items[index].includeVat = 0
+        items[index].amount = items[index].total
+      }
+    }
+
+    calAmount()
+  }
 
   const calAmount = () => {
     let qty = 0
@@ -174,8 +263,15 @@ export function PRForm() {
     setVat(vat)
     setGrandTotal(grand)
 
-    // setTotal(10000)
-    // setGrandTotal(subtotal)
+    // data.sumQty = sumQty
+    // data.total = sumTotal
+    // data.sumVat = sumVat
+    // data.amount = grandTotal
+
+    form.setValue('sumQty', sumQty)
+    form.setValue('total', sumTotal)
+    form.setValue('sumVat', sumVat)
+    form.setValue('amount', grandTotal)
   }
 
   function addFile(payload: any) {
@@ -183,35 +279,37 @@ export function PRForm() {
     console.log('File data:', payload)
   }
 
-  async function onSubmit(data: any) {
+  async function onSubmit(data: z.infer<typeof formSchema>) {
     setIsLoading(true)
 
-    const selectedLocation: any = locations.find(
-      (item) => item.name == data.selectLocation
-    )
-    const userid: any = localStorage.getItem('userId')
-    const branchid: any = localStorage.getItem('branchId')
-    data.venderId = 1
-    data.locationId = selectedLocation.id
-    data.companyId = 1
+    // const selectedLocation: any = locations.find(
+    //   (item) => item.name == data.selectLocation
+    // )
+    // const userid: any = localStorage.getItem('userId')
+    // const branchid: any = localStorage.getItem('branchId')
+    // data.venderId = 1
+    // data.locationId = selectedLocation.id
+    // data.companyId = 1
     data.sumQty = sumQty
     data.total = sumTotal
     data.sumVat = sumVat
     data.amount = grandTotal
-    data.userId = parseInt(userid)
-    data.branchId = parseInt(branchid)
-    data.createAt = format(today, 'yyyy-MM-dd')
-    data.purchaseRequestItems = items
-    data.files = files
-    console.log('onSubmit', data)
+    data.vat = data.vat < 0 ? 0 : data.vat
+    // data.userId = parseInt(userid)
+    // data.branchId = parseInt(branchid)
+    // data.createAt = format(today, 'yyyy-MM-dd')
+    // data.purchaseRequestItems = items
+    // data.files = files
+    // console.log('onSubmit', data)
+    console.log('submit', data)
 
     const respone: any = await createPurchaseRequest(data)
     if (respone.id) {
       console.log('createPurchaseRequest -success', respone.status)
-      if (data.files) {
+      if (files) {
         const formData = new FormData()
-        for (let i = 0; i < data.files?.length; i++) {
-          formData.append('files', data.files[i])
+        for (let i = 0; i < files?.length; i++) {
+          formData.append('files', files[i])
           formData.append('purchaseRequestId', respone.id)
         }
 
@@ -255,9 +353,16 @@ export function PRForm() {
   }
 
   function addNewData(payload: any) {
+    //console.log('get vat include:', form.getValues('vat'));
+    const vatData = form.getValues('vat')
     console.log('addNewData', payload)
     payload.total = payload.quantity * payload.price
-    payload.includeVat = parseFloat(payload.total) * 0.07
+
+    if (vatData != -1) {
+      payload.includeVat = parseFloat(payload.total) * (vatData / 100)
+    } else {
+      payload.includeVat = 0
+    }
     payload.amount = parseFloat(payload.total) + parseFloat(payload.includeVat)
 
     const exitIndex = items.findIndex((item) => item.code == payload.code)
@@ -265,6 +370,7 @@ export function PRForm() {
       items[exitIndex] = payload
     } else {
       items.push(payload)
+      form.setValue('purchaseRequestItems', items)
     }
     calAmount()
     setOpenModal(false)
@@ -362,6 +468,7 @@ export function PRForm() {
                                             'selectLocation',
                                             item.name
                                           )
+                                          form.setValue('locationId', item.id)
                                         }}
                                       >
                                         <Check
@@ -438,6 +545,85 @@ export function PRForm() {
                           <FormControl>
                             <Input {...field} readOnly />
                           </FormControl>
+
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name='vat'
+                      render={({ field }) => (
+                        <FormItem className='space-y-1'>
+                          <FormLabel>VAT</FormLabel>
+                          <Select
+                            onValueChange={(value) => {
+                              field.onChange(Number(value))
+                              handleChangeVat()
+                            }}
+                            // onValueChange={(field) => Number(field.onChange)}
+                            defaultValue={field.value.toString()}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder='Select vat(%)' />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {vatSelect.map((item) => (
+                                <SelectItem
+                                  key={item.value}
+                                  value={item.value.toString()}
+                                >
+                                  {item.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* <InputCurrency
+                      value={0}
+                      label='Vat'
+                      name='vat'
+                      placeholder={'input vat'}
+                    /> */}
+
+                    {/* <InputCurrency
+                      value={0}
+                      label='Non Vat'
+                      name='nonVat'
+                      placeholder={'input non vat'}
+                    /> */}
+
+                    <FormField
+                      control={form.control}
+                      name='wt'
+                      render={({ field }) => (
+                        <FormItem className='space-y-1'>
+                          <FormLabel>WT</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder='Select WT' />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {wtProp.map((item) => (
+                                <SelectItem key={item.value} value={item.name}>
+                                  {item.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
 
                           <FormMessage />
                         </FormItem>
@@ -534,7 +720,7 @@ export function PRForm() {
                             <TableCell>{item.remark}</TableCell>
                             <TableCell>
                               <Badge
-                                className='text-white hover:bg-primary mr-2'
+                                className='mr-2 text-white hover:bg-primary'
                                 variant={'default'}
                                 onClick={() => updateData(item)}
                               >
@@ -545,11 +731,10 @@ export function PRForm() {
                                 variant={'destructive'}
                                 onClick={() =>
                                   setItem(items.filter((a) => a.id !== item.id))
-                                }                              >
+                                }
+                              >
                                 <IconTrash size={20} />
                               </Badge>
-
-                              
                             </TableCell>
                           </TableRow>
                         ))}
@@ -574,11 +759,12 @@ export function PRForm() {
                           </TableCell>
                           <TableCell></TableCell>
                           <TableCell>{toCurrency(sumTotal)}</TableCell>
-                          <TableCell></TableCell>
+                          {/* <TableCell></TableCell> */}
                           <TableCell>{toCurrency(sumVat)}</TableCell>
-                          <TableCell colSpan={2} className='text-center'>
+                          <TableCell className='text-center'>
                             {toCurrency(grandTotal)}
                           </TableCell>
+                          <TableCell colSpan={2}></TableCell>
                         </TableRow>
                       </TableFooter>
                     </Table>

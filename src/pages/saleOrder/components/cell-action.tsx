@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AlertModal } from '@/components/custom/alert-modal'
 import { Button } from '@/components/custom/button'
 import {
@@ -32,8 +33,13 @@ const initialValue = {
   carRegistration: '',
   driverName: '',
   vat:0,
-  amount :0,   
+  amount :0,
+  transportationCost: 0,
+  shipTo: '',
+  quota: '',  
+  inComplete: false,   
   locationId:0,
+  billingDate: new Date(),
   location: {
       id:0,
       name: ''

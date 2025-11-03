@@ -3,6 +3,7 @@ import { DataTableColumnHeader } from '@/components/dataTable/data-table-column-
 import { PurchaseOrder } from './schema'
 import { CellAction } from './cell-action'
 import { Badge } from '@/components/ui/badge'
+import { format } from 'date-fns'
 
 export const columns: ColumnDef<PurchaseOrder>[] = [
   {
@@ -14,7 +15,7 @@ export const columns: ColumnDef<PurchaseOrder>[] = [
       return (
         <div className='flex space-x-2'>
           <span className='max-w-32 truncate font-medium sm:max-w-72 md:max-w-[31rem]'>
-            {row.getValue('createAt')}
+            {format(row.getValue('createAt'), 'dd-MM-yyyy')}
           </span>
         </div>
       )
@@ -60,7 +61,7 @@ export const columns: ColumnDef<PurchaseOrder>[] = [
       return (
         <div className='flex space-x-2'>
           <span className='max-w-32 truncate font-medium sm:max-w-72 md:max-w-[31rem]'>
-            {row.getValue('deliveryDate')}
+            {format(row.getValue('deliveryDate'), 'dd-MM-yyyy')}
           </span>
         </div>
       )

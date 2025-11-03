@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { HTMLAttributes, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
@@ -43,7 +44,7 @@ const formSchema = z.object({
 })
 
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
-  let navigate = useNavigate()
+  const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState(false)
   const [branches, setBranches] = useState<Branches[]>([])
 
@@ -61,6 +62,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     const isAuthenticate: any = await auth(data)
     console.log('Res Login ', isAuthenticate)
     if (isAuthenticate) {
+      localStorage.setItem('enablePoReceiptDate', isAuthenticate.isReceiptDate)
       localStorage.setItem('user', isAuthenticate.firstName)
       localStorage.setItem('userId', isAuthenticate.id)
       localStorage.setItem('accessToken', isAuthenticate.token)
@@ -179,7 +181,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
                 </FormItem>
               )}
             />
-            <Button className='mt-2' loading={isLoading}>
+            <Button className='mt-2 hover:bg-primary' loading={isLoading}>
               Login
             </Button>
 

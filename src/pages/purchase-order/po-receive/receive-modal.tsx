@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 import { SyntheticEvent, useEffect, useState } from 'react'
 import { Button } from '@/components/custom/button'
@@ -40,24 +41,37 @@ import {
 import usePermission from '@/hooks/use-permission'
 import { toCurrency } from '@/lib/utils'
 
+import React from 'react'
+import { CalendarIcon } from 'lucide-react'
+
+import { CalendarModal } from './calendar-modal'
+
 interface ReceiveModalProps {
   isOpen: boolean
   onClose: () => void
   data: PurchaseOrder
+  isOpenReceiptDate?: boolean
 }
 
 interface ChangeEvent<T = Element> extends SyntheticEvent<T> {
   target: EventTarget & T
 }
 
+//const isOpenReceiptDate = localStorage.getItem('isOpenReceiptDate')
+
 export const ReceiveModal: React.FC<ReceiveModalProps> = ({
   isOpen,
   onClose,
   data,
+  isOpenReceiptDate
 }) => {
   const [isMounted, setIsMounted] = useState(false)
   const [onloading, setOnloading] = useState(false)
+
   const [locations, setLocation] = useState<LocationType[]>([])
+    const [dateIndex, setDateIndex] = useState(0)
+  
+  const [openCalendar, setOpenCalendar] = useState(false)
 
   const userid: any = localStorage.getItem('userId')
   const today = new Date()
@@ -85,21 +99,21 @@ export const ReceiveModal: React.FC<ReceiveModalProps> = ({
     if (findIndex != -1) {
       data.purchaseOrderItems[findIndex].locationId = parseInt(e.target.value)
       data.purchaseOrderItems[findIndex].userId = parseInt(userid)
-      data.purchaseOrderItems[findIndex].receiveDate = format(
-        today,
-        'yyyy-MM-dd'
-      )
+      // data.purchaseOrderItems[findIndex].receiveDate = format(
+      //   today,
+      //   'yyyy-MM-dd'
+      // )
     }
     console.log('handleChange Location', data.purchaseOrderItems)
   }
 
   async function updateReceive() {
     setOnloading(true)
-    // const receiptItem = data.purchaseOrderItems.filter(
-    //   (item) => item.receiveQuantity > 0
-    // )
-    // data.purchaseOrderItems = receiptItem
+   
     for (let index = 0; index < data.purchaseOrderItems.length; index++) {
+      const receiptDateValue = data.purchaseOrderItems[index].receiveDate? format(data.purchaseOrderItems[index].receiveDate,'yyyy-MM-dd'): format(today, 'yyyy-MM-dd')
+         data.purchaseOrderItems[index].receiveDate = receiptDateValue
+
       if (data.purchaseOrderItems[index].receiveQuantity > 0) {
         data.purchaseOrderItems[index].received =
           data.purchaseOrderItems[index].received +
@@ -127,7 +141,7 @@ export const ReceiveModal: React.FC<ReceiveModalProps> = ({
 
     const res: any = await createReceiveOrderItem(data.purchaseOrderItems)
     if (res.status == 200) {
-      let checkReceiptCompleted = data.purchaseOrderItems.find(
+      const checkReceiptCompleted = data.purchaseOrderItems.find(
         (a) => a.balance > 0
       )
       console.log('Check Receipt Completed', checkReceiptCompleted)
@@ -142,12 +156,32 @@ export const ReceiveModal: React.FC<ReceiveModalProps> = ({
 
         await createInventory(data.purchaseOrderItems)
         await createInventoryHistory(data.purchaseOrderItems)
+       //if(history.id){
+        // call store SP_PURCHASE_COST  { @stockHistoryId, @UserId }
+       // await Call_SP_PURCHASE_COST(history.id, Number(userid))
+       //}
       }
     }
     setTimeout(() => {
       setOnloading(false)
       onClose()
     }, 2000)
+  }
+
+  
+  
+
+  function handleReceiptDate(value: any) {
+    console.log('handleReceiptDate', value)
+    const findIndex: any = data.purchaseOrderItems.findIndex(
+      (item:any) => item.id == dateIndex
+    )
+    if (findIndex != -1) {
+      data.purchaseOrderItems[findIndex].receiveDate = value.selectDate
+      console.log('set ReceiptDate', data.purchaseOrderItems[findIndex])
+    }
+    // setOpenCalendar(false)
+    setOpenCalendar(false)
   }
 
   useEffect(() => {
@@ -170,6 +204,7 @@ export const ReceiveModal: React.FC<ReceiveModalProps> = ({
 
           <Card>
             <CardContent className='h-[38rem] space-y-2'>
+           
               <div className='grid gap-4'>
                 <Table>
                   <TableCaption>A list items of purchase order.</TableCaption>
@@ -183,6 +218,7 @@ export const ReceiveModal: React.FC<ReceiveModalProps> = ({
                       <TableHead>Location</TableHead>
 
                       <TableHead>Value</TableHead>
+                      <TableHead>Receipt Date</TableHead>
                       <TableHead>Amount</TableHead>
                       <TableHead>Status</TableHead>
                     </TableRow>
@@ -236,7 +272,24 @@ export const ReceiveModal: React.FC<ReceiveModalProps> = ({
                             onChange={handleChangePrice}
                           />
                         </TableCell>
-                        <TableCell>{item.amount}</TableCell>
+                        <TableCell className='w-[180px]'>
+                          <div className='flex items-center gap-2'>
+                            <Input  readOnly value={item.receiveDate? format(item.receiveDate, 'dd-MM-yyyy') : format(today, 'dd-MM-yyyy')} defaultValue={format(today, 'dd-MM-yyyy')}/>
+                            <CalendarIcon
+                              className={`${!isOpenReceiptDate ? 'pointer-events-none opacity-50' : 'none'}`}
+
+                              size={20}
+                              onClick={() => {
+                                setDateIndex(Number(item.id))
+                                setOpenCalendar(true)
+                              }}
+                            />
+                          </div>
+                        </TableCell>
+
+                        <TableCell className='w-[180px]'>
+                          {item.amount}
+                        </TableCell>
                         <TableCell>{item.status}</TableCell>
                       </TableRow>
                     ))}
@@ -263,6 +316,11 @@ export const ReceiveModal: React.FC<ReceiveModalProps> = ({
           </Card>
         </DialogContent>
       </Dialog>
+      <CalendarModal
+        isOpen={openCalendar} 
+        onClose={() => setOpenCalendar(false)}
+        onSelectDate={ handleReceiptDate}
+      />
     </>
   )
 }

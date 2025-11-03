@@ -32,6 +32,7 @@ import { useNavigate } from 'react-router-dom'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
   createItem,
+  createItemEcount,
   createWip,
   getAccountCode,
   getItemCategory,
@@ -47,16 +48,34 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Badge } from '@/components/ui/badge'
 import { getUom } from '@/services/bomApi'
 import { LocationType } from '@/pages/location/components/type'
 import { getLocation } from '@/services/locationApi'
 import FileDrag from '@/components/custom/fileDrag'
 import { PageHeader } from '@/components/layouts/header'
-import { IconFile, IconPencilPlus } from '@tabler/icons-react'
+import {
+  IconChecklist,
+  IconFile,
+  IconPencilPlus,
+  IconPlus,
+  IconTrash,
+} from '@tabler/icons-react'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { Label } from '@/components/ui/label'
 import { IconInfoCircle } from '@tabler/icons-react'
 import InputCurrency from '@/components/custom/inputCurrency'
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { CreateModal } from './create-modal'
 
 interface SignUpFormProps extends HTMLAttributes<HTMLDivElement> {}
 
@@ -72,6 +91,13 @@ interface ItemType {
 interface ItemGroup {
   id: number
   name: string
+}
+
+interface ItemEcount{
+    id: number
+    code: string
+    name: string
+    itemMasterId: number
 }
 
 interface AccountCode {
@@ -138,6 +164,13 @@ const formSchema = z.object({
   specialInstruction: z.string(),
 })
 
+const intial = {
+  id: 0,
+  code: '',
+  name: '',
+  itemMasterId: 0,
+}
+
 export function ItemForm({ className, ...props }: SignUpFormProps) {
   const [uom, setUom] = useState<Uom[]>([])
   const [itemType, setType] = useState<ItemType[]>([])
@@ -146,6 +179,11 @@ export function ItemForm({ className, ...props }: SignUpFormProps) {
   const [itemCategory, setCategory] = useState<ItemCategory[]>([])
   const [locations, setLocation] = useState<LocationType[]>([])
   const [files, setFiles] = useState<File[]>()
+  const [ecounts, setEcount] = useState<ItemEcount[]>([])
+  const [openModal, setOpenModal] = useState(false)
+  const [ecountKey, setEcountKey] = useState(0)
+  const [editEcount, setEditEcount] = useState<ItemEcount>(intial)
+
   //const [balanceValue, setBalanceValue] = useState('');
 
   const [isLoading, setIsLoading] = useState(false)
@@ -197,13 +235,23 @@ export function ItemForm({ className, ...props }: SignUpFormProps) {
     },
   })
 
+  function addNewData(value: ItemEcount) {
+    console.log('addNewData', value)
+    setEcount((prev) => [...prev, {
+      ...value,
+      id: ecountKey + 1, // Ensure unique key for each item
+    }])
+
+    setEcountKey((prev) => prev + 1) // Increment key for next item
+  }
+
   function uploadFile(payload: any) {
     setFiles(payload)
     console.log('File data:', payload)
   }
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
-    setIsLoading(true)
+   // setIsLoading(true)
     const locatId: any = locations.find((x) => x.name === data.selectedLocation)
     if (locatId) data.locationId = locatId.id
 
@@ -218,14 +266,14 @@ export function ItemForm({ className, ...props }: SignUpFormProps) {
     console.log('onSubmit', data)
 
     const response: any = await createItem(data)
-    console.log('uploadFiles -success', response)
+    console.log('createItem -success', response)
     if (response.id) {
       if (typeId.name == 'Work in Process') {
         const res: any = await createWip(response.id)
         console.log('CreateWip', res.data)
       }
       const filesData = files
-     // data.files = files
+      // data.files = files
       if (filesData) {
         const formData = new FormData()
         for (let i = 0; i < filesData?.length; i++) {
@@ -239,6 +287,22 @@ export function ItemForm({ className, ...props }: SignUpFormProps) {
         }
       }
 
+      if (ecounts.length > 0) {
+        const ecountData = ecounts.map((item) => ({
+          ...item,
+          //id: typeof item.id === 'number' ? item.id : Number(item.id),
+          id: 0,
+          itemMasterId: response.id,
+        }))
+         console.log('creating e-count data....',ecountData)
+       const resEcount = await createItemEcount(ecountData)
+        if (resEcount.status == 200) {
+          console.log('createItemEcount -success', resEcount.status)
+        } else {
+          console.error('Error creating e-count data:', resEcount)
+        }
+      }
+
       console.log('createVender -success')
       navigate('/master/item', { replace: true })
     }
@@ -248,8 +312,6 @@ export function ItemForm({ className, ...props }: SignUpFormProps) {
       navigate('/master/item', { replace: true })
     }, 2000)
   }
-
-  
 
   useEffect(() => {
     getUom().then((data) => setUom(data))
@@ -282,342 +344,334 @@ export function ItemForm({ className, ...props }: SignUpFormProps) {
                   </TabsList>
                   <TabsContent value='general'> */}
                 {/* <Card> */}
-                  {/* <CardHeader>
+                {/* <CardHeader>
                         <CardTitle>general</CardTitle>
                         <CardDescription>
                           Make changes to your account here. Click save when
                           you're done.
                         </CardDescription>
                       </CardHeader> */}
-                  {/* <CardContent className='space-y-2 p-2'> */}
-                    <div className='grid grid-cols-3 gap-2 rounded-md border p-4 m-2 shadow'>
-                      <div className='col-span-3 mb-3 mt-3 flex items-center'>
-                        <IconInfoCircle />
-                        <Label htmlFor='terms' className='ml-3 text-lg'>
-                          Information.
-                        </Label>
-                      </div>
-                      <div className='col-span-3'>
-                        <hr />
-                      </div>
-                      <FormField
-                        control={form.control}
-                        name='code'
-                        render={({ field }) => (
-                          <FormItem className='space-y-1'>
-                            <FormLabel>Code</FormLabel>
+                {/* <CardContent className='space-y-2 p-2'> */}
+                <div className='m-2 grid grid-cols-3 gap-2 rounded-md border p-4 shadow'>
+                  <div className='col-span-3 mb-3 mt-3 flex items-center'>
+                    <IconInfoCircle />
+                    <Label htmlFor='terms' className='ml-3 text-lg'>
+                      Information.
+                    </Label>
+                  </div>
+                  <div className='col-span-3'>
+                    <hr />
+                  </div>
+                  <FormField
+                    control={form.control}
+                    name='code'
+                    render={({ field }) => (
+                      <FormItem className='space-y-1'>
+                        <FormLabel>Code</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name='name'
+                    render={({ field }) => (
+                      <FormItem className='col-span-2 space-y-1'>
+                        <FormLabel>Item Name</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name='description'
+                    render={({ field }) => (
+                      <FormItem className='col-span-3 space-y-1'>
+                        <FormLabel>Description</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name='category'
+                    render={({ field }) => (
+                      <FormItem className='grid space-y-3'>
+                        <FormLabel>Category</FormLabel>
+                        <Popover>
+                          <PopoverTrigger asChild>
                             <FormControl>
-                              <Input {...field} />
+                              <Button
+                                variant='outline'
+                                role='combobox'
+                                className={cn(
+                                  'justify-between',
+                                  !field.value && 'text-muted-foreground'
+                                )}
+                              >
+                                {field.value
+                                  ? itemCategory.find(
+                                      (item) => item.name === field.value
+                                    )?.name
+                                  : 'Select category'}
+                                <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                              </Button>
                             </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name='name'
-                        render={({ field }) => (
-                          <FormItem className='col-span-2 space-y-1'>
-                            <FormLabel>Item Name</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name='description'
-                        render={({ field }) => (
-                          <FormItem className='col-span-3 space-y-1'>
-                            <FormLabel>Description</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name='category'
-                        render={({ field }) => (
-                          <FormItem className='grid space-y-3'>
-                            <FormLabel>Category</FormLabel>
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <FormControl>
-                                  <Button
-                                    variant='outline'
-                                    role='combobox'
-                                    className={cn(
-                                      'justify-between',
-                                      !field.value && 'text-muted-foreground'
-                                    )}
-                                  >
-                                    {field.value
-                                      ? itemCategory.find(
-                                          (item) => item.name === field.value
-                                        )?.name
-                                      : 'Select category'}
-                                    <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                                  </Button>
-                                </FormControl>
-                              </PopoverTrigger>
-                              <PopoverContent className='w-[200px] p-0'>
-                                <Command>
-                                  <CommandInput placeholder='Search category...' />
-                                  <CommandList>
-                                    <CommandEmpty>
-                                      No category found.
-                                    </CommandEmpty>
-                                    <CommandGroup>
-                                      {itemCategory.map((item) => (
-                                        <CommandItem
-                                          value={item.name}
-                                          key={item.id}
-                                          onSelect={() => {
-                                            form.setValue('category', item.name)
-                                          }}
-                                        >
-                                          <Check
-                                            className={cn(
-                                              'mr-2 h-4 w-4',
-                                              item.name === field.value
-                                                ? 'opacity-100'
-                                                : 'opacity-0'
-                                            )}
-                                          />
-                                          {item.name}
-                                        </CommandItem>
-                                      ))}
-                                    </CommandGroup>
-                                  </CommandList>
-                                </Command>
-                              </PopoverContent>
-                            </Popover>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                          </PopoverTrigger>
+                          <PopoverContent className='w-[200px] p-0'>
+                            <Command>
+                              <CommandInput placeholder='Search category...' />
+                              <CommandList>
+                                <CommandEmpty>No category found.</CommandEmpty>
+                                <CommandGroup>
+                                  {itemCategory.map((item) => (
+                                    <CommandItem
+                                      value={item.name}
+                                      key={item.id}
+                                      onSelect={() => {
+                                        form.setValue('category', item.name)
+                                      }}
+                                    >
+                                      <Check
+                                        className={cn(
+                                          'mr-2 h-4 w-4',
+                                          item.name === field.value
+                                            ? 'opacity-100'
+                                            : 'opacity-0'
+                                        )}
+                                      />
+                                      {item.name}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                      <FormField
-                        control={form.control}
-                        name='subCategory1'
-                        render={({ field }) => (
-                          <FormItem className='hidden space-y-1'>
-                            <FormLabel>Sub-Category1</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name='subCategory2'
-                        render={({ field }) => (
-                          <FormItem className='hidden space-y-1'>
-                            <FormLabel>Sub-Category2</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name='subCategory3'
-                        render={({ field }) => (
-                          <FormItem className='hidden space-y-1'>
-                            <FormLabel>Sub-Category3</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name='brand'
-                        render={({ field }) => (
-                          <FormItem className='space-y-1'>
-                            <FormLabel>Brand</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name='size'
-                        render={({ field }) => (
-                          <FormItem className='space-y-1'>
-                            <FormLabel>Size</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                  <FormField
+                    control={form.control}
+                    name='subCategory1'
+                    render={({ field }) => (
+                      <FormItem className='hidden space-y-1'>
+                        <FormLabel>Sub-Category1</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name='subCategory2'
+                    render={({ field }) => (
+                      <FormItem className='hidden space-y-1'>
+                        <FormLabel>Sub-Category2</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name='subCategory3'
+                    render={({ field }) => (
+                      <FormItem className='hidden space-y-1'>
+                        <FormLabel>Sub-Category3</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name='brand'
+                    render={({ field }) => (
+                      <FormItem className='space-y-1'>
+                        <FormLabel>Brand</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name='size'
+                    render={({ field }) => (
+                      <FormItem className='space-y-1'>
+                        <FormLabel>Size</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                      <FormField
-                        control={form.control}
-                        name='stockingUom'
-                        render={({ field }) => (
-                          <FormItem className='grid space-y-3'>
-                            <FormLabel>Stocking-Uom</FormLabel>
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <FormControl>
-                                  <Button
-                                    variant='outline'
-                                    role='combobox'
-                                    className={cn(
-                                      'bg-forefround hover:bg-forefround justify-between',
-                                      !field.value && 'text-muted-foreground'
-                                    )}
-                                  >
-                                    {field.value
-                                      ? uom.find(
-                                          (item) => item.code === field.value
-                                        )?.code
-                                      : 'Select stocking Uom'}
-                                    <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                                  </Button>
-                                </FormControl>
-                              </PopoverTrigger>
-                              <PopoverContent className='w-[200px] p-0'>
-                                <Command>
-                                  <CommandInput placeholder='Search stocking Uom...' />
-                                  <CommandList>
-                                    <CommandEmpty>
-                                      No stockingUom found.
-                                    </CommandEmpty>
-                                    <CommandGroup>
-                                      {uom.map((item) => (
-                                        <CommandItem
-                                          value={item.code}
-                                          key={item.id}
-                                          onSelect={() => {
-                                            form.setValue(
-                                              'stockingUom',
-                                              item.code
-                                            )
-                                          }}
-                                        >
-                                          <Check
-                                            className={cn(
-                                              'mr-2 h-4 w-4',
-                                              item.code === field.value
-                                                ? 'opacity-100'
-                                                : 'opacity-0'
-                                            )}
-                                          />
-                                          {item.code}
-                                        </CommandItem>
-                                      ))}
-                                    </CommandGroup>
-                                  </CommandList>
-                                </Command>
-                              </PopoverContent>
-                            </Popover>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name='alternateUom'
-                        render={({ field }) => (
-                          <FormItem className='grid space-y-3'>
-                            <FormLabel>Alternal UOM </FormLabel>
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <FormControl>
-                                  <Button
-                                    variant='outline'
-                                    role='combobox'
-                                    className={cn(
-                                      'bg-forefround hover:bg-forefround justify-between',
-                                      !field.value && 'text-muted-foreground'
-                                    )}
-                                  >
-                                    {field.value
-                                      ? uom.find(
-                                          (item) => item.code === field.value
-                                        )?.code
-                                      : 'Select Alternal Uom'}
-                                    <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                                  </Button>
-                                </FormControl>
-                              </PopoverTrigger>
-                              <PopoverContent className='w-[200px] p-0'>
-                                <Command>
-                                  <CommandInput placeholder='Search Alternal Uom...' />
-                                  <CommandList>
-                                    <CommandEmpty>
-                                      No Alternal UOM found.
-                                    </CommandEmpty>
-                                    <CommandGroup>
-                                      {uom.map((item) => (
-                                        <CommandItem
-                                          value={item.code}
-                                          key={item.id}
-                                          onSelect={() => {
-                                            form.setValue(
-                                              'alternateUom',
-                                              item.code
-                                            )
-                                          }}
-                                        >
-                                          <Check
-                                            className={cn(
-                                              'mr-2 h-4 w-4',
-                                              item.code === field.value
-                                                ? 'opacity-100'
-                                                : 'opacity-0'
-                                            )}
-                                          />
-                                          {item.code}
-                                        </CommandItem>
-                                      ))}
-                                    </CommandGroup>
-                                  </CommandList>
-                                </Command>
-                              </PopoverContent>
-                            </Popover>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name='convertFactor'
-                        render={({ field }) => (
-                          <FormItem className='space-y-1'>
-                            <FormLabel>Convert Factor</FormLabel>
+                  <FormField
+                    control={form.control}
+                    name='stockingUom'
+                    render={({ field }) => (
+                      <FormItem className='grid space-y-3'>
+                        <FormLabel>Stocking-Uom</FormLabel>
+                        <Popover>
+                          <PopoverTrigger asChild>
                             <FormControl>
-                              <Input
-                                type='number'
-                                {...field}
-                                onChange={(event) =>
-                                  field.onChange(parseFloat(event.target.value))
-                                }
-                              />
+                              <Button
+                                variant='outline'
+                                role='combobox'
+                                className={cn(
+                                  'bg-forefround hover:bg-forefround justify-between',
+                                  !field.value && 'text-muted-foreground'
+                                )}
+                              >
+                                {field.value
+                                  ? uom.find(
+                                      (item) => item.code === field.value
+                                    )?.code
+                                  : 'Select stocking Uom'}
+                                <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                              </Button>
                             </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      {/* <FormField
+                          </PopoverTrigger>
+                          <PopoverContent className='w-[200px] p-0'>
+                            <Command>
+                              <CommandInput placeholder='Search stocking Uom...' />
+                              <CommandList>
+                                <CommandEmpty>
+                                  No stockingUom found.
+                                </CommandEmpty>
+                                <CommandGroup>
+                                  {uom.map((item) => (
+                                    <CommandItem
+                                      value={item.code}
+                                      key={item.id}
+                                      onSelect={() => {
+                                        form.setValue('stockingUom', item.code)
+                                      }}
+                                    >
+                                      <Check
+                                        className={cn(
+                                          'mr-2 h-4 w-4',
+                                          item.code === field.value
+                                            ? 'opacity-100'
+                                            : 'opacity-0'
+                                        )}
+                                      />
+                                      {item.code}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name='alternateUom'
+                    render={({ field }) => (
+                      <FormItem className='grid space-y-3'>
+                        <FormLabel>Alternal UOM </FormLabel>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant='outline'
+                                role='combobox'
+                                className={cn(
+                                  'bg-forefround hover:bg-forefround justify-between',
+                                  !field.value && 'text-muted-foreground'
+                                )}
+                              >
+                                {field.value
+                                  ? uom.find(
+                                      (item) => item.code === field.value
+                                    )?.code
+                                  : 'Select Alternal Uom'}
+                                <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className='w-[200px] p-0'>
+                            <Command>
+                              <CommandInput placeholder='Search Alternal Uom...' />
+                              <CommandList>
+                                <CommandEmpty>
+                                  No Alternal UOM found.
+                                </CommandEmpty>
+                                <CommandGroup>
+                                  {uom.map((item) => (
+                                    <CommandItem
+                                      value={item.code}
+                                      key={item.id}
+                                      onSelect={() => {
+                                        form.setValue('alternateUom', item.code)
+                                      }}
+                                    >
+                                      <Check
+                                        className={cn(
+                                          'mr-2 h-4 w-4',
+                                          item.code === field.value
+                                            ? 'opacity-100'
+                                            : 'opacity-0'
+                                        )}
+                                      />
+                                      {item.code}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name='convertFactor'
+                    render={({ field }) => (
+                      <FormItem className='space-y-1'>
+                        <FormLabel>Convert Factor</FormLabel>
+                        <FormControl>
+                          <Input
+                            type='number'
+                            {...field}
+                            onChange={(event) =>
+                              field.onChange(parseFloat(event.target.value))
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  {/* <FormField
                             control={form.control}
                             name='stockingUom'
                             render={({ field }) => (
@@ -648,121 +702,121 @@ export function ItemForm({ className, ...props }: SignUpFormProps) {
                               </FormItem>
                             )}
                           /> */}
-                      <FormField
-                        control={form.control}
-                        name='model'
-                        render={({ field }) => (
-                          <FormItem className='space-y-1'>
-                            <FormLabel>Model</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                  <FormField
+                    control={form.control}
+                    name='model'
+                    render={({ field }) => (
+                      <FormItem className='space-y-1'>
+                        <FormLabel>Model</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                      <FormField
-                        control={form.control}
-                        name='feature'
-                        render={({ field }) => (
-                          <FormItem className='space-y-1'>
-                            <FormLabel>Feature</FormLabel>
+                  <FormField
+                    control={form.control}
+                    name='feature'
+                    render={({ field }) => (
+                      <FormItem className='space-y-1'>
+                        <FormLabel>Feature</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name='material'
+                    render={({ field }) => (
+                      <FormItem className='space-y-1'>
+                        <FormLabel>Material</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name='specification'
+                    render={({ field }) => (
+                      <FormItem className='space-y-1'>
+                        <FormLabel>Specification</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name='type'
+                    render={({ field }) => (
+                      <FormItem className='grid space-y-3'>
+                        <FormLabel>Type</FormLabel>
+                        <Popover>
+                          <PopoverTrigger asChild>
                             <FormControl>
-                              <Input {...field} />
+                              <Button
+                                variant='outline'
+                                role='combobox'
+                                className={cn(
+                                  'bg-forefround hover:bg-forefround justify-between',
+                                  !field.value && 'text-muted-foreground'
+                                )}
+                              >
+                                {field.value
+                                  ? itemType.find(
+                                      (item) => item.name === field.value
+                                    )?.name
+                                  : 'Select type'}
+                                <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                              </Button>
                             </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name='material'
-                        render={({ field }) => (
-                          <FormItem className='space-y-1'>
-                            <FormLabel>Material</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name='specification'
-                        render={({ field }) => (
-                          <FormItem className='space-y-1'>
-                            <FormLabel>Specification</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name='type'
-                        render={({ field }) => (
-                          <FormItem className='grid space-y-3'>
-                            <FormLabel>Type</FormLabel>
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <FormControl>
-                                  <Button
-                                    variant='outline'
-                                    role='combobox'
-                                    className={cn(
-                                      'bg-forefround hover:bg-forefround justify-between',
-                                      !field.value && 'text-muted-foreground'
-                                    )}
-                                  >
-                                    {field.value
-                                      ? itemType.find(
-                                          (item) => item.name === field.value
-                                        )?.name
-                                      : 'Select type'}
-                                    <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                                  </Button>
-                                </FormControl>
-                              </PopoverTrigger>
-                              <PopoverContent className='w-[200px] p-0'>
-                                <Command>
-                                  <CommandInput placeholder='Search type...' />
-                                  <CommandList>
-                                    <CommandEmpty>No type found.</CommandEmpty>
-                                    <CommandGroup>
-                                      {itemType.map((item) => (
-                                        <CommandItem
-                                          value={item.name}
-                                          key={item.id}
-                                          onSelect={() => {
-                                            form.setValue('type', item.name)
-                                          }}
-                                        >
-                                          <Check
-                                            className={cn(
-                                              'mr-2 h-4 w-4',
-                                              item.name === field.value
-                                                ? 'opacity-100'
-                                                : 'opacity-0'
-                                            )}
-                                          />
-                                          {item.name}
-                                        </CommandItem>
-                                      ))}
-                                    </CommandGroup>
-                                  </CommandList>
-                                </Command>
-                              </PopoverContent>
-                            </Popover>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                          </PopoverTrigger>
+                          <PopoverContent className='w-[200px] p-0'>
+                            <Command>
+                              <CommandInput placeholder='Search type...' />
+                              <CommandList>
+                                <CommandEmpty>No type found.</CommandEmpty>
+                                <CommandGroup>
+                                  {itemType.map((item) => (
+                                    <CommandItem
+                                      value={item.name}
+                                      key={item.id}
+                                      onSelect={() => {
+                                        form.setValue('type', item.name)
+                                      }}
+                                    >
+                                      <Check
+                                        className={cn(
+                                          'mr-2 h-4 w-4',
+                                          item.name === field.value
+                                            ? 'opacity-100'
+                                            : 'opacity-0'
+                                        )}
+                                      />
+                                      {item.name}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                      {/* <FormField
+                  {/* <FormField
                             control={form.control}
                             name='type'
                             render={({ field }) => (
@@ -793,395 +847,388 @@ export function ItemForm({ className, ...props }: SignUpFormProps) {
                               </FormItem>
                             )}
                           /> */}
-                      <FormField
-                        control={form.control}
-                        name='group'
-                        render={({ field }) => (
-                          <FormItem className='space-y-1'>
-                            <FormLabel>Group</FormLabel>
-                            <Select
-                              onValueChange={field.onChange}
-                              defaultValue={field.value}
-                            >
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder='Select Group' />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {itemGroup.map((item) => (
-                                  <SelectItem key={item.id} value={item.name}>
-                                    {item.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
+                  <FormField
+                    control={form.control}
+                    name='group'
+                    render={({ field }) => (
+                      <FormItem className='space-y-1'>
+                        <FormLabel>Group</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder='Select Group' />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {itemGroup.map((item) => (
+                              <SelectItem key={item.id} value={item.name}>
+                                {item.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
 
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                      <FormField
-                        control={form.control}
-                        name='accountCode1'
-                        render={({ field }) => (
-                          <FormItem className='space-y-1'>
-                            <FormLabel>Account Code-1</FormLabel>
-                            <Select
-                              onValueChange={field.onChange}
-                              defaultValue={field.value}
-                            >
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder='Select Account Code' />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {accountCode.map((item) => (
-                                  <SelectItem key={item.id} value={item.code}>
-                                    {item.code}-{item.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
+                  <FormField
+                    control={form.control}
+                    name='accountCode1'
+                    render={({ field }) => (
+                      <FormItem className='space-y-1'>
+                        <FormLabel>Account Code-1</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder='Select Account Code' />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {accountCode.map((item) => (
+                              <SelectItem key={item.id} value={item.code}>
+                                {item.code}-{item.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
 
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name='accountCode2'
-                        render={({ field }) => (
-                          <FormItem className='space-y-1'>
-                            <FormLabel>Account Code-2</FormLabel>
-                            <Select
-                              onValueChange={field.onChange}
-                              defaultValue={field.value}
-                            >
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder='Select Account Code' />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {accountCode.map((item) => (
-                                  <SelectItem key={item.id} value={item.code}>
-                                    {item.code}-{item.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name='accountCode2'
+                    render={({ field }) => (
+                      <FormItem className='space-y-1'>
+                        <FormLabel>Labor Cost</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder='Select Labor Cost' />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {accountCode.map((item) => (
+                              <SelectItem key={item.id} value={item.code}>
+                                {item.code}-{item.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
 
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name='accountCode3'
-                        render={({ field }) => (
-                          <FormItem className='space-y-1'>
-                            <FormLabel>Account Code-3</FormLabel>
-                            <Select
-                              onValueChange={field.onChange}
-                              defaultValue={field.value}
-                            >
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder='Select Account Code' />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {accountCode.map((item) => (
-                                  <SelectItem key={item.id} value={item.code}>
-                                    {item.code}-{item.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name='accountCode3'
+                    render={({ field }) => (
+                      <FormItem className='space-y-1'>
+                        <FormLabel>Overhead Cost</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder='Select Overhead Cost' />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {accountCode.map((item) => (
+                              <SelectItem key={item.id} value={item.code}>
+                                {item.code}-{item.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
 
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name='accountCode4'
-                        render={({ field }) => (
-                          <FormItem className='space-y-1'>
-                            <FormLabel>Account Code-4</FormLabel>
-                            <Select
-                              onValueChange={field.onChange}
-                              defaultValue={field.value}
-                            >
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder='Select Account Code' />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {accountCode.map((item) => (
-                                  <SelectItem key={item.id} value={item.code}>
-                                    {item.code}-{item.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name='accountCode4'
+                    render={({ field }) => (
+                      <FormItem className='space-y-1'>
+                        <FormLabel>Other Cost</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder='Select Other Cost' />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {accountCode.map((item) => (
+                              <SelectItem key={item.id} value={item.code}>
+                                {item.code}-{item.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
 
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name='accountCode5'
-                        render={({ field }) => (
-                          <FormItem className='space-y-1'>
-                            <FormLabel>Cost Center</FormLabel>
-                            <Select
-                              onValueChange={field.onChange}
-                              defaultValue={field.value}
-                            >
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder='Select Cost Center' />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {accountCode.map((item) => (
-                                  <SelectItem key={item.id} value={item.code}>
-                                    {item.code}-{item.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name='accountCode5'
+                    render={({ field }) => (
+                      <FormItem className='space-y-1'>
+                        <FormLabel>Cost Center</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder='Select Cost Center' />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {accountCode.map((item) => (
+                              <SelectItem key={item.id} value={item.code}>
+                                {item.code}-{item.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
 
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                      <FormField
-                        control={form.control}
-                        name='status'
-                        render={({ field }) => (
-                          <FormItem className='space-y-1'>
-                            <FormLabel>Status</FormLabel>
-                            <Select
-                              onValueChange={field.onChange}
-                              defaultValue={field.value}
-                            >
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder='Select Status' />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {itemStatus.map((item) => (
-                                  <SelectItem
-                                    key={item.value}
-                                    value={item.name}
-                                  >
-                                    {item.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
+                  <FormField
+                    control={form.control}
+                    name='status'
+                    render={({ field }) => (
+                      <FormItem className='space-y-1'>
+                        <FormLabel>Status</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder='Select Status' />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {itemStatus.map((item) => (
+                              <SelectItem key={item.value} value={item.name}>
+                                {item.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
 
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      
-                    </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
-                
-                    <div className='grid grid-cols-3 gap-2 rounded-md border p-4 m-2 shadow'>
-                      <div className='col-span-3 mb-3 mt-3 flex items-center '>
-                        <IconInfoCircle />
-                        <Label htmlFor='terms' className='ml-3 text-lg'>
-                          Planing.
-                        </Label>
-                      </div>
-                      <div className='col-span-3'>
-                        <hr />
-                      </div>
-                      <FormField
-                        control={form.control}
-                        name='purchaseLeadTime'
-                        render={({ field }) => (
-                          <FormItem className='space-y-1'>
-                            <FormLabel>Purchase LeadTime</FormLabel>
+                <div className='m-2 grid grid-cols-3 gap-2 rounded-md border p-4 shadow'>
+                  <div className='col-span-3 mb-3 mt-3 flex items-center '>
+                    <IconInfoCircle />
+                    <Label htmlFor='terms' className='ml-3 text-lg'>
+                      Planing.
+                    </Label>
+                  </div>
+                  <div className='col-span-3'>
+                    <hr />
+                  </div>
+                  <FormField
+                    control={form.control}
+                    name='purchaseLeadTime'
+                    render={({ field }) => (
+                      <FormItem className='space-y-1'>
+                        <FormLabel>Purchase LeadTime</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name='manufacturingLeadTime'
+                    render={({ field }) => (
+                      <FormItem className='space-y-1'>
+                        <FormLabel>Manufacturing LeadTime</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name='weight'
+                    render={({ field }) => (
+                      <FormItem className='space-y-1'>
+                        <FormLabel>Weight</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name='safetyStock'
+                    render={({ field }) => (
+                      <FormItem className='space-y-1'>
+                        <FormLabel>Safety Stock</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name='cubicVolumn'
+                    render={({ field }) => (
+                      <FormItem className='space-y-1'>
+                        <FormLabel>Cubic Volumn</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name='lenght'
+                    render={({ field }) => (
+                      <FormItem className='space-y-1'>
+                        <FormLabel>Lenght</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name='width'
+                    render={({ field }) => (
+                      <FormItem className='space-y-1'>
+                        <FormLabel>Width</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name='height'
+                    render={({ field }) => (
+                      <FormItem className='space-y-1'>
+                        <FormLabel>Height</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name='selectedLocation'
+                    render={({ field }) => (
+                      <FormItem className='grid space-y-3'>
+                        <FormLabel>Default Location</FormLabel>
+                        <Popover>
+                          <PopoverTrigger asChild>
                             <FormControl>
-                              <Input {...field} />
+                              <Button
+                                variant='outline'
+                                role='combobox'
+                                className={cn(
+                                  'justify-between',
+                                  !field.value && 'text-muted-foreground'
+                                )}
+                              >
+                                {field.value
+                                  ? locations.find(
+                                      (item) => item.name === field.value
+                                    )?.name
+                                  : 'Select location'}
+                                <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                              </Button>
                             </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name='manufacturingLeadTime'
-                        render={({ field }) => (
-                          <FormItem className='space-y-1'>
-                            <FormLabel>Manufacturing LeadTime</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name='weight'
-                        render={({ field }) => (
-                          <FormItem className='space-y-1'>
-                            <FormLabel>Weight</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name='safetyStock'
-                        render={({ field }) => (
-                          <FormItem className='space-y-1'>
-                            <FormLabel>Safety Stock</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                          </PopoverTrigger>
+                          <PopoverContent className='w-[200px] p-0'>
+                            <Command>
+                              <CommandInput placeholder='Search location...' />
+                              <CommandList>
+                                <CommandEmpty>No location found.</CommandEmpty>
+                                <CommandGroup>
+                                  {locations.map((item) => (
+                                    <CommandItem
+                                      value={item.name}
+                                      key={item.id}
+                                      onSelect={() => {
+                                        form.setValue(
+                                          'selectedLocation',
+                                          item.name
+                                        )
+                                      }}
+                                    >
+                                      <Check
+                                        className={cn(
+                                          'mr-2 h-4 w-4',
+                                          item.name === field.value
+                                            ? 'opacity-100'
+                                            : 'opacity-0'
+                                        )}
+                                      />
+                                      {item.name}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                      <FormField
-                        control={form.control}
-                        name='cubicVolumn'
-                        render={({ field }) => (
-                          <FormItem className='space-y-1'>
-                            <FormLabel>Cubic Volumn</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name='lenght'
-                        render={({ field }) => (
-                          <FormItem className='space-y-1'>
-                            <FormLabel>Lenght</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name='width'
-                        render={({ field }) => (
-                          <FormItem className='space-y-1'>
-                            <FormLabel>Width</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name='height'
-                        render={({ field }) => (
-                          <FormItem className='space-y-1'>
-                            <FormLabel>Height</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name='selectedLocation'
-                        render={({ field }) => (
-                          <FormItem className='grid space-y-3'>
-                            <FormLabel>Default Location</FormLabel>
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <FormControl>
-                                  <Button
-                                    variant='outline'
-                                    role='combobox'
-                                    className={cn(
-                                      'justify-between',
-                                      !field.value && 'text-muted-foreground'
-                                    )}
-                                  >
-                                    {field.value
-                                      ? locations.find(
-                                          (item) => item.name === field.value
-                                        )?.name
-                                      : 'Select location'}
-                                    <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                                  </Button>
-                                </FormControl>
-                              </PopoverTrigger>
-                              <PopoverContent className='w-[200px] p-0'>
-                                <Command>
-                                  <CommandInput placeholder='Search location...' />
-                                  <CommandList>
-                                    <CommandEmpty>
-                                      No location found.
-                                    </CommandEmpty>
-                                    <CommandGroup>
-                                      {locations.map((item) => (
-                                        <CommandItem
-                                          value={item.name}
-                                          key={item.id}
-                                          onSelect={() => {
-                                            form.setValue(
-                                              'selectedLocation',
-                                              item.name
-                                            )
-                                          }}
-                                        >
-                                          <Check
-                                            className={cn(
-                                              'mr-2 h-4 w-4',
-                                              item.name === field.value
-                                                ? 'opacity-100'
-                                                : 'opacity-0'
-                                            )}
-                                          />
-                                          {item.name}
-                                        </CommandItem>
-                                      ))}
-                                    </CommandGroup>
-                                  </CommandList>
-                                </Command>
-                              </PopoverContent>
-                            </Popover>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      {/* <FormField
+                  {/* <FormField
                             control={form.control}
                             name='selectedLocation'
                             render={({ field }) => (
@@ -1213,34 +1260,34 @@ export function ItemForm({ className, ...props }: SignUpFormProps) {
                             )}
                           /> */}
 
-                      <FormField
-                        control={form.control}
-                        name='shefLifeDay'
-                        render={({ field }) => (
-                          <FormItem className='space-y-1'>
-                            <FormLabel>ShefLife Day</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name='specialInstruction'
-                        render={({ field }) => (
-                          <FormItem className='space-y-1'>
-                            <FormLabel>Special Instruction</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                  <FormField
+                    control={form.control}
+                    name='shefLifeDay'
+                    render={({ field }) => (
+                      <FormItem className='space-y-1'>
+                        <FormLabel>ShefLife Day</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name='specialInstruction'
+                    render={({ field }) => (
+                      <FormItem className='space-y-1'>
+                        <FormLabel>Special Instruction</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                      {/* <FormField
+                  {/* <FormField
                         control={form.control}
                         name='standardCost'
                         render={({ field }) => (
@@ -1260,71 +1307,129 @@ export function ItemForm({ className, ...props }: SignUpFormProps) {
                           </FormItem>
                         )}
                       /> */}
-                      
-                      <InputCurrency 
-                       value={0}
-                       label="Standard Cost(Baht)"
-                       name="standardCost"
-                       placeholder={'input standardCost'}
-                      />
-                  
-                      <InputCurrency 
-                       value={0}
-                       label="Average Cost(Baht)"
-                       name="averageCost"
-                       placeholder={'input averageCost'}
-                      />                 
-                      
 
-                      <FormField
-                        control={form.control}
-                        name='combineMtFlag'
-                        render={({ field }) => (
-                          <FormItem className='mt-7 flex h-[37px] flex-row items-start space-x-3 space-y-0 rounded-md border p-2.5  shadow'>
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
+                  <InputCurrency
+                    value={0}
+                    label='Standard Cost(Baht)'
+                    name='standardCost'
+                    placeholder={'input standardCost'}
+                  />
+
+                  <InputCurrency
+                    value={0}
+                    label='Average Cost(Baht)'
+                    name='averageCost'
+                    placeholder={'input averageCost'}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name='combineMtFlag'
+                    render={({ field }) => (
+                      <FormItem className='mt-7 flex h-[37px] flex-row items-start space-x-3 space-y-0 rounded-md border p-2.5  shadow'>
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className='space-y-1 leading-none'>
+                          <FormLabel>Combine Mt Flag</FormLabel>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                  <div className='mt-7'>
+                    <FormField
+                      control={form.control}
+                      name='lotControlFlag'
+                      render={({ field }) => (
+                        <FormItem className='flex h-[37px] flex-row items-start space-x-3 space-y-0 rounded-md border p-2.5 shadow'>
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className='space-y-1 leading-none'>
+                            <FormLabel>Lot Control Flag</FormLabel>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+                <div className='m-2 mb-3 grid grid-cols-3 items-start gap-2 space-x-3 space-y-0 rounded-md border p-4 shadow'>
+                  <div className='col-span-3 mb-2  flex items-center'>
+                    <IconChecklist />
+                    <Label htmlFor='terms' className='ml-3 text-lg'>
+                      E-Count List.
+                    </Label>
+                  </div>
+                  <div className='col-span-3 mb-2  flex items-center'>
+                    <Table className='w-full'>
+                      <TableCaption>A list of your recent items.</TableCaption>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead >
+                            E-Count code
+                          </TableHead>
+                          <TableHead>E-Count Name</TableHead>
+
+                          <TableHead>Action</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {ecounts?.map((item) => (
+                          <TableRow key={item.id}>
+                            <TableCell>{item.code}</TableCell>
+                            <TableCell>{item.name}</TableCell>
+
+                            <TableCell className='w-[8rem]'>
+                              <IconTrash
+                                size={20}
+                                onClick={() =>
+                                  setEcount(
+                                    ecounts.filter((a) => a.id != item.id)
+                                  )
+                                }
                               />
-                            </FormControl>
-                            <div className='space-y-1 leading-none'>
-                              <FormLabel>Combine Mt Flag</FormLabel>
-                            </div>
-                          </FormItem>
-                        )}
-                      />
-                     <div className='mt-7'>
-                      <FormField
-                        control={form.control}
-                        name='lotControlFlag'
-                        render={({ field }) => (
-                          <FormItem className='flex h-[37px] flex-row items-start space-x-3 space-y-0 rounded-md border p-2.5 shadow'>
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                              />
-                            </FormControl>
-                            <div className='space-y-1 leading-none'>
-                              <FormLabel>Lot Control Flag</FormLabel>
-                            </div>
-                          </FormItem>
-                        )}
-                      />
-                 </div>
-                    </div>
-                    <div className='mb-3 m-2 grid grid-cols-3 items-start gap-2 space-x-3 space-y-0 rounded-md border p-4 shadow'>
-                      <div className='col-span-3 mb-2  flex items-center'>
-                        <IconFile />
-                        <Label htmlFor='terms' className='ml-3 text-lg'>
-                          File Attachment.
-                        </Label>
-                      </div>
-                      <div className='col-span-3 mb-2  flex items-center'>
-                        <FileDrag uploadData={(e) => uploadFile(e)} />
-                      </div>
-                    </div>
-                  {/* </CardContent>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                      <TableFooter>
+                        <TableRow>
+                          <TableCell className='item-center' colSpan={9}>
+                            <Badge
+                              className='text-white hover:bg-primary'
+                              variant={'default'}
+                              onClick={() => {
+                                setEditEcount(intial)
+                                setOpenModal(true)
+                              }}
+                            >
+                              <IconPlus size={20} />
+                              Add Item.
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      </TableFooter>
+                    </Table>
+                  </div>
+                </div>
+                <div className='m-2 mb-3 grid grid-cols-3 items-start gap-2 space-x-3 space-y-0 rounded-md border p-4 shadow'>
+                  <div className='col-span-3 mb-2  flex items-center'>
+                    <IconFile />
+                    <Label htmlFor='terms' className='ml-3 text-lg'>
+                      File Attachment.
+                    </Label>
+                  </div>
+                  <div className='col-span-3 mb-2  flex items-center'>
+                    <FileDrag uploadData={(e) => uploadFile(e)} />
+                  </div>
+                </div>
+                {/* </CardContent>
                   <CardFooter>
                         <Button>Save password</Button>
                       </CardFooter>
@@ -1346,6 +1451,14 @@ export function ItemForm({ className, ...props }: SignUpFormProps) {
             </Form>
           </div>
         </div>
+
+        <CreateModal
+          isOpen={openModal}
+          onClose={() => setOpenModal(false)}
+          loading={isLoading}
+          createData={(e) => addNewData(e)}
+          data={editEcount}
+        />
       </LayoutBody>
     </Layout>
   )

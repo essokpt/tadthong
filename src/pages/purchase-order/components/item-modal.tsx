@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/custom/button'
 import { useForm } from 'react-hook-form'
@@ -37,15 +38,15 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { cn } from '@/lib/utils'
 import { Check, ChevronsUpDown } from 'lucide-react'
-import { PurchaseOrderItemType } from './type'
 import InputCurrency from '@/components/custom/inputCurrency'
+import { PurchaseOrderItem } from './item-schema'
 
 interface EditModalProps {
   isOpen: boolean
   onClose: () => void
   createData: (data: any) => void
   loading: boolean
-  editData: PurchaseOrderItemType
+  editData: PurchaseOrderItem
 }
 
 const formSchema = z.object({

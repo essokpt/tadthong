@@ -2,35 +2,42 @@ import { z } from 'zod'
 
 // We're keeping a simple non-relational schema here.
 // IRL, you will have a schema for your data models.
-export const schema = z.object({   
+export const schema = z.object({
     id: z.number(),
     selectLocation: z.string(),
     selectCustomer: z.string(),
     createBy: z.string(),
-    code: z.string(),    
+    code: z.string(),
     poNumber: z.string(),
     cause: z.string(),
     carRegistration: z.string(),
     driverName: z.string(),
     vat: z.number(),
-    amount : z.number(),   
+    transportationCost: z.number(),
+    shipTo: z.string(),
+    quota: z.string(),
+    inComplete: z.boolean(),
+    amount: z.number(),
     locationId: z.number(),
     location: z.object({
         id: z.number(),
         name: z.string()
-    }),    
+    }),
     customerId: z.number(),
     customer: z.object({
         code: z.string(),
-        companyName : z.string()
+        companyName: z.string()
     }),
     userId: z.number(),
-    user: z.object({        
-        firstName : z.string()
+    user: z.object({
+        firstName: z.string()
     }),
     createAt: z.string(),
-    remark: z.string(), 
-    workorderNo : z.string(),  
+    remark: z.string(),
+    billingDate: z.date({
+        required_error: 'A date of customer billing is required.',
+    }),
+    workorderNo: z.string(),
     status: z.string(),
     saleOrderItems: z.array(z.object({
         id: z.number(),
@@ -53,21 +60,21 @@ export const schema = z.object({
         destinationHumidity: z.number(),
         destinationWeighingScale: z.string(),
         remark: z.string(),
-    //new
-        humidity:z.number(),
-        adulteration :z.number(),
-        other:z.number(),
-        weighingMoney:z.number(),
-        shipDown :z.number(),
-        cashOther : z.number()
+        //new
+        humidity: z.number(),
+        adulteration: z.number(),
+        other: z.number(),
+        weighingMoney: z.number(),
+        shipDown: z.number(),
+        cashOther: z.number()
     })),
     saleOrderAttachFiles: z.array(z.object({
         id: z.number(),
         fileName: z.string(),
         path: z.string()
     }))
-    
-       
+
+
 })
 
 export type SaleOrder = z.infer<typeof schema>

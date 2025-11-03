@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react'
 import { Button } from '../custom/button'
 import { IconChevronLeft } from '@tabler/icons-react'

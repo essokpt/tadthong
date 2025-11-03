@@ -62,6 +62,13 @@ export const customerSchema = z.object({
         fileName: z.string(),
         path: z.string()
     })),
+    itemEcounts:z.array(z.object({
+        id: z.number(),
+        code: z.string(),
+        name: z.string(),
+        itemMasterId: z.number(),
+      
+    })),
     accountCode1: z.string(),
     accountCode2: z.string(),
     accountCode3: z.string(),

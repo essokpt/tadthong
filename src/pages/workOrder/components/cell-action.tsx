@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AlertModal } from '@/components/custom/alert-modal'
 import { Button } from '@/components/custom/button'
 import logo from '@/assets/logo.jpg'
@@ -37,6 +38,7 @@ const initialValue = {
   balance: 0,
   createAt: '',
   userId: '',
+ 
   locationId: 0,
   location: {
     id: 0,
@@ -73,6 +75,7 @@ const initialValue = {
       pickingBalance: 0,
       remark: '',
       status: '',
+      standardBom: 0,
     },
   ],
   workOrderFileAttach: [
@@ -141,9 +144,9 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
   }
 
   function printHeader(doc: any, value: WorkOrder) {
-    let bodyItems = []
+    const bodyItems = []
     for (let index = 0; index < value.workOrderUsages.length; index++) {
-      let item = [
+      const item = [
         index + 1,
         value.workOrderUsages[index].itemMaster.code,
         value.workOrderUsages[index].itemMaster.name,

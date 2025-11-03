@@ -49,7 +49,7 @@ export function DataTableToolbar<TData>({
         currency: row.original.currency,
         paymentTerm: row.original.paymentTerm,
         paymentType: row.original.paymentType,
-        venderType: row.original.venderType,
+        venderType: row.original.venderType?.typeName,
         specialIntruction: row.original.specialIntruction,
         address: row.original.address,
         district: row.original.district,
@@ -66,7 +66,8 @@ export function DataTableToolbar<TData>({
       }
     })
 
-    // console.log('export data', rows)
+    //  console.log('data', rows)
+    //  console.log('export data', rowData)
 
     exportCsv(rowData)
   }

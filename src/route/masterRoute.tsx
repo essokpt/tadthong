@@ -70,6 +70,8 @@ import PurchaseRequestReports from '@/pages/report/purchaseRequest';
 import SaleOrderReports from '@/pages/report/saleOrder';
 import WorkOrderReports from '@/pages/report/workOrder';
 import PurchaseOrderReports from '@/pages/report/purchaseOrder';
+import Expense from '@/pages/expense';
+import { ExpenseForm } from '@/pages/expense/expense-form';
 
 export default [
   {
@@ -429,6 +431,16 @@ export default [
     path: '/master/approveWeightScalePrice',
     element: WeightScaleApprove,
     requireRoles: 'approveWeightScalePrice',
+  },
+  {
+    path: '/expense',
+    element: Expense,
+    requireRoles: 'report',
+  },
+   {
+    path: '/expense/new',
+    element: ExpenseForm,
+    requireRoles: 'report',
   },
   
 ];

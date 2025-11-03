@@ -1,12 +1,15 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 //import { AlertModal } from '@/components/custom/alert-modal'
 import { Button } from '@/components/custom/button'
 import { PurchaseOrder } from '../components/schema'
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { ReceiveModal } from './receive-modal'
 import { IconEdit } from '@tabler/icons-react'
 import { ApiContext } from '@/components/layouts/api-context'
 import { ApiType } from 'types/api'
 import usePermission from '@/hooks/use-permission'
+    
+
 
 interface DataTableRowActionsProps {
   row: PurchaseOrder
@@ -71,27 +74,42 @@ const initialValue = {
   purchaseOrderItems: [],
   paymentTerm: '',
   amount: 0,
-  discount :0,  
-  vat :0,
+  discount: 0,
+  vat: 0,
+  nonVat: 0,
+  wt: '',
   approveBy: '',
-  purchaseOrderFileAttach: [{
-    id: 0,
-    fileName: '',
-    path: ''
-}]
+  purchaseOrderFileAttach: [
+    {
+      id: 0,
+      fileName: '',
+      path: '',
+    },
+  ],
 }
-
 
 export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
   const [isEdit, setIsEdit] = useState(false)
   const [editValue, setEditValue] = useState<PurchaseOrder>(initialValue)
   const { setRefresh } = useContext(ApiContext) as ApiType
+  const [enableDate, setenableDate] = useState(false)
+
   const rule: any = usePermission('poReceive')
-  
+
   function updateAction(row: any) {
-    setIsEdit(true)
+    const isOpenReceiptDate = localStorage.getItem('enablePoReceiptDate')
+
     setEditValue(row)
     console.log('update row', row)
+     if (isOpenReceiptDate == 'true') {
+      setenableDate(true)
+
+    } else {
+      setenableDate(false)
+    }
+    console.log('isOpenReceiptDate', isOpenReceiptDate, enableDate);
+
+    setIsEdit(true)
   }
 
   function closeEditModal() {
@@ -99,14 +117,18 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
     setRefresh(true)
   }
 
+  useEffect(() => {
+
+    
+  }, [])
 
   return (
     <>
-      
       <ReceiveModal
         isOpen={isEdit}
         onClose={closeEditModal}
         data={editValue}
+        isOpenReceiptDate={enableDate}
       />
       {/* <AlertModal
         isOpen={open}
@@ -115,15 +137,14 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
         loading={loading}
         title={deleteTitle}
       /> */}
-      <Button 
-      disabled={!rule[0]?.canView}
-      size='icon' 
-      variant='outline' 
-      className='rounded-full bg-primary text-white'
-      onClick={() => updateAction(row)}
+      <Button
+        disabled={!rule[0]?.canView}
+        size='icon'
+        variant='outline'
+        className='rounded-full bg-primary text-white'
+        onClick={() => updateAction(row)}
       >
         <IconEdit size={15} />
-      
       </Button>
       {/* <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>

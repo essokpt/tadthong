@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from '@/components/custom/button'
 import { ImportMaterial } from '../../components/schema'
 import { useContext, useEffect, useState } from 'react'
@@ -76,15 +77,15 @@ export const CellAction: React.FC<DataTableRowActionsProps> = ({ row }) => {
         //   sumWeightIn : summaryItem.sumWeightIn += parseInt(data.materials[index].weightIn),
         //   sumWeightOut : summaryItem.sumWeightOut += parseInt(data.materials[index].weightOut)          
         // })
-          initSum.sumWeightIn += parseInt(data.materials[index].weightIn)
-          initSum.sumWeightOut += parseInt(data.materials[index].weightOut)       
-          initSum.sumHumiduty += parseInt(data.materials[index].col4)
-          initSum.sumadulteration += parseInt(data.materials[index].col5)
-          initSum.sumOther += parseInt(data.materials[index].col6)
-          initSum.sumPrice += parseInt(data.materials[index].priceReceipt)
-          initSum.sumCol7 += parseInt(data.materials[index].sumCol7)
-          initSum.sumShiping += parseInt(data.materials[index].sumCol8)
-          initSum.sumMoney += parseInt( data.materials[index].col9)       
+          initSum.sumWeightIn += parseFloat(data.materials[index].weightIn)
+          initSum.sumWeightOut += parseFloat(data.materials[index].weightOut)       
+          initSum.sumHumiduty += parseFloat(data.materials[index].col4)
+          initSum.sumadulteration += parseFloat(data.materials[index].col5)
+          initSum.sumOther += parseFloat(data.materials[index].col6)
+          initSum.sumPrice += parseFloat(data.materials[index].priceReceipt)
+          initSum.sumCol7 += parseFloat(data.materials[index].sumCol7)
+          initSum.sumShiping += parseFloat(data.materials[index].sumCol8)
+          initSum.sumMoney += parseFloat( data.materials[index].col9)       
      }
      initSum.sumWeightNet = initSum.sumWeightIn - initSum.sumWeightOut
       //Sum น้ำหนักคงเหลือ (Sum น้ำหนักสุทธิ - Sum หักความชื้น - Sum หักสิ่งเจือปน - Sum หักอื่นๆ)

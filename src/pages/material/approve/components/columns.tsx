@@ -3,6 +3,9 @@ import { DataTableColumnHeader } from '@/components/dataTable/data-table-column-
 import { ImportMaterial } from '../../components/schema' 
 import { CellAction } from './cell-action'
 import { format } from 'date-fns'
+import { Badge } from '@/components/ui/badge'
+import { formatCurrency } from '@/lib/utils'
+import { AppStatus } from '@/components/custom/status'
 
 export const columns: ColumnDef<ImportMaterial>[] = [
   
@@ -52,6 +55,24 @@ export const columns: ColumnDef<ImportMaterial>[] = [
         </div>
       )
     },
+  },
+   {
+    accessorKey: 'amount',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title='Amount' />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className='flex space-x-2'>
+          <span className='max-w-32 truncate font-medium sm:max-w-72 md:max-w-[31rem]'>
+            <Badge className='bg-wait hover:bg-wait text-white' variant='default'> 
+              {formatCurrency(row.getValue('amount'))}
+            </Badge>
+           
+          </span>
+        </div>
+      )
+    },
   },  
   {
     accessorKey: 'status',
@@ -63,7 +84,7 @@ export const columns: ColumnDef<ImportMaterial>[] = [
         <div className='flex space-x-2'>
          
           <span className='max-w-32 truncate font-medium sm:max-w-72 md:max-w-[31rem]'>
-            {row.getValue('status')}
+              <AppStatus status={row.original.status?.toLocaleLowerCase()}/>
           </span>
         </div>
       )

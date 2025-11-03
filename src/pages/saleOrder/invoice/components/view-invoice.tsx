@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { Invoice } from './schema'
@@ -22,73 +23,77 @@ import { IconChecklist, IconEye, IconInfoCircle } from '@tabler/icons-react'
 import { EditModal } from '../../components/edit-modal'
 import { SaleOrder } from '../../components/schema'
 import { toCurrency } from '@/lib/utils'
+import { Checkbox } from '@/components/ui/checkbox'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 
 const initialValue = {
   id: 0,
-    code: '',    
-    cause: '',
-    currency: '',
+  code: '',
+  cause: '',
+  currency: '',
+  paymentTerm: '',
+  total: 0,
+  vat: 0,
+  amount: 0,
+  createAt: '',
+  status: '',
+  mergeItem: false,
+  customerId: 0,
+  customer: {
+    code: '',
+    companyName: '',
+    attn: '',
+    address: '',
+    district: '',
+    subDistrict: '',
+    province: '',
+    zipcode: '',
+    country: '',
+    tax: '',
     paymentTerm: '',
-    total: 0,
-    vat: 0,
-    amount : 0, 
-    createAt: '',
-    status: '',      
-    customerId: 0,
-    customer: {
-        code: '',
-        companyName : '',
-        attn:'',
-        address: '',
-        district: '',
-        subDistrict: '',
-        province: '',
-        zipcode: '',
-        country: '',
-        tax: '',
-        paymentTerm: '',
-        customerBillings: {
-            address: '',
-            district: '',
-            subDistrict: '',
-            province: '',
-            zipcode: '',
-            country: '',
-            contactName: '',
-        }
+    customerBillings: {
+      address: '',
+      district: '',
+      subDistrict: '',
+      province: '',
+      zipcode: '',
+      country: '',
+      contactName: '',
     },
-    invoiceItems: [{
-        id: '',
-        saleOrderItems: {
-            id: 0,
-            itemMasterId: 0,
-            itemMaster: {
-                id: 0,
-                code: '',
-                name: '',
-                stockingUom: '',
-                convertFactor: 0
-            },
-            quantity: 0,
-            unitPrice: 0,
-            amount: 0,
-            underCutPrice: 0,
-            cuttingWeight: 0,
-            afterCutPrice: 0,
-            afterCutQuantity: 0,
-            afterAmount: 0,
-            sourceHumidity: 0,
-            destinationHumidity: 0,
-            destinationWeighingScale: '',
-            remark: '',
-             uomType: '',
-            saleOrder: {
-                id: 0,
-                code: ''
-            },
-        }
-    }]     
-       
+  },
+  invoiceItems: [
+    {
+      id: '',
+      saleOrderItems: {
+        id: 0,
+        itemMasterId: 0,
+        itemMaster: {
+          id: 0,
+          code: '',
+          name: '',
+          stockingUom: '',
+          convertFactor: 0,
+        },
+        quantity: 0,
+        unitPrice: 0,
+        amount: 0,
+        underCutPrice: 0,
+        cuttingWeight: 0,
+        afterCutPrice: 0,
+        afterCutQuantity: 0,
+        afterAmount: 0,
+        sourceHumidity: 0,
+        destinationHumidity: 0,
+        destinationWeighingScale: '',
+        remark: '',
+        uomType: '',
+        saleOrder: {
+          id: 0,
+          code: '',
+        },
+      },
+    },
+  ],
 }
 
 const initialSaleOrderValue = {
@@ -104,6 +109,11 @@ const initialSaleOrderValue = {
   driverName: '',
   vat: 0,
   amount: 0,
+  transportationCost: 0,
+  shipTo: '',
+  quota: '',
+  inComplete: false,
+  billingDate: new Date(),
   locationId: 0,
   location: {
     id: 0,
@@ -130,7 +140,7 @@ const initialSaleOrderValue = {
       zipcode: '',
       country: '',
       contactName: '',
-    }
+    },
   },
   userId: 0,
   user: {
@@ -182,6 +192,7 @@ export const ViewInvoice = () => {
   const [data, setData] = useState<Invoice>(initialValue)
   const [isEdit, setIsEdit] = useState(false)
   const [editValue, setEditValue] = useState<SaleOrder>(initialSaleOrderValue)
+  const [isMergeItem, setIsMergeItem] = useState(true)
 
   const { id } = useParams()
 
@@ -208,9 +219,19 @@ export const ViewInvoice = () => {
   //}
 
   useEffect(() => {
-    findInvoiceById(id).then((datas) => setData(datas.invoice))
-    //findInvoiceById(id)
-  }, [])
+    findInvoiceById(id).then((datas) => {
+      setData(datas.invoice)
+      console.log('datas:', datas)
+      if (datas.invoice.mergeItem) {
+        setIsMergeItem(true)
+      } else {
+        setIsMergeItem(false)
+      }
+    })
+  }, [id])
+
+  
+
   return (
     <Layout>
       <LayoutBody className='flex flex-col' fixedHeight>
@@ -309,7 +330,7 @@ export const ViewInvoice = () => {
                     className='py-1 text-[0.8rem] text-muted-foreground'
                     htmlFor='paymentTerm'
                   >
-                    paymentTerm
+                    Payment Term
                   </Label>
                   <Input
                     readOnly
@@ -373,6 +394,40 @@ export const ViewInvoice = () => {
                     //{...register('status')}
                     defaultValue={data.status}
                   />
+                </div>
+                <div>
+                  <RadioGroup
+                    defaultValue={isMergeItem == true ? 'true' : 'false'}
+                    className='flex items-center gap-3'
+                    //onValueChange={handleRadioChange}
+                  >
+                    <div className='flex items-center space-x-2'>
+                      <RadioGroupItem value='true' id='option-one' />
+                      <Label htmlFor='option-one'>Merge items</Label>
+                    </div>
+                    <div className='flex items-center space-x-2'>
+                      <RadioGroupItem value='false' id='option-two' />
+                      <Label htmlFor='option-two'>Separate items</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+                <div className='mt-8 flex items-start space-x-2 space-y-0 rounded-md border p-2 shadow'>
+                  <Checkbox
+                    id='mergeItem'
+                    //  {...register('mergeItem')}
+                    //id={data.id}
+                    // onCheckedChange={() =>
+                    //   onCheckMergeItemFlag(data.mergeItem)
+                    // }
+                    defaultChecked={isMergeItem}
+                  />
+
+                  <label
+                    htmlFor='mergeItem'
+                    className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
+                  >
+                    Merge Item {data.mergeItem ? 'Yes' : 'No'}
+                  </label>
                 </div>
                 <div className='col-span-2 grid'>
                   <Label

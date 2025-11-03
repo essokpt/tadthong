@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import api from '../../config/SetupAxios'
 
 const endpoint = '/Branch'
@@ -8,7 +9,7 @@ export async function getBranch(){
   try {
     const response = await api.get(endpoint);  
     const res = await response.data
-    console.log('getBranch', res);
+   // console.log('getBranch', res);
     return res
   } catch (error) {
     console.error(error);

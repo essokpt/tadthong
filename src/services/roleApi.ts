@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import api from '../../config/SetupAxios'
 
 const endpoint = '/Role'
@@ -18,6 +19,8 @@ export async function getPermissions(){
   try {
     const response = await api.get('/Permission');  
     const res = await response.data
+   console.log('Permission', res);
+    
     return res
   } catch (error) {
     console.error(error);

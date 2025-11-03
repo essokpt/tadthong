@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { ItemEcount } from '@/pages/master/item/components/type';
 import api from '../../config/SetupAxios'
 
 const endpoint = '/ItemMaster'
@@ -8,7 +10,7 @@ export async function getItem(){
   try {
     const response = await api.get(endpoint);  
     const res = await response.data
-    console.log('getItem:',res);
+   // console.log('getItem:',res);
     
     return res
   } catch (error) {
@@ -33,7 +35,7 @@ export async function getItemCategory(){
   try {
     const response = await api.get(`${endpoint}/Category`);  
     const res = await response.data
-    console.log('getItemCategory:',res);
+   // console.log('getItemCategory:',res);
     
     return res
   } catch (error) {
@@ -45,7 +47,7 @@ export async function getItemType(){
   try {
     const response = await api.get(`${endpoint}/Type`);  
     const res = await response.data
-    console.log('getItemType:',res);
+   // console.log('getItemType:',res);
     
     return res
   } catch (error) {
@@ -57,7 +59,7 @@ export async function getItemGroup(){
   try {
     const response = await api.get(`${endpoint}/Group`);  
     const res = await response.data
-    console.log('getItemGroup:',res);
+  //  console.log('getItemGroup:',res);
     
     return res
   } catch (error) {
@@ -69,7 +71,7 @@ export async function getAccountCode(){
   try {
     const response = await api.get(`${endpoint}/AccountCode`);  
     const res = await response.data
-    console.log('getAccountCode:',res);
+ //   console.log('getAccountCode:',res);
     
     return res
   } catch (error) {
@@ -81,7 +83,7 @@ export async function getItemPrice(){
   try {
     const response = await api.get(`${endpoint}/price`);  
     const res = await response.data
-    console.log('getPrice:',res);
+   // console.log('getPrice:',res);
     
     return res
   } catch (error) {
@@ -91,9 +93,9 @@ export async function getItemPrice(){
 
 export async function getItemPriceById(id:any){
   try {
-    console.log('getItemPriceById:',id);
+  //  console.log('getItemPriceById:',id);
     const response = await api.get(`${endpoint}/price/${id}`);  
-    console.log('getPrice:',response);
+   // console.log('getPrice:',response);
     const res = await response.data
    
     
@@ -107,7 +109,7 @@ export async function getItemMaster(){
   try {
     const response = await api.get(`${endpoint}/Master`);  
     const res = await response.data
-    console.log('getItemMaster:',res);
+    //console.log('getItemMaster:',res);
 
     return res
   } catch (error) {
@@ -119,7 +121,7 @@ export async function getItemBom(){
   try {
     const response = await api.get(`${endpoint}/Bom`);  
     const res = await response.data
-    console.log('getItemBom:',res);
+    //console.log('getItemBom:',res);
 
     return res
   } catch (error) {
@@ -206,7 +208,7 @@ export async function updateWipValue(data:any) {
   // console.error('login',data);
    try {
      const response = await api.put(`${endpoint}/WipValue`, data);
-     console.log('updateWipValue',response);
+    // console.log('updateWipValue',response);
      //const res = await response.data
      return response
    } catch (error:any) {
@@ -215,10 +217,9 @@ export async function updateWipValue(data:any) {
  }
 
  export async function UpdateProductionWip(data:any) {
-  // console.error('login',data);
    try {
      const response = await api.put(`${endpoint}/UpdateProductionWip`, data);
-     console.log('UpdateProductionWip',response);
+    // console.log('UpdateProductionWip',response);
      //const res = await response.data
      return response
    } catch (error:any) {
@@ -226,12 +227,25 @@ export async function updateWipValue(data:any) {
    }
  }
 
+ export async function UpdateEcount(data:any) {
+  // console.error('login',data);
+   try {
+     const response = await api.put(`${endpoint}/UpdateItemEcount`, data);
+     const res = await response.data
+     return res
+   } catch (error:any) {
+     return error.response
+   }
+ }
+
+
+
 
 export async function createVenderItem(data:any) {
   // console.error('login',data);
    try {
      const response = await api.post(`${endpoint}/CreateItemVenderList`, data);
-     console.log('create Vender Item',response.status);
+   //  console.log('create Vender Item',response.status);
      const res = await response.data
      return res
    } catch (error:any) {
@@ -244,7 +258,7 @@ export async function updateItemVender(data:any) {
   // console.error('login',data);
    try {
      const response = await api.put(`${endpoint}/Vender`, data);
-     console.log('addItemVender',response.status);
+   //  console.log('addItemVender',response.status);
      return response
    } catch (error) {
      console.error(error);
@@ -257,7 +271,7 @@ export async function createWip(id:number) {
   // console.error('login',data);
    try {
      const response = await api.post(`${endpoint}/CreateWip?itemMasterId=${id}`);
-     console.log('createWip',response);
+  //   console.log('createWip',response);
      //const res = await response.data
      return response
    } catch (error) {
@@ -270,7 +284,7 @@ export async function createItem(data:any) {
    // console.error('login',data);
     try {
       const response = await api.post(endpoint, data);
-      console.log('createCustomer',response.status);
+    //  console.log('createCustomer',response.status);
       const res = await response.data
       return res
     } catch (error) {
@@ -288,18 +302,28 @@ export async function createItem(data:any) {
      {
        headers: headers 
      });
-      console.log('uploadFiles',response.status);
+   //   console.log('uploadFiles',response.status);
       return response.data
     } catch (error) {
       console.error(error);
     }
   }
 
+    export async function createItemEcount(data: ItemEcount[]) {
+    try {    
+      const response = await api.post(`${endpoint}/createItemEcount`, data);
+      // console.log('createItemEcount',response.status);
+      return response.data
+    }catch (error) {
+       console.error(error);
+     }
+  }
+
   export async function updateItem(payload:any) {
     // console.error('login',payload);
      try {
        const response = await api.put(endpoint, payload);
-       console.log('update bom',response.data);
+      // console.log('update bom',response.data);
        return response
      } catch (error) {
        console.error(error);
@@ -310,7 +334,7 @@ export async function deleteItem(id:any) {
   // console.error('login',data);
       try {
         const response = await api.delete(`${endpoint}?id=${id}`);
-        console.log('createCustomer',response.status);
+       // console.log('createCustomer',response.status);
         return response
       } catch (error) {
         console.error(error);
@@ -321,7 +345,7 @@ export async function itemMasterDeleteFileAttach(id:any) {
   // console.error('login',data);
       try {
         const response = await api.delete(`${endpoint}/DeleteFileAttach?id=${id}`);
-        console.log('itemMasterDeleteFileAttach',response.status);
+       // console.log('itemMasterDeleteFileAttach',response.status);
         return response
       } catch (error) {
         console.error(error);
@@ -331,7 +355,18 @@ export async function itemMasterDeleteFileAttach(id:any) {
     export async function deleteVenderitem(id:any) {
       try {
         const response = await api.delete(`${endpoint}/DeleteItemVenderList?id=${id}`);
-        console.log('deleteVenderitem',response.status);
+       // console.log('deleteVenderitem',response.status);
+        return response
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    
+    export async function deleteItemEcount(id:any) {
+      try {
+        const response = await api.delete(`${endpoint}/DeleteItemEcount?id=${id}`);
+       // console.log('deleteVenderitem',response.status);
         return response
       } catch (error) {
         console.error(error);

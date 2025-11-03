@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { HTMLAttributes, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -88,10 +89,11 @@ export function RoleForm({ className, ...props }: SignUpFormProps) {
   const addACLForm = (options: Permission[]) => {
     setResource(options)
     const temp = options.map((data) => {
-      let acl = {
+    const acl = {
         ddid: parseInt(data.id),
         permission: data.name,
         description: data.description,
+        master: data.master,
         canCreate: false,
         canView: false,
         canUpdate: false,
@@ -121,12 +123,10 @@ export function RoleForm({ className, ...props }: SignUpFormProps) {
   async function onSubmit(data: z.infer<typeof formSchema>) {
     setIsLoading(true)
     data.permission = []
-   // console.log('create acl data:', [newPermissionsRole])
    const newselect:any = selectResource()
-    //console.log('onSubmit:', newselect, newPermissionsRole)
+    console.log('onSubmit:', newselect)
 
     const respone = await createRole(data)
-   // console.log('create role res:', respone)
     if (respone.status == 400) {
       setIsLoading(false)
       setNotification(respone.data)
@@ -202,7 +202,6 @@ export function RoleForm({ className, ...props }: SignUpFormProps) {
 
   useEffect(() => {
     getPermissions().then((data) => addACLForm(data))
-    //addACLForm()
   }, [])
 
   return (

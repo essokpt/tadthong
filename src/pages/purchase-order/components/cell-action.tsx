@@ -53,6 +53,8 @@ const initialValue = {
   amount: 0,
   discount: 0,
   vat: 0,
+  nonVat: 0,
+  wt: "",
   vender: {
     code: '',
     companyName: '',

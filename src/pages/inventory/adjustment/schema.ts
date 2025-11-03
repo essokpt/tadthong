@@ -7,7 +7,9 @@ export const schema = z.object({
   date: z.string(),  
   createAt: z.string(),  
   code: z.string(),
+  drawerBy: z.string(),
   remark: z.string(),
+  adjustType: z.string(),
   adjustmentReason: z.object({
     desc : z.string()
   }),

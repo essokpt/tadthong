@@ -10,6 +10,7 @@ export const schema = z.object({
   location: z.object({
     name: z.string(),     
     warehouse: z.object({
+      id: z.number(),
       name: z.string(),      
       branch: z.object({
         name: z.string(),

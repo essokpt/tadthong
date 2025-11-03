@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Layout, LayoutBody } from '@/components/custom/layout'
 // import { DataTable } from './components/data-table'
 import React, { SyntheticEvent, useContext, useEffect, useState } from 'react'
@@ -22,10 +23,11 @@ import { ToolBar } from './toolbar'
 import { Loading } from '@/components/custom/loading'
 import { format } from 'date-fns'
 import { PageHeader } from '@/components/layouts/header'
-import {
-  createInventory,
-  createInventoryHistory,
-} from '@/services/inventoryApi'
+import { toCurrency } from '@/lib/utils'
+// import {
+//   createInventory,
+//   createInventoryHistory,
+// } from '@/services/inventoryApi'
 
 interface ChangeEvent<T = Element> extends SyntheticEvent<T> {
   target: EventTarget & T
@@ -51,39 +53,43 @@ export default function WIP() {
 
   const updateItem = async (item: any) => {
     console.log('updateItem:', item)
+    item.userId = localStorage.getItem('userId')
     const res: any = await updateWipValue(item)
 
-    if (res.status == 200) {
-      console.log('updateItem:', res.data)
+     if (res.status == 200) {
+       console.log('updateItem:', res.data)
+     
       //add to stock onhand
-      const stock = {
-        itemMasterId: res.data.item.id,
-        locationId: res.data.item.locationId,
-        warehouseId: res.data.item.location.warehouseId,
-        branchesId: localStorage.getItem('branchId'),
-        receiveQuantity: res.data.newProductionValue,
-        unit: 'pcs',
-      }
-      console.log('add stock:', [stock])
+      // const stock = {
+      //   itemMasterId: res.data.item.id,
+      //   locationId: res.data.item.locationId,
+      //   warehouseId: res.data.item.location.warehouseId,
+      //   branchesId: localStorage.getItem('branchId'),
+      //   receiveQuantity: res.data.newProductionValue,
+      //   unit: 'pcs',
+      // }
+      // console.log('add stock:', [stock])
 
-      await createInventory([stock])
+     // await createInventory([stock])
 
       //save stock history
-      const history = {
-        StockType: 'WIP',
-        Ref: res.data.item.code,
-        StockBy: localStorage.getItem('user'),
-        ReceiveQuantity: res.data.newProductionValue,
-        Unit: 'pcs',
-        Status: 'WIP',
-        ItemMasterId: res.data.item.id,
-        LocationId: res.data.item.locationId,
-        warehouseId: res.data.item.location.warehouseId,
-        branchesId: localStorage.getItem('branchId'),
-      }
+      // const history = {
+      //   StockType: 'WIP',
+      //   Ref: res.data.item.code,
+      //   StockBy: localStorage.getItem('user'),
+      //   ReceiveQuantity: res.data.newProductionValue,
+      //   Unit: 'pcs',
+      //   Status: 'WIP',
+      //   ItemMasterId: res.data.item.id,
+      //   LocationId: res.data.item.locationId,
+      //   warehouseId: res.data.item.location.warehouseId,
+      //   branchesId: localStorage.getItem('branchId'),
+      // }
 
-      await createInventoryHistory([history])
-      setRefresh(true)
+     // await createInventoryHistory([history])
+     // setRefresh(true)
+         getData(selectedMonth, selectedYear)
+
     }
   }
 
@@ -100,11 +106,11 @@ export default function WIP() {
   }
 
   function handleChangeItemValue(e: ChangeEvent<HTMLInputElement>) {
-    const value: any = parseInt(e.target.value)
+    const value: any = parseFloat(e.target.value)
     data[parseInt(e.target.id)].wips[3].wipValues[
       parseInt(e.target.name)
     ].value = value
-    console.log('handleChangeItemValue name', e.target.name)
+    console.log('handleChangeItemValue name', e.target.value)
   }
 
   const getData = (month: number, year: number) => {
@@ -112,6 +118,7 @@ export default function WIP() {
     console.log('get wip data', month, year)
 
     getWip(month, year).then((data) => {
+      //console.log('getWip data:', data)
       setMonthLabel(data.month)
       setData(data.data)
       setDateOfMonth(data.dateOfMonth)
@@ -121,8 +128,10 @@ export default function WIP() {
   }
 
   const queryData = (str: any) => {
+    console.log('queryData:', str);
+    
     setData([])
-    if (str == '') {
+    if (str == '' ) {
       getData(currentMonth, currentYear)
     } else {
       searchWip(str).then((data) => setData(data))
@@ -130,25 +139,25 @@ export default function WIP() {
   }
 
   const compareDate = (item: any, wipValue: any, level: any, index: any) => {
-    let findValue = wipValue.find((x: any) => x.date == item)
-    let indexValue = wipValue.findIndex((x: any) => x.date == item)
+    const findValue = wipValue.find((x: any) => x.date == item)
+    const indexValue = wipValue.findIndex((x: any) => x.date == item)
     if (findValue) {
       return (
         <TableCell
           className='w-[6rem] items-center text-center hover:bg-none'
-          key={findValue.id}
+          key={ findValue.id}
         >
           {level != 4 ? (
-            findValue.value
+          <span className='mr-6'>{toCurrency(findValue.value)}</span>  
           ) : (
-            <div className='item-right'>
+            <div >
               <Input
                 disabled={parseInt(findValue.value) > 0}
-                className='ml-8 w-[65px] text-right'
+                className=' w-[85px] text-right'
                 type='number'
                 id={index.toString()}
                 name={indexValue.toString()}
-                defaultValue={findValue.value}
+                defaultValue={toCurrency(findValue.value)}
                 onChange={handleChangeItemValue}
               />
               <Button

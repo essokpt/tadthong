@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { HTMLAttributes, SyntheticEvent, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as xlsx from 'xlsx'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/custom/button'
-import { cn } from '@/lib/utils'
+import { cn, convertTimeString, formatCurrency } from '@/lib/utils'
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -30,13 +31,16 @@ import { MaterilalType } from './type'
 import { Separator } from '@/components/ui/separator'
 import { createMaterial, createMaterialItem } from '@/services/materialApi'
 import { format } from 'date-fns'
-
+//import Papa from 'papaparse'
 import { getLocation } from '@/services/locationApi'
 import { LocationType } from '@/pages/location/components/type'
 import { IconTrash } from '@tabler/icons-react'
 import { PageHeader } from '@/components/layouts/header'
 import { IconPencilPlus } from '@tabler/icons-react'
-import { getWeightScaleVenderItems } from '@/services/weightScaleApi'
+//import { getWeightScaleVenderItems } from '@/services/weightScaleApi'
+import { VenderType } from '@/pages/master/vender/components/type'
+import { getVenders } from '@/services/vendersApi'
+//import { usePapaParse } from 'react-papaparse'
 
 interface SignUpFormProps extends HTMLAttributes<HTMLDivElement> {}
 
@@ -44,26 +48,28 @@ interface ChangeEvent<T = Element> extends SyntheticEvent<T> {
   target: EventTarget & T
 }
 
-interface WeightScalePriceItems {
-  id: number
-  price: number
-  itemMaster: {
-    id: number
-    code: string
-    name: string
-  }
-  venderType: {
-    id: number
-    typeName: string
-    description: string
-  }
-}
+// interface WeightScalePriceItems {
+//   id: number
+//   price: number
+//   itemMaster: {
+//     id: number
+//     code: string
+//     name: string
+//   }
+//   venderType: {
+//     id: number
+//     typeName: string
+//     description: string
+//   }
+// }
 
 export function MaterialForm({ className, ...props }: SignUpFormProps) {
   const [material, setMaterial] = useState<MaterilalType[]>([])
-  const [weitghtScalePrice, setWeitghtScalePrice] = useState<
-    WeightScalePriceItems[]
-  >([])
+  const [venders, setVender] = useState<VenderType[]>([])
+ // const { jsonToCSV } = usePapaParse()
+  // const [weitghtScalePrice, setWeitghtScalePrice] = useState<
+  //   WeightScalePriceItems[]
+  // >([])
 
   const [locations, setLocation] = useState<LocationType[]>([])
   const [selectLocation, setSelectLocation] = useState('')
@@ -71,52 +77,82 @@ export function MaterialForm({ className, ...props }: SignUpFormProps) {
   const [alertMessage, setAlertMessage] = useState('')
   const [isImport, setIsImport] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  //const [csvData, setCsvData] = useState<any[]>([])
 
   const navigate = useNavigate()
   const { handleSubmit, register } = useForm()
 
-  const checkProductCode = (code: string, price: number) => {
-    let isCode = 500
+  // const checkProductCode = (code: string, price: number) => {
+  //   let isCode = 500
 
-    for (let index = 0; index < weitghtScalePrice.length; index++) {
-      console.log(
-        'check product code:',
-        weitghtScalePrice[index].itemMaster.code,
-        code
-      )
-      if (weitghtScalePrice[index].itemMaster.code === code) {
-        console.log(
-          'existing product code',
-          weitghtScalePrice[index].itemMaster.code
-        )
+  //   console.log('all product', weitghtScalePrice)
 
-        if (weitghtScalePrice[index].price == price) {
-          console.log(' match', code, price)
-        } else {
-          console.log('price not match', weitghtScalePrice[index].price, price)
-          return isCode
-        }
-        isCode = 200
-        break
-      } else {
-        console.log('no product code:', code)
-        return isCode
-      }
-    }
-    return isCode
-  }
+  //   for (let index = 0; index < weitghtScalePrice.length; index++) {
+  //     console.log(
+  //       'check product code:',
+  //       weitghtScalePrice[index].itemMaster.code,
+  //       code
+  //     )
+  //     if (weitghtScalePrice[index].itemMaster.code === code) {
+  //       console.log(
+  //         'existing product code',
+  //         weitghtScalePrice[index].itemMaster.code
+  //       )
+
+  //       if (weitghtScalePrice[index].price == price) {
+  //         console.log(' match', code, price)
+  //       } else {
+  //         console.log('price not match', weitghtScalePrice[index].price, price)
+  //         return isCode
+  //       }
+  //       isCode = 200
+  //       break
+  //     } else {
+  //       console.log('no product code:', code)
+  //       return isCode
+  //     }
+  //   }
+  //   return isCode
+  // }
+  // const checkCsvType = (file: any) => {
+  //   if (file) {
+  //     Papa.parse(file, {
+  //       header: true, // Set to true if your CSV has a header row
+  //       skipEmptyLines: true,
+  //       encoding: 'UTF-8',
+
+  //       complete: (results) => {
+  //         if (results.meta.delimiter === ',') {
+  //           console.log('File is comma-delimited!')
+  //           console.log('csv data', results.data)
+  //           setCsvData(results.data)
+  //          // return results.data
+  //           // handleConvert(file)
+  //         } else {
+  //           console.log(
+  //             'File is not comma-delimited (or uses a different delimiter).'
+  //           )
+  //          // return file
+  //         }
+  //       },
+  //       error: (error) => {
+  //         console.error('Error parsing CSV:', error)
+  //       },
+  //     })
+  //   }
+  // }
 
   const handleImport = (e: ChangeEvent<HTMLInputElement>) => {
     const files: any = e.target.files
-    
-
-    if (files.length) {
+    if (files.length > 0) {
       const file = files[0]
-      console.log('file:', file)
-      setFilename(file.name)
+     // checkCsvType(file)
+
+     // console.log('file:', csvData)
+
       const reader = new FileReader()
       reader.onload = (event: any) => {
-        const wb = xlsx.read(event.target.result)
+        const wb = xlsx.read(event.target.result, { type: 'array' })
         const sheets = wb.SheetNames
         if (sheets.length) {
           const rows: any = xlsx.utils.sheet_to_json(wb.Sheets[sheets[0]], {
@@ -125,13 +161,16 @@ export function MaterialForm({ className, ...props }: SignUpFormProps) {
           const newArray = []
 
           for (let index = 0; index < rows.length; index++) {
-            // console.log('product code:', rows[index][12])
-            const isProductCode: any = checkProductCode(
-              rows[index][12],
-              rows[index][17]
-            )
+            console.log('car no:', rows[index][3])
+
+            // check product code [12] and priceReceipt [17]
+            const isProductCode = 200
+            // const isProductCode: any = checkProductCode(
+            //    rows[index][12],
+            //    rows[index][17]
+            //  )
             if (isProductCode == 200) {
-              let renamedObject: any = Object.assign(
+              const renamedObject: any = Object.assign(
                 {},
                 {
                   importId: rows[index][0],
@@ -139,19 +178,22 @@ export function MaterialForm({ className, ...props }: SignUpFormProps) {
                   cardNo: rows[index][2],
                   carNo: rows[index][3],
                   dateIn: rows[index][4],
-                  timeIn: rows[index][5],
-                  weightIn: rows[index][6],
+                  timeIn: convertTimeString(rows[index][5]),
+                  weightIn: formatCurrency(rows[index][6]),
                   dateOut: rows[index][7],
-                  timeOut: rows[index][8],
-                  weightOut: rows[index][9],
+                  timeOut: convertTimeString(rows[index][8]),
+                  weightOut: formatCurrency(rows[index][9]),
                   typeCode: rows[index][10],
                   customerCode: rows[index][11],
-                  productCode: rows[index][12],
+                  paymentType: findVenderPayment(rows[index][11]),
+                  productCode: rows[index][12] ? rows[index][12] : '',
                   col1: rows[index][13],
                   col2: rows[index][14],
                   col3: rows[index][15],
                   remark: rows[index][16],
-                  priceReceipt: rows[index][17],
+                  priceReceipt: rows[index][17]
+                    ? formatCurrency(rows[index][17])
+                    : 0,
                   col4: rows[index][18],
                   col5: rows[index][19],
                   col6: rows[index][20],
@@ -170,7 +212,9 @@ export function MaterialForm({ className, ...props }: SignUpFormProps) {
             } else {
               console.log('product code or price not match, not import data')
               setIsImport(true)
-              setAlertMessage("Product code or price not match, not import data Plesae try again.")
+              setAlertMessage(
+                'Product code or price not match, not import data Plesae try again.'
+              )
               setMaterial([])
               setFilename('')
               e.target.value = ''
@@ -192,13 +236,34 @@ export function MaterialForm({ className, ...props }: SignUpFormProps) {
     setSelectLocation(e.target.value)
   }
 
+  // function convertTimeString(value: any) {
+  //    const totalSeconds = value * 24 * 60 * 60
+  //   // Calculate hours, minutes, and seconds
+  //   const hours = Math.floor(totalSeconds / 3600)
+  //   const minutes = Math.floor((totalSeconds % 3600) / 60)
+  //   const seconds = Math.round(totalSeconds % 60)
+
+  //  const specificTime = new Date(1900, 1, 1, hours, minutes, seconds, 0); // July 1, 2025, 3:30 PM
+  //  // console.log('convertTimeString', specificTime)
+
+  //   const timeString = specificTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+  //   return timeString.toString()
+  // }
+
+  function findVenderPayment(code: string) {
+    const venderData = venders.find((x) => x.code == code.toString())
+    console.log('findVenderPayment', code, venderData)
+
+    return venderData ? venderData.paymentType : 'None'
+  }
+
   async function onSubmit(data: any) {
     setIsLoading(true)
     const userid: any = localStorage.getItem('userId')
     const branchid: any = localStorage.getItem('branchId')
-    let today = new Date()
-    let importCode = format(today, 'yyyy-MM-dd')
-    let genCode = importCode.split('-')
+    const today = new Date()
+    const importCode = format(today, 'yyyy-MM-dd')
+    const genCode = importCode.split('-')
     const locationID: any = locations.find(
       (item) => item.name == selectLocation
     )
@@ -232,7 +297,8 @@ export function MaterialForm({ className, ...props }: SignUpFormProps) {
 
   useEffect(() => {
     getLocation().then((data) => setLocation(data))
-    getWeightScaleVenderItems().then((data) => setWeitghtScalePrice(data))
+    // getWeightScaleVenderItems().then((data) => setWeitghtScalePrice(data))
+    getVenders().then((data) => setVender(data))
   }, [])
 
   return (
@@ -255,8 +321,8 @@ export function MaterialForm({ className, ...props }: SignUpFormProps) {
                 </Label>
 
                 <Input
-                 // ref={inputFileRef}
-                 // value={''}
+                  // ref={inputFileRef}
+                  // value={''}
                   id='material'
                   type='file'
                   name='file'
@@ -364,10 +430,11 @@ export function MaterialForm({ className, ...props }: SignUpFormProps) {
                       </TableHead>
                       <TableHead>ประเภท (code1)</TableHead>
                       <TableHead>บริษัท (code2)</TableHead>
+                      <TableHead className='w-[6rem]'>Payment Type</TableHead>
                       <TableHead>สินค้า (code3)</TableHead>
                       <TableHead>การขนส่ง (code4)</TableHead>
-                      <TableHead>ความชื้น% (remark1)</TableHead>
-                      <TableHead>สิ่งเจือปน% (remark2)</TableHead>
+                      <TableHead>ความชื้น% (Work Order)</TableHead>
+                      <TableHead>สิ่งเจือปน% (Quota)</TableHead>
                       <TableHead>หมายเหตุ (remark3)</TableHead>
                       <TableHead>ราคา (price)</TableHead>
                       <TableHead className='w-[6rem]'>
@@ -399,7 +466,6 @@ export function MaterialForm({ className, ...props }: SignUpFormProps) {
                         <TableCell> {item.carNo}</TableCell>
                         <TableCell>{item.dateIn}</TableCell>
                         <TableCell>{item.timeIn}</TableCell>
-
                         <TableCell>{item.weightIn}</TableCell>
                         <TableCell>{item.dateOut}</TableCell>
                         <TableCell>{item.timeOut}</TableCell>
@@ -407,6 +473,7 @@ export function MaterialForm({ className, ...props }: SignUpFormProps) {
                         <TableCell>{item.typeCode}</TableCell>
 
                         <TableCell>{item.customerCode}</TableCell>
+                        <TableCell>{item.paymentType} </TableCell>
                         <TableCell>{item.productCode}</TableCell>
                         <TableCell>{item.col1}</TableCell>
                         <TableCell>{item.col2}</TableCell>
@@ -456,14 +523,14 @@ export function MaterialForm({ className, ...props }: SignUpFormProps) {
           </form>
         </div>
 
-        <AlertDialog open={isImport} onOpenChange={() => setIsImport(!isImport)}>
-        
+        <AlertDialog
+          open={isImport}
+          onOpenChange={() => setIsImport(!isImport)}
+        >
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Warning?</AlertDialogTitle>
-              <AlertDialogDescription>
-                {alertMessage}
-              </AlertDialogDescription>
+              <AlertDialogDescription>{alertMessage}</AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Close</AlertDialogCancel>

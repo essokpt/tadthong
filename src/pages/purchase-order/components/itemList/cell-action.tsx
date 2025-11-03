@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from '@/components/custom/button'
 
 import { PurchaseOrderItems } from './schema'
@@ -34,6 +35,8 @@ const initialValue = {
   amount: 0,
   discount : 0,
   vat : 0,
+  nonVat: 0,
+  wt: "",
   vender: {
     code: '',
     companyName: '',

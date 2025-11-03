@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 import { useContext, useEffect, useState } from 'react'
 import { Button } from '@/components/custom/button'
@@ -66,6 +67,18 @@ import { Calendar } from '@/components/ui/calendar'
 import { ItemModal } from './item-modal'
 import { PurchaseOrderItemType } from './type'
 
+const vatSelect = [
+  { value: 0, name: 'Non vat' },
+  { value: 7, name: '7%' },
+  { value: 0, name: '0%' },
+]
+
+
+const wtProp = [
+  { value: '1%', name: '1%' },
+  { value: '3%', name: '3%' },
+  { value: '5%', name: '5%' },
+]
 interface EditModalProps {
   isOpen: boolean
   onClose: () => void
@@ -138,11 +151,9 @@ export const EditModal: React.FC<EditModalProps> = ({
           data.purchaseOrderFileAttach?.push(response[index])
         }
         console.log('uploadFiles -success', response.status)
-       
       }
       setTimeout(() => {
         setOnloading(false)
-       
       }, 3000)
     }
   }
@@ -190,6 +201,12 @@ export const EditModal: React.FC<EditModalProps> = ({
   function updateItem(row: any) {
     row.itemName = row.itemMaster.name
     row.itemMasterId = row.itemMaster.id.toString()
+    row.discountPercent = row.discountPercent == null ? 0 : row.discountPercent
+    row.discountTotal = row.discountTotal == null ? 0 : row.discountTotal
+    row.discountUnit = row.discountUnit == null ? 0 : row.discountUnit
+    row.amount = row.amount == null ? 0 : row.amount
+
+    row.deliveryDate = row.deliveryDate == null ? '' : row.deliveryDate
 
     setOpenEdit(true)
     setEditValue(row)
@@ -507,6 +524,72 @@ export const EditModal: React.FC<EditModalProps> = ({
                         defaultValue={data.paymentType}
                       />
                     </div>
+                     <div className='grid '>
+                      <Label
+                        className='py-1 text-[0.8rem] text-muted-foreground'
+                        htmlFor='vat'
+                      >
+                        Vat
+                      </Label>
+                       <select
+                        // id={item.id}
+                        // onChange={handleChangeRole}
+                        {...register('vat')}
+                        defaultValue={data.vat}
+                        className='flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1'
+                      >
+                      
+                        {vatSelect.map((item) => (
+                          <option
+                            className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
+                            value={item.value}
+                            key={item.value}
+                          >
+                            {item.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                     {/* <div className='grid '>
+                      <Label
+                        className='py-1 text-[0.8rem] text-muted-foreground'
+                        htmlFor='nonVat'
+                      >
+                        Non Vat
+                      </Label>
+                      <Input
+                        className='text-[0.8rem]'
+                        {...register('nonVat')}
+                        defaultValue={data.nonVat}
+                      />
+                    </div> */}
+                     <div className='grid'>
+                      <Label
+                        className='py-1 text-[0.8rem] text-muted-foreground'
+                        htmlFor='wt'
+                      >
+                        WT
+                      </Label>
+                      <select
+                        // id={item.id}
+                        // onChange={handleChangeRole}
+                        {...register('wt')}
+                        defaultValue={data.wt}
+                        className='flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1'
+                      >
+                      
+                        {wtProp.map((item) => (
+                          <option
+                            className='relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
+                            value={item.value}
+                            key={item.value}
+                          >
+                            {item.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
                     <div className='grid '>
                       <Label
                         className='py-1 text-[0.8rem] text-muted-foreground'
@@ -597,14 +680,20 @@ export const EditModal: React.FC<EditModalProps> = ({
                             <TableCell>{item.specification}</TableCell>
                             <TableCell>{toCurrency(item.quantity)}</TableCell>
                             <TableCell>{toCurrency(item.price)}</TableCell>
-                            <TableCell>{toCurrency(item.discountPercent)}</TableCell>
-                            <TableCell>{toCurrency(item.discountUnit)}</TableCell>
-                            <TableCell>{toCurrency(item.discountTotal)}</TableCell>
+                            <TableCell>
+                              {toCurrency(item.discountPercent)}
+                            </TableCell>
+                            <TableCell>
+                              {toCurrency(item.discountUnit)}
+                            </TableCell>
+                            <TableCell>
+                              {toCurrency(item.discountTotal)}
+                            </TableCell>
                             <TableCell>{toCurrency(item.amount)}</TableCell>
                             <TableCell>{toCurrency(item.vat)}</TableCell>
                             <TableCell>{item.remark}</TableCell>
                             <TableCell>
-                            <div className='flex items-center gap-3'>
+                              <div className='flex items-center gap-3'>
                                 <IconEdit
                                   size={20}
                                   onClick={() => updateItem(item)}
@@ -614,7 +703,6 @@ export const EditModal: React.FC<EditModalProps> = ({
                                   onClick={() => deleteItem(item.id)}
                                 />
                               </div>
-                              
                             </TableCell>
                           </TableRow>
                         ))}
@@ -650,7 +738,6 @@ export const EditModal: React.FC<EditModalProps> = ({
                     </div>
 
                     <FileDrag uploadData={(e) => uploadFile(e)} />
-                   
 
                     <Table className='overflow-scroll'>
                       <TableCaption>A list of file attached.</TableCaption>

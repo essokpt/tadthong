@@ -2,6 +2,7 @@ export interface Permission{
     id: string
     name: string
     description: string
+    master: string
     checked : boolean
   }
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // import { zodResolver } from '@hookform/resolvers/zod'
 // import { z } from 'zod'
 import { SyntheticEvent, useContext, useEffect, useState } from 'react'
@@ -55,6 +56,7 @@ import { MagnifyingGlassIcon } from '@radix-ui/react-icons'
 import { cn } from '@/lib/utils'
 import { PlusCircleIcon } from 'lucide-react'
 import { CreateModal } from './create-modal'
+import { Checkbox } from '@/components/ui/checkbox'
 
 type UserRoleBanch = {
   id: string
@@ -104,6 +106,7 @@ const intial = {
 const formSchema = z.object({
   branch: z.string(),
   roleBranches: z.string(),
+  isSelectPoReciveDate: z.boolean(),
 })
 
 export const EditModal: React.FC<EditModalProps> = ({
@@ -119,7 +122,7 @@ export const EditModal: React.FC<EditModalProps> = ({
   const [deleteId, setDeleteId] = useState(null)
   const [deleteTitle, setdeleteTitle] = useState(null)
   const [onloading, setOnloading] = useState(false)
-  
+
   const [addressThai, setAddressThai] = useState<ThaiAddress[]>()
   const [isOpenAddress, setIsOpenAddress] = useState(false)
   const [editValue, setEditValue] = useState<BranchRole>(intial)
@@ -137,6 +140,18 @@ export const EditModal: React.FC<EditModalProps> = ({
       roleBranches: '',
     },
   })
+
+   function onCheckEnableDateFlag(e: any) {
+    if (e) {
+      data.isSelectPoReciveDate = false
+      //form.setValue('isSelectPoReciveDate', false)
+    } else {
+     data.isSelectPoReciveDate = true
+      //form.setValue('isSelectPoReciveDate', true)
+    }
+
+    console.log('onCheck:', e)
+  }
 
   // async function addUserRoleBranch(user: any) {
   //   setOnloading(true)
@@ -156,13 +171,11 @@ export const EditModal: React.FC<EditModalProps> = ({
   //     setOnloading(false)
   //     form.reset()
   //     setTimeout(() => {
-        
+
   //     }, 1000)
   //   }
   //   setOnloading(false)
   // }
-
- 
 
   const deleteItem = async (item: any) => {
     console.log('delete use role branch', item)
@@ -179,7 +192,7 @@ export const EditModal: React.FC<EditModalProps> = ({
     if (res.status == 200) {
       console.log(res)
       updateUserRoleBranchData(res)
-     
+
       setTimeout(() => {
         //onClose()
       }, 3000)
@@ -207,13 +220,14 @@ export const EditModal: React.FC<EditModalProps> = ({
     // const updateRole = rolebranch.find((i) => i.id == item)
     // console.log('editItem', updateRole)
   }
-  async function updateData(data: any) {
+  async function updateData(payload: any) {
     setOnloading(true)
-    console.log('updateData', data)
-    data.id = parseInt(data.id)
-    console.log('updateData', data)
+    // console.log('updateData', payload)
+    payload.id = parseInt(data.id)
+    console.log('updateData2', payload)
+    payload.isSelectPoReciveDate = data.isSelectPoReciveDate
 
-    const res: any = await updateUserRoleBranch(data)
+    const res: any = await updateUserRoleBranch(payload)
     setOnloading(false)
     if (res.status == 200) {
       if (logoFile) {
@@ -322,7 +336,6 @@ export const EditModal: React.FC<EditModalProps> = ({
 
   useEffect(() => {
     setIsMounted(true)
-   
   }, [])
 
   if (!isMounted) {
@@ -510,6 +523,24 @@ export const EditModal: React.FC<EditModalProps> = ({
                               Inactive
                             </option>
                           </select>
+                        </div>
+                        <div className='mt-7 flex items-start space-x-2 space-y-0 rounded-md border p-2 shadow'>
+                          <Checkbox
+                            id='mergeItem'
+                             {...register('isSelectPoReciveDate')}
+                            //id={data.id}
+                            onCheckedChange={() =>
+                              onCheckEnableDateFlag(data.isSelectPoReciveDate)
+                            }
+                            defaultChecked={data.isSelectPoReciveDate}
+                          />
+
+                          <label
+                            htmlFor='mergeItem'
+                            className=' text-[0.8rem] '
+                          >
+                            Enable PO-Receipt Date
+                          </label>
                         </div>
                       </div>
                       <div className='mb-3 mt-2 grid grid-cols-2 items-start gap-2 space-x-3 space-y-0 rounded-md border p-4 shadow'>
